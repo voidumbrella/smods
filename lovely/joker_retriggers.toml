@@ -303,3 +303,42 @@ pattern = "self.ability.yorick_discards = self.ability.yorick_discards - 1"
 position = "after"
 match_indent = true
 payload = "return nil, true"
+
+# Hallucination
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = "card_eval_status_text(self, 'extra', nil, nil, nil, {message = localize('k_plus_tarot'), colour = G.C.PURPLE})"
+position = "after"
+match_indent = true
+payload = "return nil, true"
+
+## Change card returns
+# Ramen
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''
+message = localize('k_eaten_ex'),
+colour = G.C.FILTER'''
+position = "before"
+match_indent = true
+payload = "card = self,"
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''message = localize{type='variable',key='a_xmult_minus',vars={self.ability.extra}},'''
+position = "before"
+match_indent = true
+payload = "card = self,"
+
+# Yorick
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''
+delay = 0.2,
+message = localize{type='variable',key='a_xmult',vars={self.ability.x_mult}},'''
+position = "before"
+match_indent = true
+payload = "card = self,"

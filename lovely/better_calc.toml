@@ -737,8 +737,10 @@ local effects = {}
 SMODS.calculate_context({discard = true, other_card =  G.hand.highlighted[i], full_hand = G.hand.highlighted}, nil, effects)
 SMODS.trigger_effects(effects, G.hand.highlighted[i])
 for _, eval in pairs(effects) do
-    for key, eval2 in pairs(eval) do
-        if key == 'remove' or (type(eval2) == 'table' and eval2.remove) then removed = true end
+    if type(eval) == 'table' then
+        for key, eval2 in pairs(eval) do
+            if key == 'remove' or (type(eval2) == 'table' and eval2.remove) then removed = true end
+        end
     end
 end'''
 

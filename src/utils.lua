@@ -969,7 +969,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
                     if effect.chip_message then
                         card_eval_status_text(effect.card or effect.focus or scored_card, 'extra', nil, percent, nil, effect.chip_message)
                     else
-                        card_eval_status_text(scored_card, 'chips', amount, percent)
+                        card_eval_status_text(effect.card or effect.focus or scored_card, 'chips', amount, percent)
                     end
                 end
             end
@@ -989,7 +989,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
                     if effect.mult_message then
                         card_eval_status_text(effect.card or effect.focus or scored_card, 'extra', nil, percent, nil, effect.mult_message)
                     else
-                        card_eval_status_text(scored_card, 'mult', amount, percent)
+                        card_eval_status_text(effect.card or effect.focus or scored_card, 'mult', amount, percent)
                     end
                 end
             end
@@ -1004,7 +1004,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
             if effect.dollar_message then
                 card_eval_status_text(effect.card or effect.focus or scored_card, 'extra', nil, percent, nil, effect.dollar_message)
             else
-                card_eval_status_text(scored_card, 'dollars', amount, percent)
+                card_eval_status_text(effect.card or effect.focus or scored_card, 'dollars', amount, percent)
             end
         end
         return true
@@ -1022,7 +1022,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
                     if effect.xmult_message then
                         card_eval_status_text(effect.card or effect.focus or scored_card, 'extra', nil, percent, nil, effect.xmult_message)
                     else
-                        card_eval_status_text(scored_card, 'x_mult', amount, percent)
+                        card_eval_status_text(effect.card or effect.focus or scored_card, 'x_mult', amount, percent)
                     end
                 end
             end
@@ -1182,7 +1182,7 @@ function SMODS.calculate_context(context, percent, return_table)
             context.retrigger_joker = false
         end
         if return_table then 
-            SMODS.merge_lists(return_table, effects)  
+            return_table[#return_table+1] = effects[1]
         else
             SMODS.trigger_effects(effects, _card, percent)
         end
