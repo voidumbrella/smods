@@ -1,7 +1,7 @@
 [manifest]
 version = "1.0.0"
 dump_lua = true
-priority = 0
+priority = -10
 
 ## no_rank, no_suit, all_suits
 
@@ -338,4 +338,3 @@ pattern = "if self.seal == 'Blue' and #G.consumeables.cards + G.GAME.consumeable
 position = "at"
 payload = "if self.seal == 'Blue' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit and not self.ability.extra_enhancement then"
 match_indent = true
-
