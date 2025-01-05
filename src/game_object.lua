@@ -2110,9 +2110,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 end
             }))
             delay(0.3)
-            for i = 1, #G.jokers.cards do
-                G.jokers.cards[i]:calculate_joker({ remove_playing_cards = true, removed = destroyed_cards })
-            end
+            SMODS.calculate_context({ remove_playing_cards = true, removed = destroyed_cards })
         end,
     })
     SMODS.Consumable:take_ownership('familiar', {
@@ -2151,9 +2149,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 end
             }))
             delay(0.3)
-            for i = 1, #G.jokers.cards do
-                G.jokers.cards[i]:calculate_joker({ remove_playing_cards = true, removed = destroyed_cards })
-            end
+            SMODS.calculate_context({ remove_playing_cards = true, removed = destroyed_cards })
         end,
     })
     SMODS.Consumable:take_ownership('incantation', {
@@ -2192,9 +2188,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 end
             }))
             delay(0.3)
-            for i = 1, #G.jokers.cards do
-                G.jokers.cards[i]:calculate_joker({ remove_playing_cards = true, removed = destroyed_cards })
-            end
+            SMODS.calculate_context({ remove_playing_cards = true, removed = destroyed_cards })
+
         end,
     })
     -------------------------------------------------------------------------------------------------
@@ -2609,7 +2604,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         inject = function(self)
             SMODS.Sticker.inject(self)
             G.shared_sticker_eternal = self.sticker_sprite
-        end
+        end,
     }
 
     SMODS.Sticker{
@@ -2630,6 +2625,11 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         inject = function(self)
             SMODS.Sticker.inject(self)
             G.shared_sticker_perishable = self.sticker_sprite
+        end,
+        calculate = function(self, card, context)
+            if context.end_of_round and not context.repetition then
+                card:calculate_perishable()
+            end
         end
     }
 
@@ -2651,6 +2651,11 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         inject = function(self)
             SMODS.Sticker.inject(self)
             G.shared_sticker_rental = self.sticker_sprite
+        end,
+        calculate = function(self, card, context)
+            if context.end_of_round and not context.repetition and not context.individual then
+                card:calculate_rental()
+            end
         end
     }
 
@@ -2862,6 +2867,13 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end,
         loc_vars = function(self)
             return { vars = { self.config.chips } }
+        end,
+        calculate = function(self, card, context)
+            if context.edition or (context.main_scoring and context.cardarea == G.play) then
+                return {
+                    chips = card.edition.chips
+                }     
+            end
         end
     })
     SMODS.Edition:take_ownership('holo', {
@@ -2886,6 +2898,13 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end,
         loc_vars = function(self)
             return { vars = { self.config.mult } }
+        end,
+        calculate = function(self, card, context)
+            if context.edition or (context.main_scoring and context.cardarea == G.play) then
+                return {
+                    mult = card.edition.mult
+                }     
+            end
         end
     })
     SMODS.Edition:take_ownership('polychrome', {
@@ -2910,6 +2929,13 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end,
         loc_vars = function(self)
             return { vars = { self.config.x_mult } }
+        end,
+        calculate = function(self, card, context)
+            if context.edition or (context.main_scoring and context.cardarea == G.play) then
+                return {
+                    x_mult = card.edition.x_mult
+                }     
+            end
         end
     })
     SMODS.Edition:take_ownership('negative', {
