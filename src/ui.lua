@@ -1618,7 +1618,8 @@ function SMODS.GUI.dynamicModListContent(page)
         
         for _, condition in ipairs({
             function(m) return not m.can_load and not m.disabled end,
-            function(m) return m.can_load end,
+            function(m) return m.can_load and m.config_tab end,
+            function(m) return m.can_load and not m.config_tab end,
             function(m) return m.disabled end,
         }) do
             for _, modInfo in ipairs(SMODS.mod_list) do
