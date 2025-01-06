@@ -201,21 +201,26 @@ if context.cardarea == G.play and context.main_scoring then
     if chips then 
         ret.playing_card.chips = chips
     end
+    ret.playing_card.chips = (ret.playing_card.chips or 0) + 20
 
     local mult = card:get_chip_mult()
     if mult then 
         ret.playing_card.mult = mult
     end
+    ret.playing_card.mult = (ret.playing_card.mult or 0) + 20
 
     local x_mult = card:get_chip_x_mult(context)
     if x_mult > 0 then 
         ret.playing_card.x_mult = x_mult
     end
+    ret.playing_card.x_mult = (ret.playing_card.x_mult or 0) + 20
 
     local p_dollars = card:get_p_dollars()
     if p_dollars > 0 then 
         ret.playing_card.p_dollars = p_dollars
     end
+    ret.playing_card.p_dollars = (ret.playing_card.p_dollars or 0) + 20
+    sendInfoMessage(tprint(ret.playing_card))
 
     -- TARGET: main scoring on played cards
 """

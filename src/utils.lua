@@ -1082,18 +1082,25 @@ end
 SMODS.calculate_effect = function(effect, scored_card, percent, from_edition, no_x)
     local calculated = false
     local message = false
-    for key, amount in pairs(effect) do
-        if key == 'message' then
-            message = true
-        elseif key == 'retrigger' then
-        else
-            calculated = SMODS.calculate_individual_effect(effect, scored_card, percent, key, amount, from_edition, no_x)
+    for _, key in ipairs(SMODS.calculation_keys) do
+        if effect[key] then
+            calculated = SMODS.calculate_individual_effect(effect, scored_card, percent, key, effect[key], from_edition, no_x)
             percent = (percent or 0)+0.08
         end
     end
-    if message then calculated = SMODS.calculate_individual_effect(effect, scored_card, percent, 'message', effect.message, from_edition, no_x) end
+    if effect.card then effect.card:juice_up(0.1) end
+    if effect.message then calculated = SMODS.calculate_individual_effect(effect, scored_card, percent, 'message', effect.message, from_edition, no_x) end
     return calculated
 end
+
+SMODS.calculation_keys = {
+    'chips', 'h_chips', 'chip_mod',
+    'mult', 'h_mult', 'mult_mod',
+    'x_mult', 'Xmult', 'xmult', 'x_mult_mod', 'X_mult_mod',
+    'p_dollars', 'dollars', 'h_dollars',
+    'swap', 'level_up', 'func', 'extra',
+    'saved'
+}
 
 SMODS.calculate_repetitions = function(card, context, reps)
     -- From the card
