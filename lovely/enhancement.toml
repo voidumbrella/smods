@@ -257,8 +257,9 @@ match_indent = true
 [patches.pattern]
 target = "functions/state_events.lua"
 pattern = "local effects = {G.hand.cards[i]:get_end_of_round_effect()}"
-position = "after"
+position = "at"
 payload = '''
+local effects = {[1] = {playing_card = G.hand.cards[i]:get_end_of_round_effect()}}
 local extra_enhancements = SMODS.get_enhancements(G.hand.cards[i], true)
 local old_ability = copy_table(G.hand.cards[i].ability)
 local old_center = G.hand.cards[i].config.center
@@ -267,7 +268,7 @@ for k, _ in pairs(extra_enhancements) do
     if G.P_CENTERS[k] then
         G.hand.cards[i]:set_ability(G.P_CENTERS[k])
         G.hand.cards[i].ability.extra_enhancement = k
-        effects[#effects+1] = G.hand.cards[i]:get_end_of_round_effect()
+        effects[#effects+1] = {[1] = {playing_card = G.hand.cards[i]:get_end_of_round_effect()}}
     end
 end
 G.hand.cards[i].ability = old_ability
