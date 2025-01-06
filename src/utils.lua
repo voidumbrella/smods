@@ -997,7 +997,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
         return true
     end
     
-    if (key == 'p_dollars' or key == 'dollars') and amount and (not from_edition or no_x) then 
+    if (key == 'p_dollars' or key == 'dollars' or key == 'h_dollars') and amount and (not from_edition or no_x) then 
         if effect.card then juice_card(effect.card) end
         ease_dollars(amount)
         if not effect.remove_default_message then
