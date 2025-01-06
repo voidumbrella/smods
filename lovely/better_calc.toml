@@ -607,7 +607,7 @@ local effects = {}
 -- remove base game joker edition calc
 local eval = eval_card(_card, {cardarea = G.jokers, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, edition = true})
 for key, effect in pairs(eval) do
-    if key == 'edition' then 
+    if key == 'edition' and not (effect.x_mult or effect.xmult or effect.x_mult_mod or effect.Xmult_mod) then
         eval.smods = {edition = true, no_x = true}
         effects[#effects+1] = eval
     end
@@ -635,7 +635,7 @@ position = "at"
 payload = '''
 -- calculate edition multipliers
 for key, effect in pairs(eval) do
-    if key == 'edition' then
+    if key == 'edition' and (effect.x_mult or effect.xmult or effect.x_mult_mod or effect.Xmult_mod) then
         eval.smods = {edition = true}
         effects[#effects+1] = eval
     end
