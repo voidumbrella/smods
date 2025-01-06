@@ -1171,6 +1171,11 @@ function SMODS.calculate_context(context, percent, return_table)
         local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
         --calculate the joker effects
         local effects = {eval_card(_card, context)}
+        if context.other_joker then
+            for k, v in pairs(effects[1]) do
+                v.other_card = _card
+            end
+        end
         if effects[1].retriggers then
             context.retrigger_joker = true
             for rt = 1, #effects[1].retriggers do
