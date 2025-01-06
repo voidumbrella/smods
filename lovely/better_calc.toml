@@ -391,7 +391,7 @@ if card.ability.set == 'Joker' or card.ability.consumeable then
             end
         end
         if not context.post_trigger and not context.retrigger_joker_check then
-            SMODS.calculate_context({blueprint_card = context.blueprint_card, post_trigger = true, other_joker = card, other_context = context, other_ret = ret}, percent, post_trig)
+            SMODS.calculate_context({blueprint_card = context.blueprint_card, post_trigger = true, other_card = card, other_context = context, other_ret = ret}, percent, post_trig)
         end
     end
 end
