@@ -1096,7 +1096,7 @@ end
 SMODS.calculation_keys = {
     'chips', 'h_chips', 'chip_mod',
     'mult', 'h_mult', 'mult_mod',
-    'x_mult', 'Xmult', 'xmult', 'x_mult_mod', 'X_mult_mod',
+    'x_mult', 'Xmult', 'xmult', 'x_mult_mod', 'Xmult_mod',
     'p_dollars', 'dollars', 'h_dollars',
     'swap', 'level_up', 'func', 'extra',
     'saved'
