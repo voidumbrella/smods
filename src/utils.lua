@@ -1212,16 +1212,16 @@ function SMODS.calculate_context(context, percent, return_table)
                 SMODS.trigger_effects(effects, context.scoring_hand[i], percent)
             end
         end
-        context.cardarea = G.hand
-        for i=1, #G.hand.cards do
-            --calculate the held card effects
-            if return_table then 
-                return_table[#return_table+1] = eval_card(G.hand.cards[i], context)    
-            else
-                local effects = {eval_card(G.hand.cards[i], context)}
-                SMODS.calculate_quantum_enhancements(G.hand.cards[i], effects, context)
-                SMODS.trigger_effects(effects, G.hand.cards[i], percent)
-            end
+    end
+    context.cardarea = G.hand
+    for i=1, #G.hand.cards do
+        --calculate the held card effects
+        if return_table then 
+            return_table[#return_table+1] = eval_card(G.hand.cards[i], context)    
+        else
+            local effects = {eval_card(G.hand.cards[i], context)}
+            SMODS.calculate_quantum_enhancements(G.hand.cards[i], effects, context)
+            SMODS.trigger_effects(effects, G.hand.cards[i], percent)
         end
     end
     local effect = G.GAME.selected_back:trigger_effect(context)

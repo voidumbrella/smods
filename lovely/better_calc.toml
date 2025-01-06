@@ -1349,3 +1349,16 @@ pattern = '''if extra.edition then '''
 position = 'before'
 match_indent = true
 payload = '''sound = extra.sound or sound'''
+
+# Fix purple seal calc
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''
+if context.discard then
+    if self.seal == 'Purple' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then'''
+position = 'at'
+match_indent = true
+payload = '''
+if context.discard and context.other_card == self then
+    if self.seal == 'Purple' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then'''
