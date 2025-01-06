@@ -955,7 +955,7 @@ position = 'at'
 match_indent = true
 payload = '''
 for i=1, #G.jokers.cards + #G.consumeables.cards do
-    local _card = G.jokers.cards[k] or G.consumeables.cards[i - #G.jokers.cards]
+    local _card = G.jokers.cards[i] or G.consumeables.cards[i - #G.jokers.cards]
     local ret = _card:calculate_dollar_bonus()
 
     -- TARGET: calc_dollar_bonus per card
