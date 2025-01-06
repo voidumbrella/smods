@@ -1080,7 +1080,7 @@ for k=1, #G.jokers.cards + #G.consumeables.cards do
 end
 
 if reps[j] == 1 then 
-    reps = SMODS.calculate_repetitions(G.hand.cards[i], {cardarea = G.hand, other_card = G.hand.cards[i], repetition = true, end_of_round = true, card_effects = effects}, {})
+    SMODS.calculate_repetitions(G.hand.cards[i], {cardarea = G.hand, other_card = G.hand.cards[i], repetition = true, end_of_round = true, card_effects = effects}, reps)
 end
 
 SMODS.trigger_effects(effects, G.hand.cards[i], percent)
