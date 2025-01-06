@@ -842,7 +842,14 @@ function Card:calculate_enhancement(context)
 end
 
 function SMODS.get_enhancements(card, extra_only)
-    if card.extra_enhancements then return card.extra_enhancements end
+    if card.extra_enhancements and next(card.extra_enhancements) then
+        if extra_only then
+            local extras = copy_table(card.extra_enhancements)
+            extras[card.config.center.key] = nil
+            return extras
+        end
+        return card.extra_enhancements
+    end
     local enhancements = {}
     if card.config.center.key ~= "c_base" and not extra_only then
         enhancements[card.config.center.key] = true
@@ -864,18 +871,20 @@ function SMODS.get_enhancements(card, extra_only)
     if extra_only and enhancements[card.config.center.key] then
         enhancements[card.config.center.key] = nil
     end
-    card.extra_enhancements = enhancements
+    if next(enhancements) then card.extra_enhancements = enhancements end
     return enhancements
 end
 
 function SMODS.has_enhancement(card, key)
     if card.config.center.key == key then return true end
+    card.extra_enhancements = nil
     local enhancements = SMODS.get_enhancements(card)
     if enhancements[key] then return true end
     return false
 end
 
 function SMODS.shatters(card)
+    card.extra_enhancements = nil
     local enhancements = SMODS.get_enhancements(card)
     for key, _ in pairs(enhancements) do
         if G.P_CENTERS[key].shatters or key == 'm_glass' then return true end
@@ -906,6 +915,7 @@ end
 function SMODS.has_no_suit(card)
     local is_stone = false
     local is_wild = false
+    card.extra_enhancements = nil
     for k, _ in pairs(SMODS.get_enhancements(card)) do
         if k == 'm_stone' or G.P_CENTERS[k].no_suit then is_stone = true end
         if k == 'm_wild' or G.P_CENTERS[k].any_suit then is_wild = true end
@@ -913,16 +923,19 @@ function SMODS.has_no_suit(card)
     return is_stone and not is_wild
 end
 function SMODS.has_any_suit(card)
+    card.extra_enhancements = nil
     for k, _ in pairs(SMODS.get_enhancements(card)) do
         if k == 'm_wild' or G.P_CENTERS[k].any_suit then return true end
     end
 end
 function SMODS.has_no_rank(card)
+    card.extra_enhancements = nil
     for k, _ in pairs(SMODS.get_enhancements(card)) do
         if k == 'm_stone' or G.P_CENTERS[k].no_rank then return true end
     end
 end
 function SMODS.always_scores(card)
+    card.extra_enhancements = nil
     for k, _ in pairs(SMODS.get_enhancements(card)) do
         if k == 'm_stone' or G.P_CENTERS[k].always_scores then return true end
     end
