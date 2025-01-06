@@ -2627,7 +2627,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             G.shared_sticker_perishable = self.sticker_sprite
         end,
         calculate = function(self, card, context)
-            if context.end_of_round and not context.repetition then
+            if context.end_of_round and not context.repetition and not context.individual then
                 card:calculate_perishable()
             end
         end
