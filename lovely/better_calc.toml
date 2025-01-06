@@ -131,6 +131,8 @@ if next(effects) then
         local eval = eval_card(_card, {cardarea = G.hand, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_card = G.hand.cards[i], individual = true})
         if next(eval) then 
             mod_percent = true
+            eval.juice_card = eval.card
+            eval.card = nil
             table.insert(effects, eval)
             if eval.retriggers then
                 for rt = 1, #eval.retriggers do
@@ -1039,6 +1041,8 @@ for k=1, #G.jokers.cards + #G.consumeables.cards do
     local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
     --calculate the joker individual card effects
     local eval = eval_card(_card, {cardarea = G.hand, other_card = G.hand.cards[i], individual = true, end_of_round = true})
+    eval.juice_card = eval.card
+    eval.card = nil
     if next(eval) then 
         table.insert(effects, eval)
     end
