@@ -1323,3 +1323,12 @@ match_indent = true
 payload = '''
 if context.discard and context.other_card == self then
     if self.seal == 'Purple' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then'''
+
+# Fix context.blueprint persisting
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+match_indent = true
+position = 'after'
+pattern = 'local other_joker_ret = other_joker:calculate_joker(context)'
+payload = 'context.blueprint = nil'
