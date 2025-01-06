@@ -138,7 +138,6 @@ if next(effects) then
         if next(eval) then 
             mod_percent = true
             eval.juice_card = eval.card
-            eval.card = nil
             table.insert(effects, eval)
             if next(post) then
                 for _, v in ipairs(post) do
@@ -711,7 +710,7 @@ for _, _joker in ipairs(G.jokers.cards) do
     local joker_eval,post = eval_card(_joker, {full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_joker = _card})
     if next(joker_eval) then
         if joker_eval.edition then joker_eval.edition = {} end
-        joker_eval.jokers.other_card = _joker
+        joker_eval.jokers.juice_card = _joker
         table.insert(effects, joker_eval)
         if next(post) then
             for _, v in ipairs(post) do
@@ -1068,7 +1067,6 @@ for k=1, #G.jokers.cards + #G.consumeables.cards do
     --calculate the joker individual card effects
     local eval, post = eval_card(_card, {cardarea = G.hand, other_card = G.hand.cards[i], individual = true, end_of_round = true})
     eval.juice_card = eval.card
-    eval.card = nil
     if next(eval) then 
         table.insert(effects, eval)
     end
