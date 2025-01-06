@@ -194,12 +194,12 @@ payload = """
 if context.cardarea == G.play and context.main_scoring then
     ret.playing_card = {}
     local chips = card:get_chip_bonus()
-    if chips then 
+    if chips ~= 0 then 
         ret.playing_card.chips = chips
     end
 
     local mult = card:get_chip_mult()
-    if mult then 
+    if mult ~= 0 then 
         ret.playing_card.mult = mult
     end
 
@@ -236,7 +236,7 @@ payload = """
 if context.cardarea == G.hand and context.main_scoring then
     ret.playing_card = {}
     local h_mult = card:get_chip_h_mult()
-    if h_mult then 
+    if h_mult ~= 0 then 
         ret.playing_card.h_mult = h_mult
     end
 
