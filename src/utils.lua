@@ -1063,6 +1063,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
 
     if key == 'level_up' then
         level_up_hand(scored_card, G.GAME.last_hand_played, effect.instant, type(amount) == 'number' and amount or 1)
+        return true
     end
 
     if key == 'extra' then
@@ -1075,6 +1076,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
 
     if key == 'saved' then
         SMODS.saved = amount
+        return true
     end
 end
 
