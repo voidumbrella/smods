@@ -956,8 +956,8 @@ end
 
 -- This function handles the calculation of each effect returned to evaluate play.
 -- Can easily be hooked to add more calculation effects ala Talisman
-SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, amount, from_edition, no_x)
-    if (key == 'chips' or key == 'h_chips' or key == 'chip_mod') and amount and (not from_edition or no_x) then 
+SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, amount, from_edition)
+    if (key == 'chips' or key == 'h_chips' or key == 'chip_mod') and amount then 
         if effect.card then juice_card(effect.card) end
         hand_chips = mod_chips(hand_chips + amount)
         update_hand_text({delay = 0}, {chips = hand_chips, mult = mult})
@@ -977,7 +977,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
         return true
     end
 
-    if (key == 'mult' or key == 'h_mult' or key == 'mult_mod') and amount and (not from_edition or no_x) then 
+    if (key == 'mult' or key == 'h_mult' or key == 'mult_mod') and amount then 
         if effect.card then juice_card(effect.card) end
         mult = mod_mult(mult + amount)
         update_hand_text({delay = 0}, {chips = hand_chips, mult = mult})
@@ -997,7 +997,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
         return true
     end
     
-    if (key == 'p_dollars' or key == 'dollars' or key == 'h_dollars') and amount and (not from_edition or no_x) then 
+    if (key == 'p_dollars' or key == 'dollars' or key == 'h_dollars') and amount then 
         if effect.card then juice_card(effect.card) end
         ease_dollars(amount)
         if not effect.remove_default_message then
@@ -1010,7 +1010,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
         return true
     end
     
-    if (key == 'x_mult' or key == 'xmult' or key == 'x_mult_mod' or key == 'Xmult_mod') and amount ~= 1 and (not from_edition or not no_x) then 
+    if (key == 'x_mult' or key == 'xmult' or key == 'x_mult_mod' or key == 'Xmult_mod') and amount ~= 1 then 
         if effect.card then juice_card(effect.card) end
         mult = mod_mult(mult * amount)
         update_hand_text({delay = 0}, {chips = hand_chips, mult = mult})
@@ -1030,17 +1030,17 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
         return true
     end
 
-    if key == 'message' and (not from_edition or no_x) then
+    if key == 'message' then
         card_eval_status_text(effect.other_card or scored_card or effect.card or effect.focus, 'extra', nil, percent, nil, effect)
         return true
     end
 
-    if key == 'func' and (not from_edition or no_x) then
+    if key == 'func' then
         effect.func()
         return true
     end
 
-    if key == 'swap' and (not from_edition or no_x) then 
+    if key == 'swap' then 
         local old_mult = mult
         mult = mod_mult(hand_chips)
         hand_chips = mod_chips(old_mult)
@@ -1048,11 +1048,11 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
         return true
     end
 
-    if key == 'level_up' and (not from_edition or no_x) then
+    if key == 'level_up' then
         level_up_hand(scored_card, G.GAME.last_hand_played, effect.instant, type(amount) == 'number' and amount or 1)
     end
 
-    if key == 'extra' and (not from_edition or no_x) then
+    if key == 'extra' then
         local extra_calc = false
         for key_ex, amount_ex in pairs(amount) do
             extra_calc = SMODS.calculate_individual_effect(amount, scored_card, percent, key_ex, amount_ex)
@@ -1071,7 +1071,7 @@ SMODS.trigger_effects = function(effects, card, percent)
         for key, effect in pairs(effect_table) do
             if key ~= 'smods' then
                 if type(effect) == 'table' then
-                    local calc = SMODS.calculate_effect(effect, card, percent, effect_table.smods and effect_table.smods.edition, effect_table.smods and effect_table.smods.no_x)
+                    local calc = SMODS.calculate_effect(effect, card, percent, key == 'edition')
                     if calc then effects.calculated = true end
                 end
             end
@@ -1079,17 +1079,17 @@ SMODS.trigger_effects = function(effects, card, percent)
     end
 end
 
-SMODS.calculate_effect = function(effect, scored_card, percent, from_edition, no_x)
+SMODS.calculate_effect = function(effect, scored_card, percent, from_edition, pre_jokers)
     local calculated = false
     local message = false
     for _, key in ipairs(SMODS.calculation_keys) do
         if effect[key] then
-            calculated = SMODS.calculate_individual_effect(effect, scored_card, percent, key, effect[key], from_edition, no_x)
+            calculated = SMODS.calculate_individual_effect(effect, scored_card, percent, key, effect[key], from_edition, pre_jokers)
             percent = (percent or 0)+0.08
         end
     end
     if effect.card then effect.card:juice_up(0.1) end
-    if effect.message then calculated = SMODS.calculate_individual_effect(effect, scored_card, percent, 'message', effect.message, from_edition, no_x) end
+    if effect.message then calculated = SMODS.calculate_individual_effect(effect, scored_card, percent, 'message', effect.message, from_edition, pre_jokers) end
     return calculated
 end
 
