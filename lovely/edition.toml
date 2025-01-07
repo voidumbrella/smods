@@ -62,9 +62,24 @@ if G.P_CENTERS[v] and G.P_CENTERS[v].set == 'Edition' then
     info_queue[#info_queue + 1] = G.P_CENTERS[v]
 end
 if G.P_CENTERS['e_'..v] and G.P_CENTERS['e_'..v].set == 'Edition' then
-    info_queue[#info_queue + 1] = G.P_CENTERS['e_'..v]
+    local t = {key = 'e_'..v, set = 'Edition', config = {}}
+    info_queue[#info_queue + 1] = t
+    if G.P_CENTERS['e_'..v].loc_vars and type(G.P_CENTERS['e_'..v].loc_vars) == 'function' then
+        local res = G.P_CENTERS['e_'..v]:loc_vars(info_queue, card) or {}
+        t.vars = res.vars
+        t.key = res.key or t.key
+        t.set = res.set or t.set
+    end
 end'''
 line_prepend = "$indent"
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+pattern = '''localize{type = 'descriptions', key = _c.key, set = _c.set, nodes = desc_nodes, vars = loc_vars}'''
+position = 'at'
+match_indent = true
+payload = '''localize{type = 'descriptions', key = _c.key, set = _c.set, nodes = desc_nodes, vars = _c.vars or loc_vars}'''
+
 
 # get_badge_colour()
 [[patches]]
