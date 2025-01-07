@@ -342,3 +342,23 @@ message = localize{type='variable',key='a_xmult',vars={self.ability.x_mult}},'''
 position = "before"
 match_indent = true
 payload = "card = self,"
+
+# To Do List
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''message = localize('$')..self.ability.extra.dollars,
+    dollars = self.ability.extra.dollars,'''
+position = "at"
+match_indent = true
+payload = '''message = localize('$')..self.ability.extra.dollars,'''
+
+# Matador
+[[patches]]
+[patches.pattern]
+target = "card.lua"
+pattern = '''message = localize('$')..self.ability.extra,
+    dollars = self.ability.extra,'''
+position = "at"
+match_indent = true
+payload = '''message = localize('$')..self.ability.extra.dollars,'''
