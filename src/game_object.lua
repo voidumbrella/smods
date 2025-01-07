@@ -2627,7 +2627,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             G.shared_sticker_perishable = self.sticker_sprite
         end,
         calculate = function(self, card, context)
-            if context.end_of_round and not context.repetition then
+            if context.end_of_round and not context.repetition and not context.individual then
                 card:calculate_perishable()
             end
         end
@@ -2869,7 +2869,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             return { vars = { self.config.chips } }
         end,
         calculate = function(self, card, context)
-            if context.edition or (context.main_scoring and context.cardarea == G.play) then
+            if context.pre_joker or (context.main_scoring and context.cardarea == G.play) then
                 return {
                     chips = card.edition.chips
                 }     
@@ -2900,7 +2900,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             return { vars = { self.config.mult } }
         end,
         calculate = function(self, card, context)
-            if context.edition or (context.main_scoring and context.cardarea == G.play) then
+            if context.pre_joker or (context.main_scoring and context.cardarea == G.play) then
                 return {
                     mult = card.edition.mult
                 }     
@@ -2931,7 +2931,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             return { vars = { self.config.x_mult } }
         end,
         calculate = function(self, card, context)
-            if context.edition or (context.main_scoring and context.cardarea == G.play) then
+            if context.post_joker or (context.main_scoring and context.cardarea == G.play) then
                 return {
                     x_mult = card.edition.x_mult
                 }     
