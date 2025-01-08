@@ -3,7 +3,7 @@
 
 function initializeSocketConnection()
     local socket = require("socket")
-    client = socket.connect("localhost", 12345)
+    client = socket.connect("localhost", 53153)
     if not client then
         print("Failed to connect to the debug server")
     end
