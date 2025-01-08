@@ -257,7 +257,9 @@ function SMODS.juice_up_blind()
     G.GAME.blind:juice_up()
 end
 
+-- @deprecated
 function SMODS.eval_this(_card, effects)
+    sendWarnMessage('SMODS.eval_this is deprecated. All calculation stages now support returning effects directly. Effects evaluated using this function are out of order and may not use the correct sound pitch.', 'Util')
     if effects then
         local extras = { mult = false, hand_chips = false }
         if effects.mult_mod then
@@ -273,7 +275,8 @@ function SMODS.eval_this(_card, effects)
         if effects.message then
             card_eval_status_text(_card, 'jokers', nil, nil, nil, effects)
         end
-        percent = percent + 0.08
+        -- percent = percent + 0.08
+        -- Removed because it's not used and crashes for contexts outside of evaluate_play
     end
 end
 
