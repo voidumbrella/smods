@@ -68,7 +68,8 @@ for i, s in ipairs(SMODS.Suit:obj_list(true)) do
     local options = G.COLLABS.options[s.key]
     for i = 1, #options do
         local skin = SMODS.DeckSkins[options[i]]
-        for j = 1, #skin.ranks do
+        local ranks = skin.display_ranks or skin.ranks
+        for j = 1, #ranks do
             if not lookup[skin.ranks[j]] then
                 lookup[skin.ranks[j]] = true
                 rankCount = rankCount + 1
