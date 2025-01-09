@@ -983,6 +983,18 @@ SMODS.get_deckskin = function(key, suit)
     end
 end
 
+SMODS.get_deckskin_palette = function(key, palette_key, suit)
+    for k, v in pairs(SMODS.DeckSkins) do
+        if v.suit == suit and v.key == key and v.palettes then
+            for i, p in ipairs(v.palettes) do
+                if p.key == palette_key then
+                    return p
+                end
+            end
+        end
+    end
+end
+
 local function bufferCardLimitForSmallDS(cards, scaleFactor)
     local cardCount = #cards
     if type(scaleFactor) ~= "number" or scaleFactor <= 0 then
@@ -1011,7 +1023,7 @@ G.FUNCS.update_collab_cards = function(key, suit, silent)
     local cards_order = {}
     local deckskin = SMODS.get_deckskin(key, suit)
     local smodSuit = SMODS.Suits[suit]
-    local d_ranks = deckskin.display_ranks or deckskin.ranks
+    local d_ranks = SMODS.get_deckskin_palette(deckskin.key, G.SETTINGS.colourpalettes[suit], suit).ranks or deckskin.display_ranks or deckskin.ranks
     for i, r in ipairs(d_ranks) do
         local r = d_ranks[i]
         local rank = SMODS.Ranks[r]

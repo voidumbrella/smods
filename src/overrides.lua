@@ -1672,3 +1672,22 @@ G.FUNCS.change_collab = function(args)
 	end
 	G:save_settings()
 end
+
+print_atlas_pos = function(atlas, pos)
+	sendDebugMessage("atlas: "..atlas)
+	sendDebugMessage("pos:")
+	sendDebugMessage(tprint(pos))
+end
+
+G.FUNCS.refresh_contrast_mode = function()
+	local new_colour_proto = G.C["SO_"..(G.SETTINGS.colourblind_option and 2 or 1)]
+	G.C.SUITS.Hearts = new_colour_proto.Hearts
+	G.C.SUITS.Diamonds = new_colour_proto.Diamonds
+	G.C.SUITS.Spades = new_colour_proto.Spades
+	G.C.SUITS.Clubs = new_colour_proto.Clubs
+	for k, v in pairs(G.I.CARD) do
+		if v.config and v.config.card and v.children.front and v.ability.effect ~= 'Stone Card' then
+			v:set_sprites(nil, v.config.card)
+		end
+	end
+end
