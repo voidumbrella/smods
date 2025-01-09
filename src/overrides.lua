@@ -1661,3 +1661,14 @@ end
 function playing_card_joker_effects(cards)
 	SMODS.calculate_context({playing_card_added = true, cards = cards})
 end
+
+G.FUNCS.change_collab = function(args)
+	G.SETTINGS.CUSTOM_DECK.Collabs[args.cycle_config.curr_suit] = G.COLLABS.options[args.cycle_config.curr_suit][args.to_key] or 'default'
+	G.FUNCS.update_collab_cards(args.to_key, args.cycle_config.curr_suit)
+	for k, v in pairs(G.I.CARD) do
+		if v.config and v.config.card and v.children.front and v.ability.effect ~= 'Stone Card' then
+			v:set_sprites(nil, v.config.card)
+		end
+	end
+	G:save_settings()
+end

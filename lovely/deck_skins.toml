@@ -24,12 +24,18 @@ if _front and _front.suit and G.SETTINGS.CUSTOM_DECK and G.SETTINGS.CUSTOM_DECK.
             if hasRank then
                 local atlas = G.ASSET_ATLAS[G.SETTINGS.colourblind_option and deckSkin.hc_atlas or deckSkin.lc_atlas]
                 if atlas then
-                    if  deckSkin.posStyle == 'collab' then
+                    if deckSkin.posStyle == 'collab' then
                         return atlas, G.COLLABS.pos[_front.value]
                     elseif deckSkin.posStyle == 'suit' then
                         return atlas, { x = _front.pos.x, y = 0}
                     elseif deckSkin.posStyle == 'deck' then
                         return atlas, _front.pos
+                    elseif deckSkin.posStyle == 'ranks' or nil then
+                        for i, rank in ipairs(deckSkin.ranks) do
+                            if rank == _front.value then
+                                return atlas, { x = i - 1, y = 0}
+                            end
+                        end
                     end
                 end
             end
@@ -37,6 +43,16 @@ if _front and _front.suit and G.SETTINGS.CUSTOM_DECK and G.SETTINGS.CUSTOM_DECK.
     end
 end
 '''
+
+[[patches]]
+[patches.pattern]
+target = "functions/UI_definitions.lua"
+pattern = "{n=G.UIT.O, config={object = face_cards}}"
+position = "at"
+payload = "{n=G.UIT.O, config={object = cdds_cards}}"
+match_indent = true
+overwrite = false
+
 #=======================#
 # Extend custom deck ui #
 #=======================#
@@ -46,10 +62,10 @@ target = "functions/UI_definitions.lua"
 pattern = '''local face_cards = CardArea\(([\s\S]*?)\)'''
 position = "at"
 payload = '''
-local rankCount = 0
+rankCount = 0
 local lookup = {}
 local options = G.COLLABS.options[_suit]
-for i = 2, #options do
+for i = 1, #options do
     local skin = SMODS.DeckSkins[options[i]]
     for j = 1, #skin.ranks do
         if not lookup[skin.ranks[j]] then
@@ -59,7 +75,14 @@ for i = 2, #options do
     end
 end
 
-local face_cards = CardArea(
+sendDebugMessage("RANK COUNT:")
+sendDebugMessage(rankCount)
+sendDebugMessage("CURRENT WIDTH:")
+sendDebugMessage(math.min(math.max(rankCount*G.CARD_W*0.6, 4*G.CARD_W), 10*G.CARD_W))
+sendDebugMessage("MAX WIDTH:")
+sendDebugMessage(10*G.CARD_W)
+
+cdds_cards = CardArea(
     0,0,
     math.min(math.max(rankCount*G.CARD_W*0.6, 4*G.CARD_W), 10*G.CARD_W),
     1.4*G.CARD_H, 
@@ -72,23 +95,7 @@ target = "functions/UI_definitions.lua"
 pattern = '''for i = 1, 3 do([\s\S]*?)end'''
 position = "at"
 payload = '''
-local rank = SMODS.Ranks['2']
-local cards = {}
-local smodSuit = SMODS.Suits[_suit]
-repeat
-    if lookup[rank.key] then
-        local card_code = smodSuit.card_key .. '_' .. rank.card_key
-        local card = Card(0,0, G.CARD_W*1.2, G.CARD_H*1.2, G.P_CARDS[card_code], G.P_CENTERS.c_base)
-        card.no_ui = true
-        
-        cards[#cards + 1] = card
-    end
-    rank = SMODS.Ranks[rank.next[1]]
-until rank == SMODS.Ranks['2']
-
-for i = #cards, 1, -1 do
-    face_cards:emplace(cards[i])
-end
+G.FUNCS.update_collab_cards(current_option, _suit)
 '''
 
 [[patches]]

@@ -975,7 +975,70 @@ SMODS.find_mod = function(id)
     return ret
 end
 
+SMODS.get_deckskin = function(key, suit)
+    for k, v in pairs(SMODS.DeckSkins) do
+        if v.suit == suit and v.key == key then
+            return v
+        end
+    end
+end
 
+local function bufferCardLimitForSmallDS(cards, scaleFactor)
+    local cardCount = #cards
+    if type(scaleFactor) ~= "number" or scaleFactor <= 0 then
+        sendWarnMessage("scaleFactor must be a positive number")
+        return cardCount
+    end
+    -- Ensure card_limit is always at least the number of cards
+    cdds_cards.config.card_limit = math.max(cdds_cards.config.card_limit, cardCount)
+    -- Calculate the buffer size dynamically based on the scale factor
+    local buffer = 0
+    if cardCount < rankCount then
+        -- Buffer decreases as cardCount approaches rankCount, modulated by scaleFactor
+        buffer = math.ceil(((rankCount - cardCount) / scaleFactor))
+    end
+    cdds_cards.config.card_limit = math.max(cardCount, cardCount + buffer)
+
+    return cdds_cards.config.card_limit
+end
+
+G.FUNCS.update_collab_cards = function(key, suit)
+    if type(key) == "number" then
+        key = G.COLLABS.options[suit][key]
+    end
+    if not cdds_cards then return end
+    local cards = {}
+    local cards_order = {}
+    local deckskin = SMODS.get_deckskin(key, suit)
+    local smodSuit = SMODS.Suits[suit]
+    for i, r in ipairs(deckskin.ranks) do
+        local r = deckskin.ranks[i]
+        local rank = SMODS.Ranks[r]
+        local card_code = smodSuit.card_key .. '_' .. rank.card_key
+        cards_order[#cards_order+1] = card_code
+        local card = Card(0,0, G.CARD_W*1.2, G.CARD_H*1.2, G.P_CARDS[card_code], G.P_CENTERS.c_base)
+        card.no_ui = true
+
+        cards[#cards + 1] = card
+    end
+    local old_cards_order = {}
+    for i, v in ipairs(cdds_cards.cards) do old_cards_order[#old_cards_order+1] = v.config.card_key end
+
+    if cards_order ~= old_cards_order then
+        sendDebugMessage("Cards don't match! removing...")
+        while #cdds_cards.cards > 0 do
+            for i = #cdds_cards.cards, 1, -1 do
+                local card = cdds_cards.cards[i]
+                card:remove()
+                table.remove(cdds_cards.cards, i)
+            end
+        end
+        for i = #cards, 1, -1 do
+            cdds_cards:emplace(cards[i])
+        end
+    end
+    cdds_cards.config.card_limit = bufferCardLimitForSmallDS(cards, 4)
+end
 
 -- This function handles the calculation of each effect returned to evaluate play.
 -- Can easily be hooked to add more calculation effects ala Talisman

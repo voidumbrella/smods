@@ -2227,8 +2227,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             if self:check_dependencies() then
                 self.hc_atlas = self.hc_atlas or self.lc_atlas
 
-                if not (self.posStyle == 'collab' or self.posStyle == 'suit' or self.posStyle == 'deck') then
-                    sendWarnMessage(('%s is not a valid posStyle on DeckSkin %s. Supported posStyle values are \'collab\', \'suit\' and \'deck\''):format(self.posStyle, self.key), self.set)
+                if not (self.posStyle == 'ranks' or self.posStyle == 'collab' or self.posStyle == 'suit' or self.posStyle == 'deck') then
+                    sendWarnMessage(('%s is not a valid posStyle on DeckSkin %s. Supported posStyle values are \'ranks\', \'collab\', \'suit\' and \'deck\''):format(self.posStyle, self.key), self.set)
                 end
 
                 self.obj_table[self.key] = self
@@ -2236,8 +2236,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 if deck_skin_count_by_suit[self.suit] then
                     self.suit_index  = deck_skin_count_by_suit[self.suit] + 1
                 else
-                    --start at 2 for default
-                    self.suit_index = 2
+                    self.suit_index = 1
                 end
                 deck_skin_count_by_suit[self.suit] = self.suit_index
 
@@ -2246,17 +2245,30 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             end
         end,
         inject = function (self)
+            local def = 'default_'..self.suit
             if G.COLLABS.options[self.suit] == nil then
-                G.COLLABS.options[self.suit] = {'default'}
+                G.COLLABS.options[self.suit] = {def}
             end
 
             local options = G.COLLABS.options[self.suit]
-            options[#options + 1] = self.key
+            if self.key ~= def then
+                options[#options + 1] = self.key
+            end
         end
     }
 
+
     for suitName, options in pairs(G.COLLABS.options) do
-        --start at 2 to skip default
+        SMODS.DeckSkin{
+            key = options[1]..'_'..suitName,
+            suit = suitName,
+            ranks = {'2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', "King", "Ace",},
+            lc_atlas = 'cards_1',
+            hc_atlas = 'cards_2',
+            posStyle = 'deck'
+        }
+    end
+    for suitName, options in pairs(G.COLLABS.options) do
         for i = 2, #options do
             SMODS.DeckSkin{
                 key = options[i],
