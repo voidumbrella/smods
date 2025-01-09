@@ -2263,6 +2263,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             key = options[1]..'_'..suitName,
             suit = suitName,
             ranks = {'2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', "King", "Ace",},
+            display_ranks = {'Jack', 'Queen', "King"},
             lc_atlas = 'cards_1',
             hc_atlas = 'cards_2',
             posStyle = 'deck'

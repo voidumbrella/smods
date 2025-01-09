@@ -990,54 +990,63 @@ local function bufferCardLimitForSmallDS(cards, scaleFactor)
         return cardCount
     end
     -- Ensure card_limit is always at least the number of cards
-    cdds_cards.config.card_limit = math.max(cdds_cards.config.card_limit, cardCount)
+    G.cdds_cards.config.card_limit = math.max(G.cdds_cards.config.card_limit, cardCount)
     -- Calculate the buffer size dynamically based on the scale factor
     local buffer = 0
-    if cardCount < rankCount then
-        -- Buffer decreases as cardCount approaches rankCount, modulated by scaleFactor
-        buffer = math.ceil(((rankCount - cardCount) / scaleFactor))
+    if cardCount < G.cdds_cards.rankCount then
+        -- Buffer decreases as cardCount approaches G.cdds_cards.rankCount, modulated by scaleFactor
+        buffer = math.ceil(((G.cdds_cards.rankCount - cardCount) / scaleFactor))
     end
-    cdds_cards.config.card_limit = math.max(cardCount, cardCount + buffer)
+    G.cdds_cards.config.card_limit = math.max(cardCount, cardCount + buffer)
 
-    return cdds_cards.config.card_limit
+    return G.cdds_cards.config.card_limit
 end
 
-G.FUNCS.update_collab_cards = function(key, suit)
+G.FUNCS.update_collab_cards = function(key, suit, silent)
     if type(key) == "number" then
         key = G.COLLABS.options[suit][key]
     end
-    if not cdds_cards then return end
+    if not G.cdds_cards then return end
     local cards = {}
     local cards_order = {}
     local deckskin = SMODS.get_deckskin(key, suit)
     local smodSuit = SMODS.Suits[suit]
-    for i, r in ipairs(deckskin.ranks) do
-        local r = deckskin.ranks[i]
+    local d_ranks = deckskin.display_ranks or deckskin.ranks
+    for i, r in ipairs(d_ranks) do
+        local r = d_ranks[i]
         local rank = SMODS.Ranks[r]
         local card_code = smodSuit.card_key .. '_' .. rank.card_key
         cards_order[#cards_order+1] = card_code
-        local card = Card(0,0, G.CARD_W*1.2, G.CARD_H*1.2, G.P_CARDS[card_code], G.P_CENTERS.c_base)
+        local card = Card(G.ROOM.T.w+5, G.ROOM.T.h-5, G.CARD_W*1.2, G.CARD_H*1.2, G.P_CARDS[card_code], G.P_CENTERS.c_base)
         card.no_ui = true
 
         cards[#cards + 1] = card
     end
     local old_cards_order = {}
-    for i, v in ipairs(cdds_cards.cards) do old_cards_order[#old_cards_order+1] = v.config.card_key end
+    for i, v in ipairs(G.cdds_cards.cards) do old_cards_order[#old_cards_order+1] = v.config.card_key end
 
     if cards_order ~= old_cards_order then
-        sendDebugMessage("Cards don't match! removing...")
-        while #cdds_cards.cards > 0 do
-            for i = #cdds_cards.cards, 1, -1 do
-                local card = cdds_cards.cards[i]
+        while #G.cdds_cards.cards > 0 do
+            for i = #G.cdds_cards.cards, 1, -1 do
+                local card = G.cdds_cards.cards[i]
                 card:remove()
-                table.remove(cdds_cards.cards, i)
+                table.remove(G.cdds_cards.cards, i)
             end
         end
         for i = #cards, 1, -1 do
-            cdds_cards:emplace(cards[i])
+            G.cdds_cards:emplace(cards[i])
+            if not silent then
+                G.E_MANAGER:add_event(Event({
+                    trigger = 'immediate',
+                    func = (function()
+                        play_sound('card1', 0.85 + (i*100/#cards)*0.2/100, 0.6*(math.max((21-i)/20,0.7) or 1))
+                        return true
+                    end)
+                }))
+            end
         end
     end
-    cdds_cards.config.card_limit = bufferCardLimitForSmallDS(cards, 4)
+    G.cdds_cards.config.card_limit = bufferCardLimitForSmallDS(cards, 4)
 end
 
 -- This function handles the calculation of each effect returned to evaluate play.
