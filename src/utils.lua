@@ -779,6 +779,13 @@ function SMODS.poll_enhancement(args)
     local mod = args.mod or 1
     local guaranteed = args.guaranteed or false
     local options = args.options or get_current_pool("Enhanced")
+    if args.no_replace then
+        for i, k in pairs(options) do
+            if G.P_CENTERS[k].replace_base_card then
+                options[i] = 'UNAVAILABLE'
+            end
+        end
+    end
     local type_key = args.type_key or key.."type"..G.GAME.round_resets.ante
     key = key..G.GAME.round_resets.ante
 
