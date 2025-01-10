@@ -1185,20 +1185,18 @@ SMODS.calculate_context({buying_card = true, card = self})
 
 # context.first_hand_drawn
 [[patches]]
-[patches.regex]
+[patches.pattern]
 target = 'game.lua'
-pattern = '''
-[\s\S]and\n(?<indent>[\t ]*)G\.GAME\.current_round\.discards_used == 0 and G\.GAME\.facing_blind then
-[\t ]*for i = 1, #G\.hand\.cards do
-[\t ]*    eval_card\(G\.hand\.cards\[i\], \{first_hand_drawn = true\}\)
-[\t ]*end
-[\t ]*for i = 1, #G\.jokers\.cards do
-[\t ]*    G\.jokers\.cards\[i\]:calculate_joker\(\{first_hand_drawn = true\}\)
-[\t ]*end'''
+pattern = '''for i = 1, #G.hand.cards do
+    eval_card(G.hand.cards[i], {first_hand_drawn = true})
+end
+for i = 1, #G.jokers.cards do
+    G.jokers.cards[i]:calculate_joker({first_hand_drawn = true})
+end
+'''
 position = 'at'
-line_prepend = '$indent'
-payload = '''then
-SMODS.calculate_context({first_hand_drawn = true})
+match_indent = true
+payload = '''SMODS.calculate_context({first_hand_drawn = true})
 '''
 
 # context.using_consumeable
@@ -1353,7 +1351,18 @@ target = 'card.lua'
 match_indent = true
 position = 'after'
 pattern = 'local other_joker_ret = other_joker:calculate_joker(context)'
-payload = 'context.blueprint = nil'
+payload = '''
+context.blueprint = nil
+local eff_card = context.blueprint_card or self
+context.blueprint_card = nil'''
+
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+match_indent = true
+position = 'at'
+pattern = 'other_joker_ret.card = context.blueprint_card or self'
+payload = '''other_joker_ret.card = eff_card'''
 
 # Auto deal with negative chips card_eval_status_text()
 [[patches]]

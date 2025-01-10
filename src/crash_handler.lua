@@ -498,7 +498,7 @@ function getDebugInfoForCrash()
         local versionFile = love.filesystem.read("version.jkr")
         if versionFile then
             version = versionFile:match("[^\n]*") .. " (best guess)"
-        else 
+        else
             version = "???"
         end
     end
@@ -509,18 +509,18 @@ function getDebugInfoForCrash()
             modded_version = reqVersion
         else
             modded_version = "???"
-        end        
+        end
     end
-    
+
     local info = "Additional Context:\nBalatro Version: " .. version .. "\nModded Version: " ..
                      (modded_version)
     local major, minor, revision, codename = love.getVersion()
     info = info .. string.format("\nLÖVE Version: %d.%d.%d", major, minor, revision)
-
     local lovely_success, lovely = pcall(require, "lovely")
     if lovely_success then
         info = info .. "\nLovely Version: " .. lovely.version
     end
+	info = info .. "\nPlatform: " .. (love.system.getOS() or "???")
     if SMODS and SMODS.Mods then
         local mod_strings = ""
         local lovely_strings = ""
