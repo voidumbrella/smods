@@ -1414,3 +1414,11 @@ local percent_delta = 0.08
 payload = '''percent = 0.3
 percent_delta = 0.08
 '''
+
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+match_indent = true
+position = 'at'
+pattern = '''local percent = (i-0.999)/(#G.hand.cards-0.998) + (j-1)*0.1'''
+payload = '''percent = (i-0.999)/(#G.hand.cards-0.998) + (j-1)*0.1'''
