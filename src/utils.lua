@@ -864,7 +864,7 @@ function SMODS.get_enhancements(card, extra_only)
         enhancements[card.config.center.key] = true
     end
     local calc_return = {}
-    SMODS.calculate_context({other_card = card, check_enhancement = true, no_blueprint = true}, nil, calc_return)
+    SMODS.calculate_context({other_card = card, check_enhancement = true, no_blueprint = true}, calc_return)
     for _, eval in pairs(calc_return) do
         for key, eval2 in pairs(eval) do
             if type(eval2) == 'table' then
