@@ -636,7 +636,7 @@ def client_handler(client_socket, console: Console):
 
 def listen_for_clients(console: Console):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('localhost', 12345))
+    server_socket.bind(('localhost', 53153))
     server_socket.listen()
     while True:
         client, addr = server_socket.accept()
