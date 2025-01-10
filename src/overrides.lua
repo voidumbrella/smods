@@ -1665,6 +1665,18 @@ end
 G.FUNCS.change_collab = function(args)
 	G.SETTINGS.CUSTOM_DECK.Collabs[args.cycle_config.curr_suit] = G.COLLABS.options[args.cycle_config.curr_suit][args.to_key] or 'default'
 	G.FUNCS.update_collab_cards(args.to_key, args.cycle_config.curr_suit)
+	local palette_loc_options = SMODS.get_palette_loc_options(args.to_key, args.cycle_config.curr_suit)
+	local swap_node = G.OVERLAY_MENU:get_UIE_by_ID('palette_selector')
+	if swap_node then
+		for i=1, #swap_node.children do
+			swap_node.children[i]:remove()
+			swap_node.children[i] = nil
+		end
+		local new_palette_selector = {n=G.UIT.R, config={align = "cm", id = 'palette_selector'}, nodes={
+			create_option_cycle({options = palette_loc_options, w = 5.5, cycle_shoulders = false, curr_suit = args.cycle_config.curr_suit, curr_skin = args.to_key, opt_callback = 'change_colour_palette', current_option = 1, colour = G.C.ORANGE, focus_args = {snap_to = true, nav = 'wide'}}),
+		}}
+		swap_node.UIBox:add_child(new_palette_selector, swap_node)
+	end
 	for k, v in pairs(G.I.CARD) do
 		if v.config and v.config.card and v.children.front and v.ability.effect ~= 'Stone Card' then
 			v:set_sprites(nil, v.config.card)
@@ -1681,7 +1693,8 @@ end
 
 G.FUNCS.change_colour_palette = function(args)
 	G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] = G.COLLABS.colourpalettes[args.cycle_config.curr_skin][args.to_key]
-	if G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] == 'lc' or 'hc' then
+	G.FUNCS.update_collab_cards(args.cycle_config.curr_skin, args.cycle_config.curr_suit)
+	if G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] == 'lc' or G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] == 'hc' then
 		local new_colour_proto = G.C["SO_"..((G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] == 'hc' and 2) or (G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] == 'lc' and 1))]
 		G.C.SUITS.Hearts = new_colour_proto.Hearts
 		G.C.SUITS.Diamonds = new_colour_proto.Diamonds

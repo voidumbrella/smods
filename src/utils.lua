@@ -995,6 +995,27 @@ SMODS.get_deckskin_palette = function(key, palette_key, suit)
     end
 end
 
+SMODS.get_palette_loc_options = function(key, suit)
+    local deckskin = SMODS.get_deckskin(key , suit)
+
+    local palette_loc_options = localize(key, 'collab_palettes')
+
+    local current_palette = 1
+
+    for i, p in ipairs(G.COLLABS.colourpalettes[key]) do
+        if G.SETTINGS.colourpalettes[suit] == p.key then
+            current_palette = i
+        end
+    end
+
+    local conv_palette_loc_options = {}
+    for k, v in pairs(palette_loc_options) do
+        conv_palette_loc_options[tonumber(k)] = v
+    end
+
+    return conv_palette_loc_options
+end
+
 local function bufferCardLimitForSmallDS(cards, scaleFactor)
     local cardCount = #cards
     if type(scaleFactor) ~= "number" or scaleFactor <= 0 then
@@ -1060,6 +1081,21 @@ G.FUNCS.update_collab_cards = function(key, suit, silent)
         end
     end
     G.cdds_cards.config.card_limit = bufferCardLimitForSmallDS(cards, 4)
+end
+
+SMODS.add_deckskin_palette = function(key, palette)
+    local deckskin = SMODS.DeckSkins[key]
+    if deckskin.palettes == nil then
+        sendWarnMessage(('Old DeckSkin formatting detected on DeckSkin %s! Cannot add new palettes to an outdated DeckSkin'):format(self.key), self.set)
+        return
+    end
+    table.insert(deckskin.palettes, palette)
+    -- This doesn't work??? says collab_palettes is nil. Must mean its not initialized yet? But why
+    --[[
+    if palette.loc_txt then
+        SMODS.process_loc_text(G.localization.misc.collab_palettes[key], #G.localization.misc.collab_palettes[key]..'', palette.loc_txt)
+    end
+    ]]--
 end
 
 -- This function handles the calculation of each effect returned to evaluate play.

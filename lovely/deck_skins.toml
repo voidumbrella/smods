@@ -78,7 +78,7 @@ if _front and _front.suit and G.SETTINGS.CUSTOM_DECK and G.SETTINGS.CUSTOM_DECK.
                             elseif palette.posStyle == 'deck' then
                                 return atlas, _front.pos
                             elseif palette.posStyle == 'ranks' or nil then
-                                for i, rank in ipairs(deckSkin.ranks) do
+                                for i, rank in ipairs(palette.ranks) do
                                     if rank == _front.value then
                                         return atlas, { x = i - 1, y = 0}
                                     end
@@ -109,27 +109,11 @@ pattern = "table.insert(t, create_toggle({label = localize('b_high_contrast_card
 position = "at"
 payload = '''
 local deckskin_key = G.COLLABS.options[_suit][current_option]
-local deckskin = SMODS.get_deckskin(deckskin_key , _suit)
 
-local palette_loc_options = localize(deckskin_key, 'collab_palettes')
-
-local current_palette = 1
-
-for i, p in ipairs(G.COLLABS.colourpalettes[deckskin_key]) do
-    if G.SETTINGS.colourpalettes[_suit] == p.key then
-        current_palette = i
-    end
-end
-
-local conv_palette_loc_options = {}
-for k, v in pairs(palette_loc_options) do
-    conv_palette_loc_options[tonumber(k)] = v
-end
-
-palette_loc_options = conv_palette_loc_options
+local palette_loc_options = SMODS.get_palette_loc_options(deckskin_key, _suit)
 
 table.insert(t,
-    {n=G.UIT.R, config={align = "cm"}, nodes={
+    {n=G.UIT.R, config={align = "cm", id = 'palette_selector'}, nodes={
       create_option_cycle({options = palette_loc_options, w = 5.5, cycle_shoulders = false, curr_suit = _suit, curr_skin = deckskin_key, opt_callback = 'change_colour_palette', current_option = current_palette, colour = G.C.ORANGE, focus_args = {snap_to = true, nav = 'wide'}}),
     }}
   )

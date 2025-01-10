@@ -2411,54 +2411,6 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end
     end
 
-    --[[
-    SMODS.DeckSkin{
-        key = "new_deck_skin",
-        suit = "Spades",
-        palettes = {
-            {
-                key = 'lc',
-                ranks = {'Jack', 'Queen', "King"},
-                atlas = 'collab_AU_1',
-                posStyle = 'collab',
-            },
-            {
-                key = 'hc',
-                ranks = {'Jack', 'Queen', "King"},
-                atlas = 'collab_AU_2',
-                posStyle = 'collab',
-            },
-            {
-                ranks = {'Jack', 'Queen', "King", "Ace"},
-                atlas = {
-                    Jack = {
-                        atlas = 'collab_AU_1',
-                        pos = {x=0,y=0}
-                    },
-                    Queen = {
-                        atlas = 'collab_AU_1',
-                        pos = {x=1,y=0}
-                    },
-                    King = {
-                        atlas = 'collab_AU_1',
-                        pos = {x=2,y=0}
-                    },
-                    Ace = {
-                        atlas = 'cards_1',
-                        pos = {x=12,y=0}
-                    },
-                },
-                loc_txt = {
-                    ['en-us'] = "Third Color Palette!"
-                }
-            },
-        },
-        loc_txt = {
-            ['en-us'] = "New Deck Skin!"
-        },
-    }
-    ]]--
-
     --Clear 'Friends of Jimbo' skins so they can be handled via the same pipeline
     G.COLLABS.options = {}
     if G.SETTINGS.colourpalettes == nil then
