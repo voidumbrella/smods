@@ -390,7 +390,7 @@ if card.ability.set == 'Joker' or card.ability.consumeable then
             end
         end
         if not context.post_trigger and not context.retrigger_joker_check then
-            SMODS.calculate_context({blueprint_card = context.blueprint_card, post_trigger = true, other_card = card, other_context = context, other_ret = ret}, percent, post_trig)
+            SMODS.calculate_context({blueprint_card = context.blueprint_card, post_trigger = true, other_card = card, other_context = context, other_ret = ret}, post_trig)
         end
     end
 end
@@ -520,7 +520,7 @@ match_indent = true
 position = "at"
 payload = '''
         -- Base game calculation removed
-        SMODS.trigger_effects(effects, scoring_hand[i], percent)
+        SMODS.trigger_effects(effects, scoring_hand[i])
     end
     scoring_hand[i].extra_enhancements = nil
 end
@@ -573,7 +573,7 @@ match_indent = true
 position = "at"
 payload = '''
 -- Base game calculation removed 2
-SMODS.trigger_effects(effects, G.hand.cards[i], percent)
+SMODS.trigger_effects(effects, G.hand.cards[i])
 
 if reps[j] == 1 and effects.calculated then
     SMODS.calculate_repetitions(G.hand.cards[i], {cardarea = G.hand, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_card = G.hand.cards[i], repetition = true, card_effects = effects}, reps)
@@ -642,7 +642,7 @@ payload = '''
 local eval = eval_card(_card, {cardarea = G.jokers, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, edition = true, post_joker = true})
 if eval.edition then effects[#effects+1] = eval end
 
-SMODS.trigger_effects(effects, _card, percent)'''
+SMODS.trigger_effects(effects, _card)'''
 # Joker effects
 ## I am NOT converting this to regex (yet)
 [[patches]]
@@ -778,7 +778,7 @@ match_indent = true
 position = "at"
 payload = '''
 -- context.before calculations
-SMODS.calculate_context({full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, before = true}, percent)
+SMODS.calculate_context({full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, before = true})
 
 -- TARGET: effects before scoring starts'''
 
@@ -791,7 +791,7 @@ match_indent = true
 position = "before"
 payload = '''
 -- context.final_scoring_step calculations
-SMODS.calculate_context({full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, final_scoring_step = true}, percent)
+SMODS.calculate_context({full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, final_scoring_step = true})
 
 -- TARGET: effects before deck final_scoring_step
 '''
@@ -815,7 +815,7 @@ payload = '''
 -- context.destroying_card calculations
 for j = 1, #G.jokers.cards do
     local eval, post = eval_card(G.jokers.cards[j], {destroying_card = scoring_hand[i], full_hand = G.play.cards})
-    SMODS.trigger_effects({eval, post}, scoring_hand[i], percent)
+    SMODS.trigger_effects({eval, post}, scoring_hand[i])
     if eval.jokers then destroyed = true end
 
 end
@@ -827,9 +827,9 @@ end
 local eval, post = eval_card(scoring_hand[i], {destroying_card = scoring_hand[i], full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands})
 local self_destroy = false
 for key, effect in pairs(eval) do
-    self_destroy = SMODS.calculate_effect(effect, scoring_hand[i], percent)
+    self_destroy = SMODS.calculate_effect(effect, scoring_hand[i])
 end
-SMODS.trigger_effects({post}, scoring_hand[i], percent)
+SMODS.trigger_effects({post}, scoring_hand[i])
 if self_destroy then destroyed = true end
 
 -- TARGET: card destroyed when played
@@ -855,21 +855,21 @@ for i=1, #G.hand.cards do
         local self_destroy = false
         for key, effect in pairs(eval) do
             if type(effect) == 'table' then
-                self_destroy = SMODS.calculate_effect(effect, G.play.cards[i], percent)
+                self_destroy = SMODS.calculate_effect(effect, G.play.cards[i])
             else
                 self_destroy = effect
             end
         end
-        SMODS.trigger_effects({post}, G.hand.cards[i], percent)
+        SMODS.trigger_effects({post}, G.hand.cards[i])
         if self_destroy then destroyed = true end
     end
     
     local eval, post = eval_card(G.hand.cards[i], {destroying_card_hand = G.hand.cards[i], full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands})
     local self_destroy = false
     for key, effect in pairs(eval) do
-        self_destroy = SMODS.calculate_effect(effect, G.hand.cards[i], percent)
+        self_destroy = SMODS.calculate_effect(effect, G.hand.cards[i])
     end
-    SMODS.trigger_effects({post}, G.hand.cards[i], percent)
+    SMODS.trigger_effects({post}, G.hand.cards[i])
     if self_destroy then destroyed = true end
     
     -- TARGET: card held destroyed when hand played
@@ -931,7 +931,7 @@ match_indent = true
 position = "at"
 payload = '''
 -- context.debuffed_hand calculations
-SMODS.calculate_context({full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, debuffed_hand = true}, percent)
+SMODS.calculate_context({full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, debuffed_hand = true})
 
 -- TARGET: effects after hand debuffed by blind'''
 
@@ -952,7 +952,7 @@ match_indent = true
 position = "at"
 payload = '''
 -- context.after calculations
-SMODS.calculate_context({full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, after = true}, percent)
+SMODS.calculate_context({full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, after = true})
 
 -- TARGET: effects after hand evaluation'''
 
@@ -997,7 +997,7 @@ match_indent = true
 payload = '''
 -- context.end_of_round calculations
 SMODS.saved = false
-SMODS.calculate_context({end_of_round = true, game_over = game_over}, percent)
+SMODS.calculate_context({end_of_round = true, game_over = game_over})
 if SMODS.saved then game_over = false end
 -- TARGET: effects after hand evaluation
 '''
@@ -1082,7 +1082,7 @@ if reps[j] == 1 then
     SMODS.calculate_repetitions(G.hand.cards[i], {cardarea = G.hand, other_card = G.hand.cards[i], repetition = true, end_of_round = true, card_effects = effects}, reps)
 end
 
-SMODS.trigger_effects(effects, G.hand.cards[i], percent)
+SMODS.trigger_effects(effects, G.hand.cards[i])
 j = j + (effects.calculated and 1 or #reps)
 
 -- TARGET: effects after hand evaluation
@@ -1150,7 +1150,7 @@ position = 'at'
 match_indent = true
 payload = '''
 local eval, post = eval_card(self, {selling_self = true})
-SMODS.trigger_effects({eval, post}, self, percent)
+SMODS.trigger_effects({eval, post}, self)
 '''
 
 # context.open_booster
@@ -1243,7 +1243,7 @@ match_indent = true
 payload = '''
 G.E_MANAGER:add_event(Event({func = function()
     local eval, post = eval_card(c1, {buying_card = true, card = c1})
-    SMODS.trigger_effects({eval, post}, c1, percent)
+    SMODS.trigger_effects({eval, post}, c1)
     return true
     end}))
 '''
@@ -1401,4 +1401,16 @@ text = localize{type='variable',key='a_xmult',vars={amt}}
 '''
 payload = '''
 text = localize{type='variable',key='a_xmult'..(amt<0 and '_minus' or ''),vars={math.abs(amt)}}
+'''
+# Make percent and percent_delta globals
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+match_indent = true
+position = 'at'
+pattern = '''local percent = 0.3
+local percent_delta = 0.08
+'''
+payload = '''percent = 0.3
+percent_delta = 0.08
 '''

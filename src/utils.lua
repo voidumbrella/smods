@@ -273,10 +273,9 @@ function SMODS.eval_this(_card, effects)
         end
         update_hand_text({ delay = 0 }, { chips = extras.hand_chips and hand_chips, mult = extras.mult and mult })
         if effects.message then
-            card_eval_status_text(_card, 'jokers', nil, nil, nil, effects)
+            card_eval_status_text(_card, 'jokers', nil, percent, nil, effects)
         end
-        -- percent = percent + 0.08
-        -- Removed because it's not used and crashes for contexts outside of evaluate_play
+        percent = (percent or 0) + (percent_delta or 0.08)
     end
 end
 
@@ -979,7 +978,7 @@ end
 
 -- This function handles the calculation of each effect returned to evaluate play.
 -- Can easily be hooked to add more calculation effects ala Talisman
-SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, amount, from_edition)
+SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, from_edition)
     if effect.card and effect.card ~= scored_card then juice_card(effect.card) end
     if (key == 'chips' or key == 'h_chips' or key == 'chip_mod') and amount then 
         hand_chips = mod_chips(hand_chips + amount)
@@ -1076,7 +1075,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
     if key == 'extra' then
         local extra_calc = false
         for key_ex, amount_ex in pairs(amount) do
-            extra_calc = SMODS.calculate_individual_effect(amount, scored_card, percent, key_ex, amount_ex)
+            extra_calc = SMODS.calculate_individual_effect(amount, scored_card, key_ex, amount_ex)
         end
         return extra_calc
     end
@@ -1088,12 +1087,12 @@ SMODS.calculate_individual_effect = function(effect, scored_card, percent, key, 
 end
 
 -- Used to calculate a table of effects generated in evaluate_play
-SMODS.trigger_effects = function(effects, card, percent)
+SMODS.trigger_effects = function(effects, card)
     for i, effect_table in ipairs(effects) do
         for key, effect in pairs(effect_table) do
             if key ~= 'smods' then
                 if type(effect) == 'table' then
-                    local calc = SMODS.calculate_effect(effect, card, percent, key == 'edition')
+                    local calc = SMODS.calculate_effect(effect, card, key == 'edition')
                     if calc then effects.calculated = true end
                 end
             end
@@ -1101,18 +1100,18 @@ SMODS.trigger_effects = function(effects, card, percent)
     end
 end
 
-SMODS.calculate_effect = function(effect, scored_card, percent, from_edition, pre_jokers)
+SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
     local calculated = false
     local message = false
     for _, key in ipairs(SMODS.calculation_keys) do
         if effect[key] then
-            calculated = SMODS.calculate_individual_effect(effect, scored_card, percent, key, effect[key], from_edition, pre_jokers)
-            percent = (percent or 0)+0.08
+            calculated = SMODS.calculate_individual_effect(effect, scored_card, key, effect[key], from_edition, pre_jokers)
+            percent = (percent or 0) + (percent_delta or 0.08)
         end
     end
     if effect.juice_card then G.E_MANAGER:add_event(Event({trigger = 'immediate', func = function () effect.juice_card:juice_up(0.1); scored_card:juice_up(0.1) return true end})) end
     if effect.effect then calculated = true end
-    -- if effect.message then calculated = SMODS.calculate_individual_effect(effect, scored_card, percent, 'message', effect.message, from_edition, pre_jokers) end
+    -- if effect.message then calculated = SMODS.calculate_individual_effect(effect, scored_card, 'message', effect.message, from_edition, pre_jokers) end
     return calculated
 end
 
@@ -1145,7 +1144,7 @@ SMODS.calculate_repetitions = function(card, context, reps)
         local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
         --calculate the joker effects
         local eval, post = eval_card(_card, context)
-        if next(post) then SMODS.trigger_effects(post, card, percent) end
+        if next(post) then SMODS.trigger_effects(post, card) end
         local rt = eval and eval.retriggers and #eval.retriggers or 0
         for key, value in pairs(eval) do
             if value.repetitions and key ~= 'retriggers' then
@@ -1155,7 +1154,7 @@ SMODS.calculate_repetitions = function(card, context, reps)
                     reps[#reps+1] = {key = value}
                     for i=1, rt do
                         local rt_eval, rt_post = eval_card(_card, context)
-                        if next(rt_post) then SMODS.trigger_effects(rt_post, card, percent) end
+                        if next(rt_post) then SMODS.trigger_effects(rt_post, card) end
                         rt_eval.card = rt_eval.card or _card
                         reps[#reps+1] = {key = value}
                     end
@@ -1171,7 +1170,7 @@ SMODS.calculate_retriggers = function(card, context, _ret)
     for k=1, #G.jokers.cards + #G.consumeables.cards do
         local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
         local eval, post = eval_card(_card, {retrigger_joker_check = true, other_card = card, other_context = context, other_ret = _ret})
-        if next(post) then SMODS.trigger_effects(post, _card, percent) end
+        if next(post) then SMODS.trigger_effects(post, _card) end
         for key, value in pairs(eval) do
             if value.repetitions then
                 for h=1, value.repetitions do
@@ -1197,7 +1196,7 @@ end
 
 -- Used to calculate contexts across G.jokers, scoring_hand (if present), G.play and G.GAME.selected_back
 -- Hook this function to add different areas to MOST calculations
-function SMODS.calculate_context(context, percent, return_table)
+function SMODS.calculate_context(context, return_table)
     context.cardarea = G.jokers
     for k=1, #G.jokers.cards + #G.consumeables.cards do
         local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
@@ -1221,7 +1220,7 @@ function SMODS.calculate_context(context, percent, return_table)
         if return_table then 
             return_table[#return_table+1] = effects[1]
         else
-            SMODS.trigger_effects(effects, _card, percent)
+            SMODS.trigger_effects(effects, _card)
         end
     end
     if context.scoring_hand then
@@ -1234,7 +1233,7 @@ function SMODS.calculate_context(context, percent, return_table)
             else
                 local effects = {eval_card(context.scoring_hand[i], context)}
                 SMODS.calculate_quantum_enhancements(context.scoring_hand[i], effects, context)
-                SMODS.trigger_effects(effects, context.scoring_hand[i], percent)
+                SMODS.trigger_effects(effects, context.scoring_hand[i])
             end
         end
     end
@@ -1246,11 +1245,11 @@ function SMODS.calculate_context(context, percent, return_table)
         else
             local effects = {eval_card(G.hand.cards[i], context)}
             SMODS.calculate_quantum_enhancements(G.hand.cards[i], effects, context)
-            SMODS.trigger_effects(effects, G.hand.cards[i], percent)
+            SMODS.trigger_effects(effects, G.hand.cards[i])
         end
     end
     local effect = G.GAME.selected_back:trigger_effect(context)
-    if effect then SMODS.calculate_effect(effect, G.deck.cards[1], percent) end
+    if effect then SMODS.calculate_effect(effect, G.deck.cards[1]) end
 end
 
 local flat_copy_table = function(tbl)
