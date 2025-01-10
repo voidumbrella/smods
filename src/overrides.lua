@@ -1679,7 +1679,9 @@ print_atlas_pos = function(atlas, pos)
 	sendDebugMessage(tprint(pos))
 end
 
-G.FUNCS.refresh_contrast_mode = function()
+G.FUNCS.change_colour_palette = function(args)
+	G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] = G.palette_keys[args.to_key]
+	sendDebugMessage(args.to_key)
 	local new_colour_proto = G.C["SO_"..(G.SETTINGS.colourblind_option and 2 or 1)]
 	G.C.SUITS.Hearts = new_colour_proto.Hearts
 	G.C.SUITS.Diamonds = new_colour_proto.Diamonds

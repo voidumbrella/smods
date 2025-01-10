@@ -2381,6 +2381,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end
     end
 
+    --[[
     SMODS.DeckSkin{
         key = "new_deck_skin",
         suit = "Spades",
@@ -2426,6 +2427,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             ['en-us'] = "New Deck Skin!"
         },
     }
+    ]]--
 
     --Clear 'Friends of Jimbo' skins so they can be handled via the same pipeline
     G.COLLABS.options = {}

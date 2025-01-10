@@ -117,7 +117,9 @@ return {
                 'Disabled',
                 'Enabled',
                 'Bypass Restrictions'
-            }
+            },
+            b_deckskins_lc = 'Low Contrast Colors',
+            b_deckskins_hc = 'High Contrast Colors'
 		},
 		v_dictionary = {
 			c_types = '#1# Types',

@@ -1023,7 +1023,8 @@ G.FUNCS.update_collab_cards = function(key, suit, silent)
     local cards_order = {}
     local deckskin = SMODS.get_deckskin(key, suit)
     local smodSuit = SMODS.Suits[suit]
-    local d_ranks = SMODS.get_deckskin_palette(deckskin.key, G.SETTINGS.colourpalettes[suit], suit).ranks or deckskin.display_ranks or deckskin.ranks
+    local palette = SMODS.get_deckskin_palette(deckskin.key, G.SETTINGS.colourpalettes[suit], suit)
+    local d_ranks = palette.display_ranks or palette.ranks or deckskin.display_ranks or deckskin.ranks
     for i, r in ipairs(d_ranks) do
         local r = d_ranks[i]
         local rank = SMODS.Ranks[r]
