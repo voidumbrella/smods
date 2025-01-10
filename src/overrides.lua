@@ -1680,13 +1680,14 @@ print_atlas_pos = function(atlas, pos)
 end
 
 G.FUNCS.change_colour_palette = function(args)
-	G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] = G.palette_keys[args.to_key]
-	sendDebugMessage(args.to_key)
-	local new_colour_proto = G.C["SO_"..(G.SETTINGS.colourblind_option and 2 or 1)]
-	G.C.SUITS.Hearts = new_colour_proto.Hearts
-	G.C.SUITS.Diamonds = new_colour_proto.Diamonds
-	G.C.SUITS.Spades = new_colour_proto.Spades
-	G.C.SUITS.Clubs = new_colour_proto.Clubs
+	G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] = G.COLLABS.colourpalettes[args.cycle_config.curr_skin][args.to_key]
+	if G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] == 'lc' or 'hc' then
+		local new_colour_proto = G.C["SO_"..((G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] == 'hc' and 2) or (G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] == 'lc' and 1))]
+		G.C.SUITS.Hearts = new_colour_proto.Hearts
+		G.C.SUITS.Diamonds = new_colour_proto.Diamonds
+		G.C.SUITS.Spades = new_colour_proto.Spades
+		G.C.SUITS.Clubs = new_colour_proto.Clubs
+	end
 	for k, v in pairs(G.I.CARD) do
 		if v.config and v.config.card and v.children.front and v.ability.effect ~= 'Stone Card' then
 			v:set_sprites(nil, v.config.card)

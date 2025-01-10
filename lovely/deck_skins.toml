@@ -111,32 +111,26 @@ payload = '''
 local deckskin_key = G.COLLABS.options[_suit][current_option]
 local deckskin = SMODS.get_deckskin(deckskin_key , _suit)
 
-G.palette_options = {}
-G.palette_keys = {}
-if not deckskin.palettes then
-    G.palette_options[#G.palette_options+1] = localize('b_deckskins_lc')
-    G.palette_keys[#G.palette_keys+1] = "lc"
-    G.palette_options[#G.palette_options+1] = localize('b_deckskins_hc')
-    G.palette_keys[#G.palette_keys+1] = "hc"
-else
-    for i, p in ipairs(deckskin.palettes) do
-        if p.key == 'lc' then
-            G.palette_options[#G.palette_options+1] = localize('b_deckskins_lc')
-            G.palette_keys[#G.palette_keys+1] = "lc"
-        elseif p.key == 'hc' then
-            G.palette_options[#G.palette_options+1] = localize('b_deckskins_hc')
-            G.palette_keys[#G.palette_keys+1] = "hc"
-        else
-            -- [!!!!!] need someone more experienced to figure out how to properly implement localization on the palette names
-            G.palette_options[#G.palette_options+1] = p.key
-            G.palette_keys[#G.palette_keys+1] = p.key
-        end
+local palette_loc_options = localize(deckskin_key, 'collab_palettes')
+
+local current_palette = 1
+
+for i, p in ipairs(G.COLLABS.colourpalettes[deckskin_key]) do
+    if G.SETTINGS.colourpalettes[_suit] == p.key then
+        current_palette = i
     end
 end
 
+local conv_palette_loc_options = {}
+for k, v in pairs(palette_loc_options) do
+    conv_palette_loc_options[tonumber(k)] = v
+end
+
+palette_loc_options = conv_palette_loc_options
+
 table.insert(t,
     {n=G.UIT.R, config={align = "cm"}, nodes={
-      create_option_cycle({options = G.palette_options, w = 5.5, cycle_shoulders = false, curr_suit = _suit, opt_callback = 'change_colour_palette', current_option = current_option, colour = G.C.ORANGE, focus_args = {snap_to = true, nav = 'wide'}}),
+      create_option_cycle({options = palette_loc_options, w = 5.5, cycle_shoulders = false, curr_suit = _suit, curr_skin = deckskin_key, opt_callback = 'change_colour_palette', current_option = current_palette, colour = G.C.ORANGE, focus_args = {snap_to = true, nav = 'wide'}}),
     }}
   )
 '''

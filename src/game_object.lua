@@ -2211,10 +2211,42 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             if G.localization.misc.collabs[self.suit] == nil then
                 G.localization.misc.collabs[self.suit] = {["1"] = 'Default'}
             end
+            if G.localization.misc.collab_palettes == nil then
+                G.localization.misc.collab_palettes = {}
+            end
+            if G.localization.misc.collab_palettes[self.key] == nil then
+                G.localization.misc.collab_palettes[self.key] = {}
+            end
+            if not self.outdated then
+                for i, p in ipairs(self.palettes) do
+                    if p.loc_txt then
+                        SMODS.process_loc_text(G.localization.misc.collab_palettes[self.key], i..'', p.loc_txt)
+                    else
+                        if p.key == 'lc' then
+                            G.localization.misc.collab_palettes[self.key][i .. ''] = localize('b_deckskins_lc')
+                        elseif p.key == 'hc' then
+                            G.localization.misc.collab_palettes[self.key][i .. ''] = localize('b_deckskins_hc')
+                        else
+                            G.localization.misc.collab_palettes[self.key][i .. ''] = G.localization.misc.collab_palettes[self.key][i .. ''] or p.key
+                        end
+                    end
+                end
+            else
+                if self.lc_atlas == self.hc_atlas then
+                    G.localization.misc.collab_palettes[self.key]['1'] = localize('b_deckskins_def')
+                else
+                    G.localization.misc.collab_palettes[self.key]['1'] = localize('b_deckskins_lc')
+                    G.localization.misc.collab_palettes[self.key]['2'] = localize('b_deckskins_hc')
+                end
+            end
+
+            sendDebugMessage(tprint(G.localization.misc.collab_palettes[self.key]))
+
             if not self.loc_txt then
                 G.localization.misc.collabs[self.suit][self.suit_index .. ''] = G.localization.misc.collabs[self.suit][self.suit_index .. ''] or self.key
                 return
             end
+
             SMODS.process_loc_text(G.localization.misc.collabs[self.suit], self.suit_index..'', self.loc_txt)
         end,
         register = function (self)
@@ -2224,6 +2256,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             end
             if self:check_dependencies() then
                 if self.palettes and not (self.ranks and self.lc_atlas) then
+                    -- Maybe won't use this, switching between option cycle and toggle depending on if this flag is true may be pointless
+                    --[[
                     self.lc_hc_toggle = false
                     local foundLC = false
                     local foundHC = false
@@ -2247,6 +2281,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                             self.palettes[hcIndex], self.palettes[lcIndex] = self.palettes[lcIndex], self.palettes[hcIndex]
                         end
                     end
+                    ]]--
 
                     local ds_errors = {
                         'Missing key value in Palette %s on DeckSkin %s',
@@ -2316,18 +2351,13 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 if G.COLLABS.colourpalettes == nil then
                     G.COLLABS.colourpalettes = {}
                 end
-                if G.COLLABS.colourpalettes[self.suit] == nil then
-                    G.COLLABS.colourpalettes[self.suit] = {}
-                end
-                if G.COLLABS.colourpalettes[self.suit][self.key] == nil then
-                    G.COLLABS.colourpalettes[self.suit][self.key] = {}
+                if G.COLLABS.colourpalettes[self.key] == nil then
+                    G.COLLABS.colourpalettes[self.key] = {}
                 end
                 for i, v in ipairs(self.palettes) do
-                    G.COLLABS.colourpalettes[self.suit][self.key][#G.COLLABS.colourpalettes[self.suit][self.key] + 1] = v.key
+                    G.COLLABS.colourpalettes[self.key][#G.COLLABS.colourpalettes[self.key] + 1] = v.key
                 end
             end
-
-            sendDebugMessage(tprint(G.COLLABS.colourpalettes))
 
             local options = G.COLLABS.options[self.suit]
             if self.key ~= def then
@@ -2440,8 +2470,6 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         }
         G.save_settings()
     end
-
-    sendDebugMessage(tprint(G.SETTINGS.colourpalettes))
 
     -------------------------------------------------------------------------------------------------
     ----- API CODE GameObject.PokerHand
