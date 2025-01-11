@@ -271,8 +271,8 @@ pattern = "local effects = {eval_card(scoring_hand[i], {cardarea = G.play, full_
 match_indent = true
 position = "at"
 payload = '''
-local effects = {eval_card(scoring_hand[i], {main_scoring = true, cardarea = G.play, full_hand = G.play.cards, scoring_hand = scoring_hand, poker_hand = text})}
-SMODS.calculate_quantum_enhancements(scoring_hand[i], effects, {main_scoring = true, cardarea = G.play, full_hand = G.play.cards, scoring_hand = scoring_hand, poker_hand = text})
+local effects = {eval_card(scoring_hand[i], {main_scoring = true, cardarea = G.play, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands})}
+SMODS.calculate_quantum_enhancements(scoring_hand[i], effects, {main_scoring = true, cardarea = G.play, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands})
 '''
 [[patches]]
 [patches.pattern]
