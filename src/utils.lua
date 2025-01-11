@@ -1249,7 +1249,7 @@ function SMODS.calculate_context(context, return_table)
         end
     end
     local effect = G.GAME.selected_back:trigger_effect(context)
-    if effect then SMODS.calculate_effect(effect, G.deck.cards[1]) end
+    if effect then SMODS.calculate_effect(effect, G.deck.cards[1] or G.deck) end
 end
 
 local flat_copy_table = function(tbl)

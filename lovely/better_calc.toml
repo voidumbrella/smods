@@ -410,6 +410,19 @@ position = "at"
 payload = """
 elseif card.area == G.hand or card.area == G.deck then
 """
+
+# Alignment for G.deck (for when you run out of cards)
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+match_indent = true
+position = 'before'
+pattern = '''elseif card.area == G.hand or card.area == G.deck then'''
+payload = '''elseif card == G.deck then
+    y_off = -0.05*G.CARD_H
+    card_aligned = 'tm'
+'''
+
 # G.FUNCS.evaluate_play()
 [[patches]]
 [patches.pattern]
@@ -526,7 +539,7 @@ payload = '''
         -- Base game calculation removed
         SMODS.trigger_effects(effects, scoring_hand[i])
         local deck_effect = G.GAME.selected_back:trigger_effect({cardarea = G.play, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_card = scoring_hand[i], individual = true})
-        if deck_effect then SMODS.calculate_effect(deck_effect, G.deck.cards[1]) end
+        if deck_effect then SMODS.calculate_effect(deck_effect, G.deck.cards[1] or G.deck) end
         scoring_hand[i].lucky_trigger = nil
     end
     scoring_hand[i].extra_enhancements = nil
@@ -582,7 +595,7 @@ payload = '''
 -- Base game calculation removed 2
 SMODS.trigger_effects(effects, G.hand.cards[i])
 local deck_effect = G.GAME.selected_back:trigger_effect({cardarea = G.hand, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_card = G.hand.cards[i], individual = true})
-if deck_effect then SMODS.calculate_effect(deck_effect, G.deck.cards[1]) end
+if deck_effect then SMODS.calculate_effect(deck_effect, G.deck.cards[1] or G.deck) end
 
 if reps[j] == 1 and effects.calculated then
     SMODS.calculate_repetitions(G.hand.cards[i], {cardarea = G.hand, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_card = G.hand.cards[i], repetition = true, card_effects = effects}, reps)
@@ -653,7 +666,7 @@ if eval.edition then effects[#effects+1] = eval end
 
 SMODS.trigger_effects(effects, _card)
 local deck_effect = G.GAME.selected_back:trigger_effect({full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_joker = _card.ability.set == 'Joker' and _card or false, other_consumeable = _card.ability.set ~= 'Joker' and _card or false})
-if deck_effect then SMODS.calculate_effect(deck_effect, G.deck.cards[1]) end
+if deck_effect then SMODS.calculate_effect(deck_effect, G.deck.cards[1] or G.deck) end
 '''
 # Joker effects
 ## I am NOT converting this to regex (yet)
