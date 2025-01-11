@@ -760,7 +760,7 @@ match_indent = true
 position = "at"
 payload = '''
 local effects = {}
-SMODS.calculate_context({discard = true, other_card =  G.hand.highlighted[i], full_hand = G.hand.highlighted}, nil, effects)
+SMODS.calculate_context({discard = true, other_card =  G.hand.highlighted[i], full_hand = G.hand.highlighted}, effects)
 SMODS.trigger_effects(effects)
 for _, eval in pairs(effects) do
     if type(eval) == 'table' then
