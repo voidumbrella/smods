@@ -59,10 +59,14 @@ self.VT.w = self.T.w
 '''
 position = "before"
 payload = '''
-if self.config.center.pixel_size and self.config.center.pixel_size.h then
+if self.config.center.display_size and self.config.center.display_size.h then
+    self.T.h = H*(self.config.center.display_size.h/95)
+elseif self.config.center.pixel_size and self.config.center.pixel_size.h then
     self.T.h = H*(self.config.center.pixel_size.h/95)
 end
-if self.config.center.pixel_size and self.config.center.pixel_size.w then
+if self.config.center.display_size and self.config.center.display_size.w then
+    self.T.w = W*(self.config.center.display_size.w/71)
+elseif self.config.center.pixel_size and self.config.center.pixel_size.w then
     self.T.w = W*(self.config.center.pixel_size.w/71)
 end
 '''
