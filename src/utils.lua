@@ -218,10 +218,10 @@ end
 
 function SMODS.handle_loc_file(path)
     local dir = path .. 'localization/'
+    handle_loc_file(dir, 'en-us', true)
+    handle_loc_file(dir, 'default', true)
     handle_loc_file(dir, G.SETTINGS.language, true)
     if G.SETTINGS.real_language then handle_loc_file(dir, G.SETTINGS.real_language, true) end
-    handle_loc_file(dir, 'default')
-    handle_loc_file(dir, 'en-us')
 end
 
 function SMODS.insert_pool(pool, center, replace)

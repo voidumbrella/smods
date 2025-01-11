@@ -157,6 +157,7 @@ function loadMods(modsDirectory)
             end
         end},
         main_file = { type = 'string', required = true },
+        config_file = {type = 'string', default = 'config.lua' },
         __ = { check = function(mod)
             if SMODS.Mods[mod.id] then error('dupe') end
         end},
