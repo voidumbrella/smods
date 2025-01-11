@@ -89,6 +89,7 @@ for k=1, #G.jokers.cards do
     if eval then 
         table.insert(effects, eval)
     end
+end
 '''
 position = 'at'
 match_indent = true
@@ -113,6 +114,7 @@ for k=1, #G.jokers.cards + #G.consumeables.cards do
             end
         end
     end
+end
 '''
 [[patches]]
 [patches.pattern]
@@ -455,6 +457,8 @@ payload = ''
 [patches.pattern]
 target = "functions/state_events.lua"
 pattern = '''
+    scoring_hand[i].lucky_trigger = nil
+
         for ii = 1, #effects do
         --If chips added, do chip add event and add the chips to the total
         if effects[ii].chips then 
@@ -521,6 +525,9 @@ position = "at"
 payload = '''
         -- Base game calculation removed
         SMODS.trigger_effects(effects, scoring_hand[i])
+        local deck_effect = G.GAME.selected_back:trigger_effect({cardarea = G.play, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_card = scoring_hand[i], individual = true})
+        if deck_effect then SMODS.calculate_effect(deck_effect, G.deck.cards[1]) end
+        scoring_hand[i].lucky_trigger = nil
     end
     scoring_hand[i].extra_enhancements = nil
 end
@@ -574,6 +581,8 @@ position = "at"
 payload = '''
 -- Base game calculation removed 2
 SMODS.trigger_effects(effects, G.hand.cards[i])
+local deck_effect = G.GAME.selected_back:trigger_effect({cardarea = G.hand, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_card = G.hand.cards[i], individual = true})
+if deck_effect then SMODS.calculate_effect(deck_effect, G.deck.cards[1]) end
 
 if reps[j] == 1 and effects.calculated then
     SMODS.calculate_repetitions(G.hand.cards[i], {cardarea = G.hand, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_card = G.hand.cards[i], repetition = true, card_effects = effects}, reps)
@@ -642,7 +651,10 @@ payload = '''
 local eval = eval_card(_card, {cardarea = G.jokers, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, edition = true, post_joker = true})
 if eval.edition then effects[#effects+1] = eval end
 
-SMODS.trigger_effects(effects, _card)'''
+SMODS.trigger_effects(effects, _card)
+local deck_effect = G.GAME.selected_back:trigger_effect({full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_joker = _card.ability.set == 'Joker' and _card or false, other_consumeable = _card.ability.set ~= 'Joker' and _card or false})
+if deck_effect then SMODS.calculate_effect(deck_effect, G.deck.cards[1]) end
+'''
 # Joker effects
 ## I am NOT converting this to regex (yet)
 [[patches]]
@@ -1083,6 +1095,7 @@ if reps[j] == 1 then
 end
 
 SMODS.trigger_effects(effects, G.hand.cards[i])
+G.GAME.selected_back:trigger_effect({cardarea = G.hand, other_card = G.hand.cards[i], individual = true, end_of_round = true})
 j = j + (effects.calculated and 1 or #reps)
 
 -- TARGET: effects after hand evaluation
