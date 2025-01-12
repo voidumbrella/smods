@@ -197,61 +197,6 @@ end"""
 
 
 ## Allow cards to function as multiple enhancements (e.g. from jokers)
-
-# Calculate extra enhancements when played
-[[patches]]
-[patches.pattern]
-target = "functions/state_events.lua"
-pattern = "local effects = {eval_card(scoring_hand[i], {cardarea = G.play, full_hand = G.play.cards, scoring_hand = scoring_hand, poker_hand = text})}"
-position = "after"
-payload = '''
-local post_effect = {seals = effects[1].seals, edition = effects[1].edition}
-effects[1].seals = nil
-effects[1].edition = nil
-local extra_enhancements = SMODS.get_enhancements(scoring_hand[i], true)
-local old_ability = copy_table(scoring_hand[i].ability)
-local old_center = scoring_hand[i].config.center
-local old_center_key = scoring_hand[i].config.center_key
-for k, _ in pairs(extra_enhancements) do
-    if G.P_CENTERS[k] then
-        scoring_hand[i]:set_ability(G.P_CENTERS[k])
-        scoring_hand[i].ability.extra_enhancement = k
-        effects[#effects+1] = eval_card(scoring_hand[i], {cardarea = G.play, full_hand = G.play.cards, scoring_hand = scoring_hand, poker_hand = text, extra_enhancement = true})
-    end
-end
-effects[#effects+1] = post_effect
-scoring_hand[i].ability = old_ability
-scoring_hand[i].config.center = old_center
-scoring_hand[i].config.center_key = old_center_key
-scoring_hand[i]:set_sprites(old_center)
-'''
-match_indent = true
-
-# Calculate extra enhancements when held in hand
-[[patches]]
-[patches.pattern]
-target = "functions/state_events.lua"
-pattern = "local effects = {eval_card(G.hand.cards[i], {cardarea = G.hand, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands})}"
-position = "after"
-payload = '''
-local extra_enhancements = SMODS.get_enhancements(G.hand.cards[i], true)
-local old_ability = copy_table(G.hand.cards[i].ability)
-local old_center = G.hand.cards[i].config.center
-local old_center_key = G.hand.cards[i].config.center_key
-for k, _ in pairs(extra_enhancements) do
-    if G.P_CENTERS[k] then
-        G.hand.cards[i]:set_ability(G.P_CENTERS[k])
-        G.hand.cards[i].ability.extra_enhancement = k
-        effects[#effects+1] = eval_card(G.hand.cards[i], {cardarea = G.hand, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, extra_enhancement = true})
-    end
-end
-G.hand.cards[i].ability = old_ability
-G.hand.cards[i].config.center = old_center
-G.hand.cards[i].config.center_key = old_center_key
-G.hand.cards[i]:set_sprites(old_center)
-'''
-match_indent = true
-
 # Calculate extra enhancements when held in hand at end of round
 [[patches]]
 [patches.pattern]

@@ -513,3 +513,38 @@ match_indent = true
 position = 'at'
 pattern = 'if other_joker and other_joker ~= self then'
 payload = 'if other_joker and other_joker ~= self and not context.no_blueprint then'
+
+# extract joker loc_vars
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+match_indent = true
+position = 'at'
+pattern = 'function Card:generate_UIBox_ability_table()'
+payload = 'function Card:generate_UIBox_ability_table(vars_only)'
+
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+match_indent = true
+position = 'before'
+pattern = 'local badges = {}'
+payload = 'if vars_only then return loc_vars, main_start, main_end end'
+
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+match_indent = true
+position = 'after'
+pattern = "elseif _c.set == 'Joker' then"
+payload = '''
+    if not specific_vars then
+        local ability = copy_table(_c.config)
+        ability.set = 'Joker'
+        ability.name = _c.name
+        local ret = {Card.generate_UIBox_ability_table({ ability = ability, config = { center = _c }, bypass_lock = true}, true)}
+        specific_vars = ret[1]
+        if ret[2] then desc_nodes[#desc_nodes+1] = ret[2] end
+        main_end = ret[3]
+    end
+    '''
