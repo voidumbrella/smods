@@ -172,7 +172,7 @@ position = 'at'
 match_indent = true
 payload = '''
 function eval_card(card, context)
-    if card.ability.set ~= 'Joker' and card.debuff then return {} end
+    if card.ability.set ~= 'Joker' and card.debuff then return {}, {} end
     context = context or {}
     local ret = {}
 '''
