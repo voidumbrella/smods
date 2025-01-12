@@ -202,6 +202,16 @@ if context.cardarea == G.play then
     if p_dollars > 0 then 
         ret.p_dollars = p_dollars
     end
+
+    local jokers = card:calculate_joker(context)
+    if jokers then 
+        ret.jokers = jokers
+    end
+
+    local edition = card:get_edition(context)
+    if edition then 
+        ret.edition = edition
+    end
 '''
 match_indent = true
 position = "at"
@@ -229,6 +239,16 @@ if context.cardarea == G.play and context.main_scoring then
     end
 
     -- TARGET: main scoring on played cards
+
+    local jokers = card:calculate_joker(context)
+    if jokers then 
+        ret.jokers = jokers
+    end
+
+    local edition = card:calculate_edition(context)
+    if edition then 
+        ret.edition = edition
+    end
 """
 [[patches]]
 [patches.pattern]
