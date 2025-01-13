@@ -148,7 +148,7 @@ pattern = '''\{key = (?<badge>'.*?_seal'), set = 'Other'\}'''
 payload = '''(function()
             local t = {key = $badge, set = 'Other'}
             local seal = G.P_SEALS[t.key] or SMODS.Seal.badge_to_key[t.key] and G.P_SEALS[SMODS.Seal.badge_to_key[t.key]]
-            if seal and seal.generate_ui ~= 0 and type(seal.loc_vars == 'function') then
+            if seal and seal.generate_ui ~= 0 and type(seal.loc_vars) == 'function' then
                 local res = seal:loc_vars(info_queue, card) or {}
                 t.vars = res.vars
                 t.key = res.key or t.key
