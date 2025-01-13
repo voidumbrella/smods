@@ -116,5 +116,5 @@ target = "functions/common_events.lua"
 pattern = "elseif _c.set == 'Tag' then"
 position = "after"
 match_indent = true
-payload = '''specific_vars = specific_vars or Tag.get_uibox_table(_c, nil, true)
+payload = '''specific_vars = specific_vars or Tag.get_uibox_table({ name = _c.name, config = _c.config, ability = { orbital_hand = '['..localize('k_poker_hand')..']' }}, nil, true)
 '''

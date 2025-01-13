@@ -410,19 +410,15 @@ if card.ability.consumeable then
         nc = obj:keep_on_use(card)
     end
 end
-if not nc and card.area then card.area:remove_card(card) end'''
+if card.area and (not nc or card.area == G.pack_cards) then card.area:remove_card(card) end'''
 
 [[patches]]
 [patches.pattern]
 target = 'functions/button_callbacks.lua'
 pattern = "else draw_card(G.hand, G.play, 1, 'up', true, card, nil, mute) end"
 match_indent = true
-position = 'before'
-payload = '''
-elseif nc then
-    area:remove_from_highlighted(card)
-    play_sound('cardSlide2', nil, 0.3)
-    dont_dissolve = true'''
+position = 'at'
+payload = '''elseif not nc then draw_card(G.hand, G.play, 1, 'up', true, card, nil, mute) end'''
 
 # Card:set_sprites()
 [[patches]]
