@@ -99,7 +99,7 @@ pattern = "if v == 'gold_seal'*"
 match_indent = true
 position = 'before'
 payload = '''
-local seal = G.P_SEALS[v] or SMODS.Seal.badge_to_key[v] and G.P_SEALS[SMODS.Seal.badge_to_key[v]]
+local seal = G.P_SEALS[v] or G.P_SEALS[SMODS.Seal.badge_to_key[v] or '']
 if seal and seal.generate_ui ~= 0 then
 	local t = { key = v, set = 'Other' }
 	info_queue[#info_queue+1] = t
@@ -145,17 +145,7 @@ elseif _c.set == 'Seal' then
 target = 'functions/common_events.lua'
 position = 'at'
 pattern = '''\{key = (?<badge>'.*?_seal'), set = 'Other'\}'''
-payload = '''(function()
-            local t = {key = $badge, set = 'Other'}
-            local seal = G.P_SEALS[t.key] or SMODS.Seal.badge_to_key[t.key] and G.P_SEALS[SMODS.Seal.badge_to_key[t.key]]
-            if seal and seal.generate_ui ~= 0 and type(seal.loc_vars) == 'function' then
-                local res = seal:loc_vars(info_queue, card) or {}
-                t.vars = res.vars
-                t.key = res.key or t.key
-                t.set = res.set or t.set
-            end
-            return t
-        end)()'''
+payload = '''G.P_SEALS[$badge] or G.P_SEALS[SMODS.Seal.badge_to_key[$badge] or '']'''
 
 # Card:update_alert()
 [[patches]]
