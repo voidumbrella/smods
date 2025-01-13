@@ -1649,6 +1649,9 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end,
         get_obj = function(self, key) return G.P_SEALS[key] end
     }
+    for _,v in ipairs { 'Purple', 'Gold', 'Blue', 'Red' } do
+        SMODS.Seal:take_ownership(v, { badge_colour = G.C[v:upper()], pos = G.shared_seals[v].sprite_pos })
+    end
 
     -------------------------------------------------------------------------------------------------
     ----- API CODE GameObject.Suit
