@@ -949,9 +949,48 @@ function SMODS.load_mod_config(mod)
     end)
     if not s1 or type(config) ~= 'table' then config = {} end
     if not s2 or type(default_config) ~= 'table' then default_config = {} end
-    mod.config = {} 
-    for k, v in pairs(default_config) do mod.config[k] = v end
-    for k, v in pairs(config) do mod.config[k] = v end
+    mod.config = default_config
+    
+    -- Hacky line to allow for recursive calling of the function while keeping it local scoped, open to better solutions lol
+    local insertSavedConfig = function(...) end 
+    insertSavedConfig = function(savedCfg, defaultCfg)
+        for savedKey, savedVal in pairs(savedCfg) do
+            -- If the key doesn't exist in the default config, just set the whole thing regardless of value typing
+            if not defaultCfg[savedKey] then
+                defaultCfg[savedKey] = savedVal
+                goto continue
+            end
+
+            -- If the saved config value is a table and the default config value isn't a table, give priority to default
+            local savedValType = type(savedVal)
+            local defaultValType = type(defaultCfg[savedKey])
+            if savedValType == "table" and defaultValType ~= "table" then
+                goto continue
+            end
+
+            -- If the types of the saved config value and default config value are mismatched, give priority to the default
+            if savedValType ~= defaultValType then
+                goto continue
+            end
+
+            -- If the saved config value is a table and so is the default config value, call this function recursively
+            if savedValType == "table" and defaultValType == "table" then
+                insertSavedConfig(savedVal, defaultCfg[savedKey])
+                goto continue
+            end
+                
+            -- If the saved config value doesn't match the default config value, use the saved value
+            if savedVal ~= defaultCfg[savedKey] then
+                defaultCfg[savedKey] = savedVal
+                goto continue
+            end
+            
+            ::continue::
+        end
+    end
+
+    insertSavedConfig(config, mod.config)
+
     return mod.config
 end
 SMODS:load_mod_config()
