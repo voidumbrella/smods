@@ -1162,6 +1162,13 @@ SMODS.calculate_repetitions = function(card, context, reps)
             end
         end
     end
+    local effect = G.GAME.selected_back:trigger_effect(context)
+    if effect and effect.repetitions then
+        for h=1, effect.repetitions do
+            effect.card = effect.card or G.deck.cards[1] or G.deck
+            reps[#reps+1] = {key = effect}
+        end
+    end
     return reps
 end
 
