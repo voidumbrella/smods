@@ -932,7 +932,9 @@ end
 -- TARGET: add different CardAreas for destroying checks
 
 -- context.remove_playing_cards calculations
-SMODS.calculate_context({scoring_hand = scoring_hand, remove_playing_cards = true, removed = cards_destroyed})
+if cards_destroyed[1] then
+    SMODS.calculate_context({scoring_hand = scoring_hand, remove_playing_cards = true, removed = cards_destroyed})
+end
 
 -- TARGET: effects when cards are removed
 
@@ -953,7 +955,9 @@ position = "at"
 match_indent = true
 payload = '''
 -- context.remove_playing_cards from discard
-SMODS.calculate_context({remove_playing_cards = true, removed = destroyed_cards})
+if destroyed_cards[1] then
+    SMODS.calculate_context({remove_playing_cards = true, removed = destroyed_cards})
+end
 
 -- TARGET: effects after cards destroyed in discard'''
 
@@ -1370,14 +1374,6 @@ payload = '''
 SMODS.calculate_context({reroll_shop = true})
 '''
 
-# custom sounds in card_eval_status_text
-[[patches]]
-[patches.pattern]
-target = 'functions/common_events.lua'
-pattern = '''if extra.edition then '''
-position = 'before'
-match_indent = true
-payload = '''sound = extra.sound or sound'''
 
 # Fix purple seal calc
 [[patches]]
@@ -1470,3 +1466,18 @@ match_indent = true
 position = 'at'
 pattern = '''local percent = (i-0.999)/(#G.hand.cards-0.998) + (j-1)*0.1'''
 payload = '''percent = (i-0.999)/(#G.hand.cards-0.998) + (j-1)*0.1'''
+
+# Add support for pitch and volume returns in effects
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+match_indent = true
+position = 'after'
+pattern = '''
+volume = extra.edition and 0.3 or sound == 'multhit2' and 0.7 or 1
+'''
+payload = '''
+sound = extra.sound or sound
+percent = extra.pitch or percent
+volume = extra.volume or volume
+'''
