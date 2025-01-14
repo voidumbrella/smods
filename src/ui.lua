@@ -951,45 +951,23 @@ function SMODS.load_mod_config(mod)
     if not s2 or type(default_config) ~= 'table' then default_config = {} end
     mod.config = default_config
     
-    -- Hacky line to allow for recursive calling of the function while keeping it local scoped, open to better solutions lol
-    local insertSavedConfig = function(...) end 
-    insertSavedConfig = function(savedCfg, defaultCfg)
+    local function insert_saved_config(savedCfg, defaultCfg)
         for savedKey, savedVal in pairs(savedCfg) do
-            -- If the key doesn't exist in the default config, just set the whole thing regardless of value typing
-            if not defaultCfg[savedKey] then
-                defaultCfg[savedKey] = savedVal
-                goto continue
-            end
-
-            -- If the saved config value is a table and the default config value isn't a table, give priority to default
             local savedValType = type(savedVal)
             local defaultValType = type(defaultCfg[savedKey])
-            if savedValType == "table" and defaultValType ~= "table" then
-                goto continue
-            end
-
-            -- If the types of the saved config value and default config value are mismatched, give priority to the default
-            if savedValType ~= defaultValType then
-                goto continue
-            end
-
-            -- If the saved config value is a table and so is the default config value, call this function recursively
-            if savedValType == "table" and defaultValType == "table" then
-                insertSavedConfig(savedVal, defaultCfg[savedKey])
-                goto continue
-            end
-                
-            -- If the saved config value doesn't match the default config value, use the saved value
-            if savedVal ~= defaultCfg[savedKey] then
+            if not defaultCfg[savedKey] then
                 defaultCfg[savedKey] = savedVal
-                goto continue
+            elseif savedValType ~= defaultValType then
+            elseif savedValType == "table" and defaultValType == "table" then
+                insert_saved_config(savedVal, defaultCfg[savedKey])
+            elseif savedVal ~= defaultCfg[savedKey] then
+                defaultCfg[savedKey] = savedVal
             end
             
-            ::continue::
         end
     end
 
-    insertSavedConfig(config, mod.config)
+    insert_saved_config(config, mod.config)
 
     return mod.config
 end
