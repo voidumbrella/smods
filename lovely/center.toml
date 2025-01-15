@@ -534,7 +534,7 @@ match_indent = true
 position = 'after'
 pattern = "elseif _c.set == 'Joker' then"
 payload = '''
-    if not specific_vars then
+    if not card then
         local ability = copy_table(_c.config)
         ability.set = 'Joker'
         ability.name = _c.name
