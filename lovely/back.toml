@@ -46,7 +46,7 @@ match_indent = true
 payload = '''
 	local obj = self.effect.center
 	if obj.apply and type(obj.apply) == 'function' then
-		obj:apply()
+		obj:apply(self)
 	end'''
 
 # Back:trigger_effect(args)
@@ -58,9 +58,16 @@ position = 'after'
 match_indent = true
 payload = '''
 	local obj = self.effect.center
-	if obj.trigger_effect and type(obj.trigger_effect) == 'function' then
+	if type(obj.calculate) == 'function' then
+		local o = {obj:calculate(self, args)}
+		if next(o) ~= nil then return unpack(o) end
+	elseif type(obj.trigger_effect) == 'function' then
+		-- kept for compatibility
 		local o = {obj:trigger_effect(args)}
-		if o then return unpack(o) end
+		if next(o) ~= nil then
+			sendWarnMessage(('Found `trigger_effect` function on SMODS.Back object "%s". This field is deprecated; please use `calculate` instead.'):format(obj.key), 'Back')
+			return unpack(o)
+		end
 	end'''
 
 ## Back:generate_UI

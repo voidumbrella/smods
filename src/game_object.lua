@@ -1062,9 +1062,9 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 target.text_colour = res.text_colour
             end
             if desc_nodes == full_UI_table.main and not full_UI_table.name then
-                full_UI_table.name = self.set == 'Enhanced' and 'temp_value' or localize { type = 'name', set = target.set, key = target.key, nodes = full_UI_table.name }
+                full_UI_table.name = self.set == 'Enhanced' and 'temp_value' or localize { type = 'name', set = target.set, key = res.name_key or target.key, nodes = full_UI_table.name, vars = res.name_vars or target.vars or {} }
             elseif desc_nodes ~= full_UI_table.main and not desc_nodes.name and self.set ~= 'Enhanced' then
-                desc_nodes.name = localize{type = 'name_text', key = target.key, set = target.set } 
+                desc_nodes.name = localize{type = 'name_text', key = res.name_key or target.key, set = target.set }
             end
             if specific_vars and specific_vars.debuffed and not res.replace_debuff then
                 target = { type = 'other', key = 'debuffed_' ..
@@ -1274,9 +1274,9 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 target.text_colour = res.text_colour
             end
             if desc_nodes == full_UI_table.main and not full_UI_table.name then
-                full_UI_table.name = localize{type = 'name', set = 'Other', key = target.key, nodes = full_UI_table.name}
+                full_UI_table.name = localize{type = 'name', set = 'Other', key = res.name_key or target.key, nodes = full_UI_table.name, vars = res.name_vars or target.vars or {}}
             elseif desc_nodes ~= full_UI_table.main and not desc_nodes.name then
-                desc_nodes.name = localize{type = 'name_text', key = target.key, set = 'Other' } 
+                desc_nodes.name = localize{type = 'name_text', key = res.name_key or target.key, set = 'Other' } 
             end
             localize(target)
             desc_nodes.background_colour = res.background_colour
@@ -1647,8 +1647,45 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             SMODS.process_loc_text(G.localization.descriptions.Other, self.key:lower() .. '_seal', self.loc_txt)
             SMODS.process_loc_text(G.localization.misc.labels, self.key:lower() .. '_seal', self.loc_txt, 'label')
         end,
-        get_obj = function(self, key) return G.P_SEALS[key] end
+        get_obj = function(self, key) return G.P_SEALS[key] end,
+        generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
+            local target = {
+                type = 'other',
+                set = 'Other',
+                key = self.key:lower()..'_seal',
+                nodes = desc_nodes,
+                vars = specific_vars or {},
+            }
+            local res = {}
+            if self.loc_vars and type(self.loc_vars) == 'function' then
+                res = self:loc_vars(info_queue, card) or {}
+                target.vars = res.vars or target.vars
+                target.key = res.key or target.key
+                if res.set then
+                    target.type = 'descriptions'
+                    target.set = res.set
+                end
+                target.scale = res.scale
+                target.text_colour = res.text_colour
+            end
+            if desc_nodes == full_UI_table.main and not full_UI_table.name then
+                full_UI_table.name = localize { type = 'name', set = target.set, key = res.name_key or target.key, nodes = full_UI_table.name, vars = res.name_vars or target.vars or {} }
+            elseif desc_nodes ~= full_UI_table.main and not desc_nodes.name then
+                desc_nodes.name = localize{type = 'name_text', key = res.name_key or target.key, set = target.set }
+            end
+            if res.main_start then
+                desc_nodes[#desc_nodes + 1] = res.main_start
+            end
+            localize(target)
+            if res.main_end then
+                desc_nodes[#desc_nodes + 1] = res.main_end
+            end
+            desc_nodes.background_colour = res.background_colour
+        end,
     }
+    for _,v in ipairs { 'Purple', 'Gold', 'Blue', 'Red' } do
+        SMODS.Seal:take_ownership(v, { badge_colour = G.C[v:upper()], pos = G.shared_seals[v].sprite_pos, generate_ui = SMODS.Seal.generate_ui })
+    end
 
     -------------------------------------------------------------------------------------------------
     ----- API CODE GameObject.Suit
@@ -2657,9 +2694,9 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 target.text_colour = res.text_colour
             end
             if desc_nodes == full_UI_table.main and not full_UI_table.name then
-                full_UI_table.name = localize { type = 'name', set = target.set, key = target.key, nodes = full_UI_table.name }
+                full_UI_table.name = localize { type = 'name', set = target.set, key = res.name_key or target.key, nodes = full_UI_table.name, vars = res.name_vars or res.vars or {} }
             elseif desc_nodes ~= full_UI_table.main and not desc_nodes.name then
-                desc_nodes.name = localize{type = 'name_text', key = target.key, set = target.set } 
+                desc_nodes.name = localize{type = 'name_text', key = res.name_key or target.key, set = target.set } 
             end
             if res.main_start then
                 desc_nodes[#desc_nodes + 1] = res.main_start

@@ -7,6 +7,7 @@ SMODS.id = 'Steamodded'
 SMODS.version = MODDED_VERSION:gsub('%-STEAMODDED', '')
 SMODS.can_load = true
 SMODS.meta_mod = true
+SMODS.config_file = 'config.lua'
 
 -- Include lovely and nativefs modules
 local nativefs = require "nativefs"
