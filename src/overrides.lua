@@ -1665,15 +1665,22 @@ end
 G.FUNCS.change_collab = function(args)
 	G.SETTINGS.CUSTOM_DECK.Collabs[args.cycle_config.curr_suit] = G.COLLABS.options[args.cycle_config.curr_suit][args.to_key] or 'default'
 	G.FUNCS.update_collab_cards(args.to_key, args.cycle_config.curr_suit)
+	local deckskin_key = SMODS.get_deckskin_key_from_num(args.to_key, args.cycle_config.curr_suit)
 	local palette_loc_options = SMODS.get_palette_loc_options(args.to_key, args.cycle_config.curr_suit)
 	local swap_node = G.OVERLAY_MENU:get_UIE_by_ID('palette_selector')
+	local selected_palette = 1
+	for i, v in ipairs(G.COLLABS.colourpalettes[deckskin_key]) do
+		if G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] == v then
+			selected_palette = i
+		end
+	end
 	if swap_node then
 		for i=1, #swap_node.children do
 			swap_node.children[i]:remove()
 			swap_node.children[i] = nil
 		end
 		local new_palette_selector = {n=G.UIT.R, config={align = "cm", id = 'palette_selector'}, nodes={
-			create_option_cycle({options = palette_loc_options, w = 5.5, cycle_shoulders = false, curr_suit = args.cycle_config.curr_suit, curr_skin = args.to_key, opt_callback = 'change_colour_palette', current_option = 1, colour = G.C.ORANGE, focus_args = {snap_to = true, nav = 'wide'}}),
+			create_option_cycle({options = palette_loc_options, w = 5.5, cycle_shoulders = false, curr_suit = args.cycle_config.curr_suit, curr_skin = deckskin_key, opt_callback = 'change_colour_palette', current_option = selected_palette, colour = G.C.ORANGE, focus_args = {snap_to = true, nav = 'wide'}}),
 		}}
 		swap_node.UIBox:add_child(new_palette_selector, swap_node)
 	end
@@ -1706,4 +1713,5 @@ G.FUNCS.change_colour_palette = function(args)
 			v:set_sprites(nil, v.config.card)
 		end
 	end
+	G:save_settings()
 end

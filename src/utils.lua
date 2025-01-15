@@ -991,25 +991,32 @@ SMODS.get_deckskin_palette = function(key, palette_key, suit)
                     return p
                 end
             end
+            return v.palettes[1]
         end
     end
 end
 
+SMODS.get_deckskin_key_from_num = function(num, suit)
+    for k, v in pairs(G.localization.misc.collabs[suit]) do
+        if k == tostring(num) then
+            return G.COLLABS.options[suit][num]
+        end
+    end
+end
+
+
 SMODS.get_palette_loc_options = function(key, suit)
     local deckskin = SMODS.get_deckskin(key , suit)
 
-    local palette_loc_options = localize(key, 'collab_palettes')
-
     local current_palette = 1
-
-    for i, p in ipairs(G.COLLABS.colourpalettes[key]) do
-        if G.SETTINGS.colourpalettes[suit] == p.key then
-            current_palette = i
-        end
+    if type(key) == "number" then
+        key = SMODS.get_deckskin_key_from_num(key, suit)
+    else
+        current_palette = key
     end
 
     local conv_palette_loc_options = {}
-    for k, v in pairs(palette_loc_options) do
+    for k, v in pairs(G.localization.misc.collab_palettes[key]) do
         conv_palette_loc_options[tonumber(k)] = v
     end
 
@@ -1045,14 +1052,14 @@ G.FUNCS.update_collab_cards = function(key, suit, silent)
     local deckskin = SMODS.get_deckskin(key, suit)
     local smodSuit = SMODS.Suits[suit]
     local palette = SMODS.get_deckskin_palette(deckskin.key, G.SETTINGS.colourpalettes[suit], suit)
-    local d_ranks = palette.display_ranks or palette.ranks or deckskin.display_ranks or deckskin.ranks
+    local d_ranks = (palette and (palette.display_ranks or palette.ranks)) or deckskin.display_ranks or deckskin.ranks
     for i, r in ipairs(d_ranks) do
         local r = d_ranks[i]
         local rank = SMODS.Ranks[r]
         local card_code = smodSuit.card_key .. '_' .. rank.card_key
         cards_order[#cards_order+1] = card_code
         local card = Card(G.ROOM.T.w+5, G.ROOM.T.h-5, G.CARD_W*1.2, G.CARD_H*1.2, G.P_CARDS[card_code], G.P_CENTERS.c_base)
-        card.no_ui = true
+        card.no_ui = false
 
         cards[#cards + 1] = card
     end
@@ -1069,33 +1076,9 @@ G.FUNCS.update_collab_cards = function(key, suit, silent)
         end
         for i = #cards, 1, -1 do
             G.cdds_cards:emplace(cards[i])
-            if not silent then
-                G.E_MANAGER:add_event(Event({
-                    trigger = 'immediate',
-                    func = (function()
-                        play_sound('card1', 0.85 + (i*100/#cards)*0.2/100, 0.6*(math.max((21-i)/20,0.7) or 1))
-                        return true
-                    end)
-                }))
-            end
         end
     end
     G.cdds_cards.config.card_limit = bufferCardLimitForSmallDS(cards, 4)
-end
-
-SMODS.add_deckskin_palette = function(key, palette)
-    local deckskin = SMODS.DeckSkins[key]
-    if deckskin.palettes == nil then
-        sendWarnMessage(('Old DeckSkin formatting detected on DeckSkin %s! Cannot add new palettes to an outdated DeckSkin'):format(self.key), self.set)
-        return
-    end
-    table.insert(deckskin.palettes, palette)
-    -- This doesn't work??? says collab_palettes is nil. Must mean its not initialized yet? But why
-    --[[
-    if palette.loc_txt then
-        SMODS.process_loc_text(G.localization.misc.collab_palettes[key], #G.localization.misc.collab_palettes[key]..'', palette.loc_txt)
-    end
-    ]]--
 end
 
 -- This function handles the calculation of each effect returned to evaluate play.

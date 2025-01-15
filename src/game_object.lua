@@ -2256,33 +2256,6 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             end
             if self:check_dependencies() then
                 if self.palettes and not (self.ranks and self.lc_atlas) then
-                    -- Maybe won't use this, switching between option cycle and toggle depending on if this flag is true may be pointless
-                    --[[
-                    self.lc_hc_toggle = false
-                    local foundLC = false
-                    local foundHC = false
-                    local lcIndex = nil
-                    local hcIndex = nil
-                    for i, v in ipairs(self.palettes) do
-                        if type(v) == "table" then
-                            if v.key == 'lc' then
-                                foundLC = true
-                                lcIndex = i
-                            end
-                            if v.key == 'hc' then
-                                foundHC = true
-                                hcIndex = i
-                            end
-                        end
-                    end
-                    if foundLC and foundHC and #self.palettes == 2 then
-                        self.lc_hc_toggle = true
-                        if hcIndex and lcIndex and hcIndex < lcIndex then
-                            self.palettes[hcIndex], self.palettes[lcIndex] = self.palettes[lcIndex], self.palettes[hcIndex]
-                        end
-                    end
-                    ]]--
-
                     local ds_errors = {
                         'Missing key value in Palette %s on DeckSkin %s',
                         'Missing ranks value in Palette %s on DeckSkin %s',
@@ -2347,15 +2320,22 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 G.COLLABS.options[self.suit] = {def}
             end
 
+            if G.COLLABS.colourpalettes == nil then
+                G.COLLABS.colourpalettes = {}
+            end
+            if G.COLLABS.colourpalettes[self.key] == nil then
+                G.COLLABS.colourpalettes[self.key] = {}
+            end
             if self.palettes then
-                if G.COLLABS.colourpalettes == nil then
-                    G.COLLABS.colourpalettes = {}
-                end
-                if G.COLLABS.colourpalettes[self.key] == nil then
-                    G.COLLABS.colourpalettes[self.key] = {}
-                end
                 for i, v in ipairs(self.palettes) do
                     G.COLLABS.colourpalettes[self.key][#G.COLLABS.colourpalettes[self.key] + 1] = v.key
+                end
+            else
+                if self.lc_atlas == self.hc_atlas then
+                    G.COLLABS.colourpalettes[self.key][#G.COLLABS.colourpalettes[self.key] + 1] = 'lc'
+                else
+                    G.COLLABS.colourpalettes[self.key][#G.COLLABS.colourpalettes[self.key] + 1] = 'lc'
+                    G.COLLABS.colourpalettes[self.key][#G.COLLABS.colourpalettes[self.key] + 1] = 'hc'
                 end
             end
 
@@ -2421,6 +2401,15 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             Diamonds = 'lc',
         }
         G.save_settings()
+    end
+
+    SMODS.add_deckskin_palette = function(key, palette)
+        local deckskin = SMODS.DeckSkins[key]
+        if deckskin.palettes == nil then
+            sendWarnMessage(('Old DeckSkin formatting detected on DeckSkin %s! Cannot add new palettes to an outdated DeckSkin'):format(self.key), self.set)
+            return
+        end
+        table.insert(deckskin.palettes, palette)
     end
 
     -------------------------------------------------------------------------------------------------

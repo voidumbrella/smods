@@ -23,7 +23,7 @@ if _front and _front.suit and G.SETTINGS.CUSTOM_DECK and G.SETTINGS.CUSTOM_DECK.
                     if deckSkin.ranks[i] == _front.value then hasRank = true break end
                 end
                 if hasRank then
-                    local atlas = G.ASSET_ATLAS[G.SETTINGS.colourblind_option and deckSkin.hc_atlas or deckSkin.lc_atlas]
+                    local atlas = G.ASSET_ATLAS[G.SETTINGS.colourpalettes[_front.suit] == 'hc' and deckSkin.hc_atlas or deckSkin.lc_atlas]
                     if atlas then
                         if deckSkin.posStyle == 'collab' then
                             return atlas, G.COLLABS.pos[_front.value]
@@ -112,9 +112,16 @@ local deckskin_key = G.COLLABS.options[_suit][current_option]
 
 local palette_loc_options = SMODS.get_palette_loc_options(deckskin_key, _suit)
 
+local selected_palette = 1
+for i, v in ipairs(G.COLLABS.colourpalettes[deckskin_key]) do
+    if G.SETTINGS.colourpalettes[_suit] == v then
+        selected_palette = i
+    end
+end
+
 table.insert(t,
     {n=G.UIT.R, config={align = "cm", id = 'palette_selector'}, nodes={
-      create_option_cycle({options = palette_loc_options, w = 5.5, cycle_shoulders = false, curr_suit = _suit, curr_skin = deckskin_key, opt_callback = 'change_colour_palette', current_option = current_palette, colour = G.C.ORANGE, focus_args = {snap_to = true, nav = 'wide'}}),
+      create_option_cycle({options = palette_loc_options, w = 5.5, cycle_shoulders = false, curr_suit = _suit, curr_skin = deckskin_key, opt_callback = 'change_colour_palette', current_option = selected_palette, colour = G.C.ORANGE, focus_args = {snap_to = true, nav = 'wide'}}),
     }}
   )
 '''
