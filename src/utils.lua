@@ -1111,6 +1111,7 @@ SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
     end
     if effect.juice_card then G.E_MANAGER:add_event(Event({trigger = 'immediate', func = function () effect.juice_card:juice_up(0.1); scored_card:juice_up(0.1) return true end})) end
     if effect.effect then calculated = true end
+				if effect.remove then calculated = true end
     -- if effect.message then calculated = SMODS.calculate_individual_effect(effect, scored_card, 'message', effect.message, from_edition, pre_jokers) end
     return calculated
 end
