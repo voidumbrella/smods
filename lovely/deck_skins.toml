@@ -47,42 +47,34 @@ if _front and _front.suit and G.SETTINGS.CUSTOM_DECK and G.SETTINGS.CUSTOM_DECK.
                     if palette.ranks[i] == _front.value then hasRank = true break end
                 end
                 if hasRank then
-                    if type(palette.atlas) == "table" then
-                        if palette.atlas[_front.value] then
-                            local atlas = G.ASSET_ATLAS[palette.atlas]
-                            if palette.pos and not palette.posStyle then
-                                return atlas, palette.pos
-                            else
-                                if palette.posStyle == 'collab' then
-                                    return atlas, G.COLLABS.pos[_front.value]
-                                elseif palette.posStyle == 'suit' then
-                                    return atlas, { x = _front.pos.x, y = 0}
-                                elseif palette.posStyle == 'deck' then
-                                    return atlas, _front.pos
-                                elseif palette.posStyle == 'ranks' or nil then
-                                    for i, rank in ipairs(deckSkin.ranks) do
-                                        if rank == _front.value then
-                                            return atlas, { x = i - 1, y = 0}
-                                        end
-                                    end
-                                end
+                    local atlas = G.ASSET_ATLAS[palette.atlas]
+                    if type(palette.posStyle) == "table" then
+                        if palette.posStyle[_front.value] then
+                            if palette.posStyle[_front.value].atlas then
+                                atlas = G.ASSET_ATLAS[palette.posStyle[_front.value].atlas]
+                            end
+                            if palette.posStyle[_front.value].pos then
+                                return atlas, palette.posStyle[_front.value].pos
+                            end
+                        elseif palette.posStyle.fallbackStyle then
+                            if palette.posStyle.fallbackStyle == 'collab' then
+                                return atlas, G.COLLABS.pos[_front.value]
+                            elseif palette.posStyle.fallbackStyle == 'suit' then
+                                return atlas, { x = _front.pos.x, y = 0}
+                            elseif palette.posStyle.fallbackStyle == 'deck' then
+                                return atlas, _front.pos
                             end
                         end
-                    else
-                        local atlas = G.ASSET_ATLAS[palette.atlas]
-                        if palette.posStyle then
-                            if palette.posStyle == 'collab' then
-                                return atlas, G.COLLABS.pos[_front.value]
-                            elseif palette.posStyle == 'suit' then
-                                return atlas, { x = _front.pos.x, y = 0}
-                            elseif palette.posStyle == 'deck' then
-                                return atlas, _front.pos
-                            elseif palette.posStyle == 'ranks' or nil then
-                                for i, rank in ipairs(palette.ranks) do
-                                    if rank == _front.value then
-                                        return atlas, { x = i - 1, y = 0}
-                                    end
-                                end
+                    elseif palette.posStyle == 'collab' then
+                        return atlas, G.COLLABS.pos[_front.value]
+                    elseif palette.posStyle == 'suit' then
+                        return atlas, { x = _front.pos.x, y = 0}
+                    elseif palette.posStyle == 'deck' then
+                        return atlas, _front.pos
+                    elseif palette.posStyle == 'ranks' or nil then
+                        for i, rank in ipairs(palette.ranks) do
+                            if rank == _front.value then
+                                return atlas, { x = i - 1, y = 0}
                             end
                         end
                     end
@@ -220,3 +212,5 @@ function create_UIBox_customize_deck()
   return t
 end
 '''
+
+

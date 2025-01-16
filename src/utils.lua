@@ -980,6 +980,7 @@ SMODS.get_deckskin = function(key, suit)
             return v
         end
     end
+    return nil
 end
 
 SMODS.get_deckskin_palette = function(key, palette_key, suit)

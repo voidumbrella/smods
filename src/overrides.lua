@@ -1672,6 +1672,7 @@ G.FUNCS.change_collab = function(args)
 	for i, v in ipairs(G.COLLABS.colourpalettes[deckskin_key]) do
 		if G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] == v then
 			selected_palette = i
+			G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] = G.COLLABS.colourpalettes[deckskin_key][i]
 		end
 	end
 	if swap_node then
@@ -1692,12 +1693,6 @@ G.FUNCS.change_collab = function(args)
 	G:save_settings()
 end
 
-print_atlas_pos = function(atlas, pos)
-	sendDebugMessage("atlas: "..atlas)
-	sendDebugMessage("pos:")
-	sendDebugMessage(tprint(pos))
-end
-
 G.FUNCS.change_colour_palette = function(args)
 	G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] = G.COLLABS.colourpalettes[args.cycle_config.curr_skin][args.to_key]
 	G.FUNCS.update_collab_cards(args.cycle_config.curr_skin, args.cycle_config.curr_suit)
@@ -1707,6 +1702,8 @@ G.FUNCS.change_colour_palette = function(args)
 		G.C.SUITS.Diamonds = new_colour_proto.Diamonds
 		G.C.SUITS.Spades = new_colour_proto.Spades
 		G.C.SUITS.Clubs = new_colour_proto.Clubs
+	else
+		--Please pretty please someone else figure out dynamic suit colors
 	end
 	for k, v in pairs(G.I.CARD) do
 		if v.config and v.config.card and v.children.front and v.ability.effect ~= 'Stone Card' then

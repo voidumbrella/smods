@@ -2440,10 +2440,28 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         G.save_settings()
     end
 
-    SMODS.add_deckskin_palette = function(key, palette)
-        local deckskin = SMODS.DeckSkins[key]
-        if deckskin.palettes == nil then
-            sendWarnMessage(('Old DeckSkin formatting detected on DeckSkin %s! Cannot add new palettes to an outdated DeckSkin'):format(self.key), self.set)
+    SMODS.add_deckskin_palette = function(key, suit, palette)
+        if key == 'default' then
+            key = key.."_"..suit
+        end
+        local ds_errors = {
+            'Missing key value, cannot insert palette in DeckSkin %s',
+            'Missing ranks value in Palette %s on DeckSkin %s',
+            'Missing atlas value in Palette %s on DeckSkin %s',
+        }
+        if not palette.key then
+            sendWarnMessage((ds_errors[1]):format(key), "DeckSkin Palettes")
+            return
+        elseif not palette.ranks then
+            sendWarnMessage((ds_errors[2]):format(key), "DeckSkin Palettes")
+            return
+        elseif not palette.atlas then
+            sendWarnMessage((ds_errors[3]):format(key), "DeckSkin Palettes")
+            return
+        end
+        local deckskin = SMODS.get_deckskin(key, suit)
+        if deckskin == nil then
+            sendWarnMessage(('Could not find DeckSkin with key %s! Palette %s will not be added.'):format(key, palette.key), "DeckSkin Palettes")
             return
         end
         table.insert(deckskin.palettes, palette)
