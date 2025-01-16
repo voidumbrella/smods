@@ -673,7 +673,7 @@ if SMODS.has_enhancement(scoring_hand[i], 'm_glass') and not scoring_hand[i].deb
     destroyed = true
 end
 
-local eval, post = eval_card(scoring_hand[i], {destroying_card = scoring_hand[i], full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands})
+local eval, post = eval_card(scoring_hand[i], {destroying_card = scoring_hand[i], full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, cardarea = G.play})
 local self_destroy = false
 for key, effect in pairs(eval) do
     self_destroy = SMODS.calculate_effect(effect, scoring_hand[i])
@@ -713,7 +713,7 @@ for i=1, #G.hand.cards do
         if self_destroy then destroyed = true end
     end
     
-    local eval, post = eval_card(G.hand.cards[i], {destroying_card_hand = G.hand.cards[i], full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands})
+    local eval, post = eval_card(G.hand.cards[i], {destroying_card_hand = G.hand.cards[i], full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, cardarea = G.hand})
     local self_destroy = false
     for key, effect in pairs(eval) do
         self_destroy = SMODS.calculate_effect(effect, G.hand.cards[i])
