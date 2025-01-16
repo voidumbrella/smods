@@ -1209,7 +1209,9 @@ function SMODS.calculate_context(context, return_table)
     for k=1, #G.jokers.cards + #G.consumeables.cards do
         local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
         --calculate the joker effects
+        context.main_eval = true
         local effects = {eval_card(_card, context)}
+        context.main_eval = nil
         if context.other_joker then
             for k, v in pairs(effects[1]) do
                 v.other_card = _card
@@ -1438,6 +1440,55 @@ function SMODS.calculate_end_of_round_effects(context)
             j = j + (effects.calculated and 1 or #reps)
             
             -- TARGET: effects after end of round evaluation
+        end
+    end
+end
+
+function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand)
+    for i,card in ipairs(scoring_hand or context.cardarea.cards) do
+        local destroyed = nil
+        --un-highlight all cards
+        if scoring_hand then highlight_card(card,(i-0.999)/(#scoring_hand-0.998),'down') end
+
+        -- context.destroying_card calculations
+        context.destroy_card = card
+        context.destroying_card = scoring_hand and card
+        for j = 1, #G.jokers.cards + #G.consumeables.cards do
+            local _card = G.jokers.cards[j] or G.consumeables.cards[j-#G.jokers.cards]
+            local eval, post = eval_card(_card, context)
+            local self_destroy = false
+            for key, effect in pairs(eval) do
+                if type(effect) == 'table' then
+                    self_destroy = SMODS.calculate_effect(effect, card)
+                else
+                    self_destroy = effect
+                end
+            end
+            SMODS.trigger_effects({post}, card)
+            if self_destroy then destroyed = true end
+        end
+        
+        if scoring_hand and SMODS.has_enhancement(card, 'm_glass') and not card.debuff and pseudorandom('glass') < G.GAME.probabilities.normal/(card.ability.name == 'Glass Card' and card.ability.extra or G.P_CENTERS.m_glass.config.extra) then
+            destroyed = true
+        end
+        
+        local eval, post = eval_card(card, context)
+        local self_destroy = false
+        for key, effect in pairs(eval) do
+            self_destroy = SMODS.calculate_effect(effect, card)
+        end
+        SMODS.trigger_effects({post}, card)
+        if self_destroy then destroyed = true end
+        
+        -- TARGET: card destroyed
+
+        if destroyed then 
+            if SMODS.shatters(card) then
+                card.shattered = true
+            else 
+                card.destroyed = true
+            end 
+            cards_destroyed[#cards_destroyed+1] = card
         end
     end
 end

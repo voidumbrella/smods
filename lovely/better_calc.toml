@@ -686,54 +686,24 @@ if self_destroy then destroyed = true end
 
 # context.remove_playing_cards
 [[patches]]
-[patches.pattern]
+[patches.regex]
 target = "functions/state_events.lua"
-pattern = '''
-for j=1, #G.jokers.cards do
-    eval_card(G.jokers.cards[j], {cardarea = G.jokers, remove_playing_cards = true, removed = cards_destroyed})
-end'''
-match_indent = true
+pattern = '''(?<indent>[\t ]*)local cards_destroyed = \{\}\n(.*\n)*?\s+for j=1, #G\.jokers\.cards do\n\s+eval_card\(G\.jokers\.cards\[j\], \{cardarea = G\.jokers, remove_playing_cards = true, removed = cards_destroyed\}\)\n\s+end'''
+line_prepend = '$indent'
 position = "at"
 payload = '''
-for i=1, #G.hand.cards do
-    local destroyed = nil
-
-    -- context.destroying_card calculations
-    for j = 1, #G.jokers.cards do
-        local eval, post = eval_card(G.jokers.cards[j], {destroying_card_hand = G.hand.cards[i], full_hand = G.play.cards})
-        local self_destroy = false
-        for key, effect in pairs(eval) do
-            if type(effect) == 'table' then
-                self_destroy = SMODS.calculate_effect(effect, G.play.cards[i])
-            else
-                self_destroy = effect
-            end
-        end
-        SMODS.trigger_effects({post}, G.hand.cards[i])
-        if self_destroy then destroyed = true end
-    end
-    
-    local eval, post = eval_card(G.hand.cards[i], {destroying_card_hand = G.hand.cards[i], full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, cardarea = G.hand})
-    local self_destroy = false
-    for key, effect in pairs(eval) do
-        self_destroy = SMODS.calculate_effect(effect, G.hand.cards[i])
-    end
-    SMODS.trigger_effects({post}, G.hand.cards[i])
-    if self_destroy then destroyed = true end
-    
-    -- TARGET: card held destroyed when hand played
-
-    if destroyed then --
-        if SMODS.shatters(G.hand.cards[i]) then
-            G.hand.cards[i].shattered = true
-        else 
-            G.hand.cards[i].destroyed = true
-        end 
-        cards_destroyed[#cards_destroyed+1] = G.hand.cards[i]
+local cards_destroyed = {}
+for _,v in ipairs({
+    G.play,
+    G.hand,
+    SMODS.optional_features.cardareas.deck and G.deck or {},
+    SMODS.optional_features.cardareas.discard and G.discard or {},
+    -- TARGET: add your own destroying card card areas here
+}) do
+    if next(v) then
+        SMODS.calculate_destroying_cards({ full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, cardarea = v }, cards_destroyed, v == G.play and scoring_hand or nil)
     end
 end
-
--- TARGET: add different CardAreas for destroying checks
 
 -- context.remove_playing_cards calculations
 if cards_destroyed[1] then
