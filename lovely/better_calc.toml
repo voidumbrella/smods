@@ -287,7 +287,7 @@ payload = """
 elseif card.area == G.hand or card.area == G.deck then
 """
 
-# Alignment for G.deck (for when you run out of cards)
+# card_eval_status_text alignment patches 
 [[patches]]
 [patches.pattern]
 target = 'functions/common_events.lua'
@@ -852,7 +852,7 @@ match_indent = true
 payload = '''
 -- context.end_of_round calculations
 SMODS.saved = false
-SMODS.calculate_context({end_of_round = true, game_over = game_over, joker_end_of_round = true })
+SMODS.calculate_context({end_of_round = true, game_over = game_over })
 if SMODS.saved then game_over = false end
 -- TARGET: main end_of_round evaluation
 '''
