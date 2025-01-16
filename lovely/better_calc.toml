@@ -82,6 +82,7 @@ if context.cardarea == G.play then
     if edition then 
         ret.edition = edition
     end
+end
 '''
 match_indent = true
 position = "at"
@@ -119,6 +120,13 @@ if context.cardarea == G.play and context.main_scoring then
     if edition then 
         ret.edition = edition
     end
+end
+if context.end_of_round and context.cardarea == G.hand and context.playing_card_end_of_round then
+    local end_of_round = card:get_end_of_round_effect(context)
+    if end_of_round then
+        ret.end_of_round = end_of_round
+    end
+end
 """
 [[patches]]
 [patches.pattern]
@@ -844,114 +852,30 @@ match_indent = true
 payload = '''
 -- context.end_of_round calculations
 SMODS.saved = false
-SMODS.calculate_context({end_of_round = true, game_over = game_over})
+SMODS.calculate_context({end_of_round = true, game_over = game_over, joker_end_of_round = true })
 if SMODS.saved then game_over = false end
--- TARGET: effects after hand evaluation
+-- TARGET: main end_of_round evaluation
 '''
 
 # context.end_of_round individual effects
 [[patches]]
-[patches.pattern]
+[patches.regex]
 target = 'functions/state_events.lua'
-pattern = '''
-for k=1, #G.jokers.cards do
-    --calculate the joker individual card effects
-    local eval = G.jokers.cards[k]:calculate_joker({cardarea = G.hand, other_card = G.hand.cards[i], individual = true, end_of_round = true})
-    if eval then 
-        table.insert(effects, eval)
-    end
-end
-
-if reps[j] == 1 then 
-    --Check for hand doubling
-    --From Red seal
-    local eval = eval_card(G.hand.cards[i], {end_of_round = true,cardarea = G.hand, repetition = true, repetition_only = true})
-    if next(eval) and (next(effects[1]) or #effects > 1)  then 
-        for h = 1, eval.seals.repetitions do
-            reps[#reps+1] = eval
-        end
-    end
-
-    --from Jokers
-    for j=1, #G.jokers.cards do
-        --calculate the joker effects
-        local eval = eval_card(G.jokers.cards[j], {cardarea = G.hand, other_card = G.hand.cards[i], repetition = true, end_of_round = true, card_effects = effects})
-        if next(eval) then 
-            for h  = 1, eval.jokers.repetitions do
-                reps[#reps+1] = eval
-            end
-        end
-    end
-end
-
-for ii = 1, #effects do
-    --if this effect came from a joker
-    if effects[ii].card then
-        G.E_MANAGER:add_event(Event({
-            trigger = 'immediate',
-            func = (function() effects[ii].card:juice_up(0.7);return true end)
-        }))
-    end
-    
-    --If dollars
-    if effects[ii].h_dollars then 
-        ease_dollars(effects[ii].h_dollars)
-        card_eval_status_text(G.hand.cards[i], 'dollars', effects[ii].h_dollars, percent)
-    end
-
-    --Any extras
-    if effects[ii].extra then
-        card_eval_status_text(G.hand.cards[i], 'extra', nil, percent, nil, effects[ii].extra)
-    end
-end
-j = j + 1
-'''
 position = 'at'
-match_indent = true
-payload = '''
--- context.end_of_round individual calculations
-for k=1, #G.jokers.cards + #G.consumeables.cards do
-    local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
-    --calculate the joker individual card effects
-    local eval, post = eval_card(_card, {cardarea = G.hand, other_card = G.hand.cards[i], individual = true, end_of_round = true})
-    eval.juice_card = eval.card
-    if next(eval) then 
-        table.insert(effects, eval)
-    end
-    if next(post) then 
-        for _, v in ipairs(post) do
-            table.insert(effects, v) 
-        end
+pattern = '''(?<indent>[\t ]*)for i=1, #G\.hand\.cards do\n\s+--Check for hand doubling\n(.*\n)*?\s+delay\(0\.3\)'''
+line_prepend = '$indent'
+payload = '''for _,v in ipairs({
+    G.hand,
+    SMODS.optional_features.cardareas.deck and G.deck or {},
+    SMODS.optional_features.cardareas.discard and G.discard or {},
+    -- TARGET: add your own end_of_round cardareas here
+}) do
+    if next(v) then
+        SMODS.calculate_end_of_round_effects({ cardarea = v, end_of_round = true })
     end
 end
-
-if reps[j] == 1 then 
-    SMODS.calculate_repetitions(G.hand.cards[i], {cardarea = G.hand, other_card = G.hand.cards[i], repetition = true, end_of_round = true, card_effects = effects}, reps)
-end
-
-SMODS.trigger_effects(effects, G.hand.cards[i])
-G.GAME.selected_back:trigger_effect({cardarea = G.hand, other_card = G.hand.cards[i], individual = true, end_of_round = true})
-j = j + (effects.calculated and 1 or #reps)
-
--- TARGET: effects after hand evaluation
 '''
 
-# context.end_of_round individual effects
-[[patches]]
-[patches.pattern]
-target = 'functions/state_events.lua'
-pattern = '''
-if reps[j] ~= 1 then card_eval_status_text((reps[j].jokers or reps[j].seals).card, 'jokers', nil, nil, nil, (reps[j].jokers or reps[j].seals)) end
-'''
-position = 'at'
-match_indent = true
-payload = '''
-if reps[j] ~= 1 then
-    local _, eff = next(reps[j])
-    card_eval_status_text(eff.card, 'jokers', nil, nil, nil, eff)
-    percent = percent + 0.08
-end
-'''
 
 # context.setting_blind
 [[patches]]

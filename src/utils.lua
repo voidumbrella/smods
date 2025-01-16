@@ -851,9 +851,6 @@ function Card:calculate_enhancement(context)
 end
 
 function SMODS.get_enhancements(card, extra_only)
-    local ret = SMODS.get_enh_cache(card, extra_only)
-    if ret then return ret end
-    
     if card.extra_enhancements and next(card.extra_enhancements) then
         if extra_only then
             local extras = copy_table(card.extra_enhancements)
@@ -884,23 +881,7 @@ function SMODS.get_enhancements(card, extra_only)
         enhancements[card.config.center.key] = nil
     end
     if next(enhancements) then card.extra_enhancements = enhancements end
-    SMODS.save_enh_cache(card, extra_only, enhancements)
     return enhancements
-end
-
-function SMODS.get_enh_cache(card, extra_only)	-- could be faster if you attached the index to the card
-	if not G.enh_cache then G.enh_cache = {extra = {}, enh = {}} end
-	for i = 1, #G.enh_cache[extra_only and 'extra' or 'enh'] do
-		if G.enh_cache[extra_only and 'extra' or 'enh'][i].card == card then
-			return G.enh_cache[extra_only and 'extra' or 'enh'][i].enh
-		end
-	end
-	return nil
-end
-
-function SMODS.save_enh_cache(card, extra_only, enhancements)
-	if not G.enh_cache then G.enh_cache = {extra = {}, enh = {}} end
-	G.enh_cache[extra_only and 'extra' or 'enh'][#G.enh_cache[extra_only and 'extra' or 'enh']+1] = {card = card, enh = enhancements}
 end
 
 function SMODS.has_enhancement(card, key)
@@ -1386,6 +1367,76 @@ function SMODS.calculate_main_scoring(context, scoring_hand)
             card_eval_status_text(card, 'debuff')
         else
             SMODS.score_card(card, context)
+        end
+    end
+end
+
+function SMODS.calculate_end_of_round_effects(context)
+    for i, card in ipairs(context.cardarea.cards) do
+        local reps = {1}
+        local j = 1
+        while j <= #reps do
+            percent = (i-0.999)/(#context.cardarea.cards-0.998) + (j-1)*0.1
+            if reps[j] ~= 1 then
+                local _, eff = next(reps[j])
+                card_eval_status_text(eff.card, 'jokers', nil, nil, nil, eff)
+                percent = percent + 0.08
+            end
+
+            context.playing_card_end_of_round = true
+            --calculate the hand effects
+            local effects = {eval_card(card, context)}
+            local extra_enhancements = SMODS.get_enhancements(card, true)
+            local old_ability = copy_table(card.ability)
+            local old_center = card.config.center
+            local old_center_key = card.config.center_key
+            for k, _ in pairs(extra_enhancements) do
+                if G.P_CENTERS[k] then
+                    card:set_ability(G.P_CENTERS[k])
+                    card.ability.extra_enhancement = k
+                    effects[#effects+1] = eval_card(card, context)
+                end
+            end
+            card.ability = old_ability
+            card.config.center = old_center
+            card.config.center_key = old_center_key
+            card:set_sprites(old_center) 
+
+            context.playing_card_end_of_round = nil
+            context.individual = true
+            context.other_card = card
+            -- context.end_of_round individual calculations
+            for k=1, #G.jokers.cards + #G.consumeables.cards do
+                local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
+                
+                local eval, post = eval_card(_card, context)
+                eval.juice_card = eval.card
+                if next(eval) then 
+                    table.insert(effects, eval)
+                end
+                if next(post) then 
+                    for _, v in ipairs(post) do
+                        table.insert(effects, v) 
+                    end
+                end
+            end
+
+            local deck_effect = G.GAME.selected_back:trigger_effect(context)
+            if deck_effect then SMODS.calculate_effect(deck_effect, G.deck.cards[1] or G.deck) end
+            SMODS.trigger_effects(effects, card)
+
+            context.individual = nil
+            context.repetition = true
+            context.card_effects = effects
+            if reps[j] == 1 then 
+                SMODS.calculate_repetitions(card, context, reps)
+            end
+            
+            context.repetition = nil
+            context.card_effects = nil
+            j = j + (effects.calculated and 1 or #reps)
+            
+            -- TARGET: effects after end of round evaluation
         end
     end
 end
