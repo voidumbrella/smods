@@ -1353,8 +1353,6 @@ function SMODS.score_card(card, context)
         if deck_effect then SMODS.calculate_effect(deck_effect, G.deck.cards[1] or G.deck) end
 
         context.individual = nil
-        context.other_card = nil
-
         if reps[j] == 1 and effects.calculated then
             context.repetition = true
             context.card_effects = effects
@@ -1363,6 +1361,7 @@ function SMODS.score_card(card, context)
             context.card_effects = nil
         end
         j = j + (effects.calculated and 1 or #reps)
+        context.other_card = nil
         card.lucky_trigger = nil
     end
     card.extra_enhancements = nil
