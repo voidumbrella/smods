@@ -267,7 +267,7 @@ if card.ability.set == 'Joker' or card.ability.consumeable then
                 ret.retriggers = retriggers
             end
         end
-        if not context.post_trigger and not context.retrigger_joker_check then
+        if not context.post_trigger and not context.retrigger_joker_check and SMODS.optional_features.post_trigger then
             SMODS.calculate_context({blueprint_card = context.blueprint_card, post_trigger = true, other_card = card, other_context = context, other_ret = ret}, post_trig)
         end
     end

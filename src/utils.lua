@@ -901,6 +901,7 @@ function SMODS.shatters(card)
 end
 
 function SMODS.calculate_quantum_enhancements(card, effects, context)
+    if not SMODS.optional_features.quantum_enhancements then return end
     context.extra_enhancement = true
     local extra_enhancements = SMODS.get_enhancements(card, true)
     local old_ability = copy_table(card.ability)
@@ -1175,6 +1176,7 @@ end
 
 SMODS.calculate_retriggers = function(card, context, _ret)
     local retriggers = {}
+    if not SMODS.optional_features.joker_retrigger then return retriggers end
     for k=1, #G.jokers.cards + #G.consumeables.cards do
         local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
         local eval, post = eval_card(_card, {retrigger_joker_check = true, other_card = card, other_context = context, other_ret = _ret})
