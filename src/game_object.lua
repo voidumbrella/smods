@@ -1044,6 +1044,9 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             return true
         end,
         generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
+            if not card then
+                card = { ability = copy_table(self.config), fake_card = true}
+            end
             local target = {
                 type = 'descriptions',
                 key = self.key,
@@ -1259,6 +1262,9 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             return { vars = {card.ability.choose, card.ability.extra} }
         end,
         generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
+            if not card then
+                card = { ability = copy_table(self.config), fake_card = true}
+            end
             local target = {
                 type = 'other',
                 key = self.key,
@@ -2536,6 +2542,9 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             SMODS.insert_pool(G.P_CENTER_POOLS[self.set], self)
         end,
         generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
+            if not card then
+                card = { config = copy_table(self.config), fake_tag = true}
+            end
             local target = {
                 type = 'descriptions',
                 key = self.key,
