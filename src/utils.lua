@@ -851,6 +851,7 @@ function Card:calculate_enhancement(context)
 end
 
 function SMODS.get_enhancements(card, extra_only)
+    if not SMODS.optional_features.quantum_enhancements then return extra_only and card.ability.set == 'Enhanced' and { [card.config.center.key] = true } or {} end
     if card.extra_enhancements and next(card.extra_enhancements) then
         if extra_only then
             local extras = copy_table(card.extra_enhancements)
@@ -1176,7 +1177,7 @@ end
 
 SMODS.calculate_retriggers = function(card, context, _ret)
     local retriggers = {}
-    if not SMODS.optional_features.joker_retrigger then return retriggers end
+    if not SMODS.optional_features.retrigger_joker then return retriggers end
     for k=1, #G.jokers.cards + #G.consumeables.cards do
         local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
         local eval, post = eval_card(_card, {retrigger_joker_check = true, other_card = card, other_context = context, other_ret = _ret})
