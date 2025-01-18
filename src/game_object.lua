@@ -1165,7 +1165,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             local ret = SMODS.Center.create_fake_card(self)
             ret.ability.consumeable = copy_table(self.config)
             return ret
-	    end,
+	end,
         loc_vars = function(self, info_queue)
             return {}
         end
