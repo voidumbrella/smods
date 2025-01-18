@@ -929,16 +929,18 @@ SMODS.calculate_context({buying_card = true, card = self})
 [[patches]]
 [patches.pattern]
 target = 'game.lua'
-pattern = '''for i = 1, #G.hand.cards do
-    eval_card(G.hand.cards[i], {first_hand_drawn = true})
-end
-for i = 1, #G.jokers.cards do
-    G.jokers.cards[i]:calculate_joker({first_hand_drawn = true})
+pattern = '''
+    for i = 1, #G.jokers.cards do
+        G.jokers.cards[i]:calculate_joker({first_hand_drawn = true})
+    end
 end
 '''
 position = 'at'
 match_indent = true
-payload = '''SMODS.calculate_context({first_hand_drawn = true})
+payload = '''
+    SMODS.calculate_context({first_hand_drawn = true})
+end
+SMODS.calculate_context({hand_drawn = true})
 '''
 
 # context.using_consumeable
