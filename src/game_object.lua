@@ -1906,7 +1906,6 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         pos = { x = 8 },
         nominal = 10,
         next = { 'Jack' },
-        in_pool = function() end,
     }
     SMODS.Rank {
         key = 'Jack',
