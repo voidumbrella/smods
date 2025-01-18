@@ -1048,7 +1048,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end,
         generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
             if not card then
-                card = self.create_fake_card()
+                card = self:create_fake_card()
             end
             local target = {
                 type = 'descriptions',
