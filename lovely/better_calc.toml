@@ -519,17 +519,13 @@ local joker_eval, post = eval_card(_card, {cardarea = G.jokers, full_hand = G.pl
 if next(joker_eval) then
     if joker_eval.edition then joker_eval.edition = {} end
     table.insert(effects, joker_eval)
-    if next(post) then 
-        for _, v in ipairs(post) do
-            table.insert(effects, v) 
-        end
-    end
+    for _, v in ipairs(post) do effects[#effects+1] = v end
     if joker_eval.retriggers then
         for rt = 1, #joker_eval.retriggers do
             local rt_eval, rt_post = eval_card(_card, {cardarea = G.jokers, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, joker_main = true, retrigger_joker = true})
             table.insert(effects, {joker_eval.retriggers[rt]})
             table.insert(effects, rt_eval)
-            if next(rt_post) then table.insert(effects, rt_post) end
+            for _, v in ipairs(rt_post) do effects[#effects+1] = v end
         end
     end
 end'''
@@ -562,17 +558,13 @@ for k=1, #G.jokers.cards + #G.consumeables.cards do
         if joker_eval.edition then joker_eval.edition = {} end
         joker_eval.jokers.juice_card = _joker
         table.insert(effects, joker_eval)
-        if next(post) then
-            for _, v in ipairs(post) do
-                table.insert(effects, v) 
-            end
-        end
+        for _, v in ipairs(post) do effects[#effects+1] = v end
         if joker_eval.retriggers then
             for rt = 1, #joker_eval.retriggers do
                 local rt_eval, rt_post = eval_card(_card, {full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, other_joker = _card.ability.set == 'Joker' and _card or false, other_consumeable = _card.ability.set ~= 'Joker' and _card or false, retrigger_joker = true})
                 table.insert(effects, {joker_eval.retriggers[rt]})
                 table.insert(effects, rt_eval)
-                if next(rt_post) then table.insert(effects, rt_post) end
+                for _, v in ipairs(rt_post) do effects[#effects+1] = v end
             end
         end
     end
