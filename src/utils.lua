@@ -1211,14 +1211,14 @@ end
 -- Hook this function to add different areas to MOST calculations
 function SMODS.calculate_context(context, return_table)
     context.cardarea = G.jokers
+    context.main_eval = true
     for k=1, #G.jokers.cards + #G.consumeables.cards do
         local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
         --calculate the joker effects
-        context.main_eval = true
         local eval, post = eval_card(_card, context)
         local effects = {eval}
         for _,v in ipairs(post) do effects[#effects+1] = v end
-        context.main_eval = nil
+
         if context.other_joker then
             for k, v in pairs(effects[1]) do
                 v.other_card = _card
@@ -1231,7 +1231,7 @@ function SMODS.calculate_context(context, return_table)
                 local rt_eval, rt_post = eval_card(_card, context)
                 table.insert(effects, {effects[1].retriggers[rt]})
                 table.insert(effects, rt_eval)
-                for _,v in ipairs(post) do effects[#effects+1] = v end
+                for _,v in ipairs(rt_post) do effects[#effects+1] = v end
             end
             context.retrigger_joker = false
         end
@@ -1241,6 +1241,7 @@ function SMODS.calculate_context(context, return_table)
             SMODS.trigger_effects(effects, _card)
         end
     end
+    context.main_eval = nil
     if context.scoring_hand then
         context.cardarea = G.play
         for i=1, #context.scoring_hand do
