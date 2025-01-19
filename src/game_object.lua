@@ -1043,9 +1043,12 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             self = nil
             return true
         end,
+        create_fake_card = function(self)
+	        return { ability = copy_table(self.config), fake_card = true }
+        end,
         generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
             if not card then
-                card = { ability = copy_table(self.config), fake_card = true}
+                card = self:create_fake_card()
             end
             local target = {
                 type = 'descriptions',
@@ -1158,6 +1161,11 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             SMODS.remove_pool(G.P_CENTER_POOLS['Consumeables'], self.key)
             SMODS.Consumable.super.delete(self)
         end,
+        create_fake_card = function(self)
+            local ret = SMODS.Center.create_fake_card(self)
+            ret.ability.consumeable = copy_table(self.config)
+            return ret
+	end,
         loc_vars = function(self, info_queue)
             return {}
         end
@@ -1263,7 +1271,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end,
         generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
             if not card then
-                card = { ability = copy_table(self.config), fake_card = true}
+                card = self:create_fake_card()
             end
             local target = {
                 type = 'other',
