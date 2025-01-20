@@ -1303,7 +1303,7 @@ function SMODS.score_card(card, context)
     while j <= #reps do
         if reps[j] ~= 1 then
             local _, eff = next(reps[j])
-            card_eval_status_text(eff.card, 'jokers', nil, nil, nil, eff)
+            SMODS.calculate_effect(eff, eff.card)
             percent = percent + percent_delta
         end
 
@@ -1387,7 +1387,7 @@ function SMODS.calculate_end_of_round_effects(context)
             percent = (i-0.999)/(#context.cardarea.cards-0.998) + (j-1)*0.1
             if reps[j] ~= 1 then
                 local _, eff = next(reps[j])
-                card_eval_status_text(eff.card, 'jokers', nil, nil, nil, eff)
+                SMODS.calculate_effect(eff, eff.card)
                 percent = percent + 0.08
             end
 
