@@ -1206,18 +1206,11 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
 
     SMODS.Voucher:take_ownership('observatory', {
         calculate = function(self, card, context)
-            if context.other_consumeable then
-                print'1'
-                if context.other_consumeable.ability.set == 'Planet' then
-                    print'2'
-                end
-            end
             if 
                 context.other_consumeable and
                 context.other_consumeable.ability.set == 'Planet' and
                 context.other_consumeable.ability.consumeable.hand_type == context.scoring_name
             then
-                print('hi mom')
                 return {
                     x_mult = card.ability.extra
                 }
