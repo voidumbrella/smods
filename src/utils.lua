@@ -1511,7 +1511,7 @@ function SMODS.get_card_areas(_type, _context)
         return t
     end
     if _type == 'jokers' then
-        local t = {G.jokers, G.consumeables}
+        local t = {G.jokers, G.consumeables, G.vouchers}
         -- TARGET: add your own CardAreas for joker evaluation
         return t
     end
