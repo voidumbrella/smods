@@ -1219,3 +1219,16 @@ pattern = '''if self.ability.set == "Planet" and not self.debuff then
     end
 end'''
 payload = ''
+
+[[patches]]
+[patches.regex]
+target = 'back.lua'
+position = 'at'
+line_prepend = '$indent'
+pattern = '(?<indent>[\t ]*)(?<line>Card.apply_to_run\(nil, G\.P_CENTERS\[.*?\]\))'
+payload = '''G.E_MANAGER:add_event(Event({
+    func = function()
+        $line
+        return true
+    end
+}))'''
