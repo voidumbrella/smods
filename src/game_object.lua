@@ -1204,6 +1204,21 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         }
     }
 
+    SMODS.Voucher:take_ownership('observatory', {
+        calculate = function(self, card, context)
+            if context.joker_main then return { mult = 20 } end
+            if 
+                context.other_consumeable and
+                context.other_consumeable.ability.set == 'Planet' and
+                context.other_consumeable.ability.consumeable.hand_type == context.scoring_name
+            then
+                return {
+                    x_mult = card.ability.extra
+                }
+            end
+        end,
+    })
+
     -------------------------------------------------------------------------------------------------
     ------- API CODE GameObject.Center.Back
     -------------------------------------------------------------------------------------------------

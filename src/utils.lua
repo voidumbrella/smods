@@ -1145,23 +1145,24 @@ SMODS.calculate_repetitions = function(card, context, reps)
     end
     context.repetition_only = false
     --From jokers
-    for k=1, #G.jokers.cards + #G.consumeables.cards do
-        local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
+    for _, area in ipairs(SMODS.get_card_areas('jokers')) do
+        for _, _card in ipairs(area.cards) do
         --calculate the joker effects
-        local eval, post = eval_card(_card, context)
-        if next(post) then SMODS.trigger_effects({post}, card) end
-        local rt = eval and eval.retriggers and #eval.retriggers or 0
-        for key, value in pairs(eval) do
-            if value.repetitions and key ~= 'retriggers' then
+            local eval, post = eval_card(_card, context)
+            if next(post) then SMODS.trigger_effects({post}, card) end
+            local rt = eval and eval.retriggers and #eval.retriggers or 0
+            for key, value in pairs(eval) do
+                if value.repetitions and key ~= 'retriggers' then
 
-                for h=1, value.repetitions do
-                    value.card = value.card or _card
-                    reps[#reps+1] = {key = value}
-                    for i=1, rt do
-                        local rt_eval, rt_post = eval_card(_card, context)
-                        rt_eval.card = rt_eval.card or _card
+                    for h=1, value.repetitions do
+                        value.card = value.card or _card
                         reps[#reps+1] = {key = value}
-                        if next(rt_post) then SMODS.trigger_effects({rt_post}, card) end
+                        for i=1, rt do
+                            local rt_eval, rt_post = eval_card(_card, context)
+                            rt_eval.card = rt_eval.card or _card
+                            reps[#reps+1] = {key = value}
+                            if next(rt_post) then SMODS.trigger_effects({rt_post}, card) end
+                        end
                     end
                 end
             end
@@ -1180,15 +1181,16 @@ end
 SMODS.calculate_retriggers = function(card, context, _ret)
     local retriggers = {}
     if not SMODS.optional_features.retrigger_joker then return retriggers end
-    for k=1, #G.jokers.cards + #G.consumeables.cards do
-        local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
-        local eval, post = eval_card(_card, {retrigger_joker_check = true, other_card = card, other_context = context, other_ret = _ret})
-        if next(post) then SMODS.trigger_effects({post}, _card) end
-        for key, value in pairs(eval) do
-            if value.repetitions then
-                for h=1, value.repetitions do
-                    value.retrigger_card = _card
-                    retriggers[#retriggers + 1] = value
+    for _, area in ipairs(SMODS.get_card_areas('jokers')) do
+        for _, _card in ipairs(area.cards) do
+            local eval, post = eval_card(_card, {retrigger_joker_check = true, other_card = card, other_context = context, other_ret = _ret})
+            if next(post) then SMODS.trigger_effects({post}, _card) end
+            for key, value in pairs(eval) do
+                if value.repetitions then
+                    for h=1, value.repetitions do
+                        value.retrigger_card = _card
+                        retriggers[#retriggers + 1] = value
+                    end
                 end
             end
         end
@@ -1212,33 +1214,34 @@ end
 function SMODS.calculate_context(context, return_table)
     context.cardarea = G.jokers
     context.main_eval = true
-    for k=1, #G.jokers.cards + #G.consumeables.cards do
-        local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
-        --calculate the joker effects
-        local eval, post = eval_card(_card, context)
-        local effects = {eval}
-        for _,v in ipairs(post) do effects[#effects+1] = v end
+    for _, area in ipairs(SMODS.get_card_areas('jokers')) do
+        for _, _card in ipairs(area.cards) do
+            --calculate the joker effects
+            local eval, post = eval_card(_card, context)
+            local effects = {eval}
+            for _,v in ipairs(post) do effects[#effects+1] = v end
 
-        if context.other_joker then
-            for k, v in pairs(effects[1]) do
-                v.other_card = _card
+            if context.other_joker then
+                for k, v in pairs(effects[1]) do
+                    v.other_card = _card
+                end
             end
-        end
-        if effects[1].retriggers then
-            context.retrigger_joker = true
-            for rt = 1, #effects[1].retriggers do
-                context.retrigger_joker = effects[1].retriggers[rt].retrigger_card
-                local rt_eval, rt_post = eval_card(_card, context)
-                table.insert(effects, {effects[1].retriggers[rt]})
-                table.insert(effects, rt_eval)
-                for _,v in ipairs(rt_post) do effects[#effects+1] = v end
+            if effects[1].retriggers then
+                context.retrigger_joker = true
+                for rt = 1, #effects[1].retriggers do
+                    context.retrigger_joker = effects[1].retriggers[rt].retrigger_card
+                    local rt_eval, rt_post = eval_card(_card, context)
+                    table.insert(effects, {effects[1].retriggers[rt]})
+                    table.insert(effects, rt_eval)
+                    for _,v in ipairs(rt_post) do effects[#effects+1] = v end
+                end
+                context.retrigger_joker = false
             end
-            context.retrigger_joker = false
-        end
-        if return_table then 
-            for _,v in ipairs(effects) do return_table[#return_table+1] = v end
-        else
-            SMODS.trigger_effects(effects, _card)
+            if return_table then 
+                for _,v in ipairs(effects) do return_table[#return_table+1] = v end
+            else
+                SMODS.trigger_effects(effects, _card)
+            end
         end
     end
     context.main_eval = nil
@@ -1315,23 +1318,24 @@ function SMODS.score_card(card, context)
         context.other_card = card
 
         if next(effects) then
-            for k = 1, #G.jokers.cards + #G.consumeables.cards do
-                local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
-                --calculate the joker individual card effects
-                local eval, post = eval_card(_card, context)
-                if next(eval) then
-                    eval.juice_card = eval.card
-                    table.insert(effects, eval)
-                    for _, v in ipairs(post) do effects[#effects+1] = v end
-                    if eval.retriggers then
-                        context.retrigger_joker = true
-                        for rt = 1, #eval.retriggers do
-                            local rt_eval, rt_post = eval_card(_card, context)
-                            table.insert(effects, { eval.retriggers[rt] })
-                            table.insert(effects, rt_eval)
-                            for _, v in ipairs(rt_post) do effects[#effects+1] = v end
+            for _, area in ipairs(SMODS.get_card_areas('jokers')) do
+                for _, _card in ipairs(area.cards) do
+                    --calculate the joker individual card effects
+                    local eval, post = eval_card(_card, context)
+                    if next(eval) then
+                        eval.juice_card = eval.card
+                        table.insert(effects, eval)
+                        for _, v in ipairs(post) do effects[#effects+1] = v end
+                        if eval.retriggers then
+                            context.retrigger_joker = true
+                            for rt = 1, #eval.retriggers do
+                                local rt_eval, rt_post = eval_card(_card, context)
+                                table.insert(effects, { eval.retriggers[rt] })
+                                table.insert(effects, rt_eval)
+                                for _, v in ipairs(rt_post) do effects[#effects+1] = v end
+                            end
+                            context.retrigger_joker = nil
                         end
-                        context.retrigger_joker = nil
                     end
                 end
             end
@@ -1414,15 +1418,16 @@ function SMODS.calculate_end_of_round_effects(context)
             context.individual = true
             context.other_card = card
             -- context.end_of_round individual calculations
-            for k=1, #G.jokers.cards + #G.consumeables.cards do
-                local _card = G.jokers.cards[k] or G.consumeables.cards[k - #G.jokers.cards]
-                
-                local eval, post = eval_card(_card, context)
-                eval.juice_card = eval.card
-                if next(eval) then 
-                    table.insert(effects, eval)
+            for _, area in ipairs(SMODS.get_card_areas('jokers')) do
+                for _, _card in ipairs(area.cards) do
+                    
+                    local eval, post = eval_card(_card, context)
+                    eval.juice_card = eval.card
+                    if next(eval) then 
+                        table.insert(effects, eval)
+                    end
+                    for _, v in ipairs(post) do effects[#effects+1] = v end
                 end
-                for _, v in ipairs(post) do effects[#effects+1] = v end
             end
 
             local deck_effect = G.GAME.selected_back:trigger_effect(context)
@@ -1454,19 +1459,20 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
         -- context.destroying_card calculations
         context.destroy_card = card
         context.destroying_card = scoring_hand and card
-        for j = 1, #G.jokers.cards + #G.consumeables.cards do
-            local _card = G.jokers.cards[j] or G.consumeables.cards[j-#G.jokers.cards]
-            local eval, post = eval_card(_card, context)
-            local self_destroy = false
-            for key, effect in pairs(eval) do
-                if type(effect) == 'table' then
-                    self_destroy = SMODS.calculate_effect(effect, card)
-                else
-                    self_destroy = effect
+        for _, area in ipairs(SMODS.get_card_areas('jokers')) do
+            for _, _card in ipairs(area.cards) do
+                local eval, post = eval_card(_card, context)
+                local self_destroy = false
+                for key, effect in pairs(eval) do
+                    if type(effect) == 'table' then
+                        self_destroy = SMODS.calculate_effect(effect, card)
+                    else
+                        self_destroy = effect
+                    end
                 end
+                SMODS.trigger_effects({post}, card)
+                if self_destroy then destroyed = true end
             end
-            SMODS.trigger_effects({post}, card)
-            if self_destroy then destroyed = true end
         end
         
         if scoring_hand and SMODS.has_enhancement(card, 'm_glass') and not card.debuff and pseudorandom('glass') < G.GAME.probabilities.normal/(card.ability.name == 'Glass Card' and card.ability.extra or G.P_CENTERS.m_glass.config.extra) then
@@ -1492,6 +1498,24 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
             cards_destroyed[#cards_destroyed+1] = card
         end
     end
+end
+
+function SMODS.get_card_areas(_type, _context)
+    if _type == 'playing_cards' then
+        local t = {}
+        if _context ~= 'end_of_round' then t[#t+1] = G.play end
+        t[#t+1] = G.hand
+        if SMODS.optional_features.cardareas.deck then t[#t+1] = G.deck end
+        if SMODS.optional_features.cardareas.discard then t[#t+1] = G.discard end
+        -- TARGET: add your own CardAreas for playing card evaluation
+        return t
+    end
+    if _type == 'jokers' then
+        local t = {G.jokers, G.consumeables, G.vouchers}
+        -- TARGET: add your own CardAreas for joker evaluation
+        return t
+    end
+    return {}
 end
 
 local flat_copy_table = function(tbl)
