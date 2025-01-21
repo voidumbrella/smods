@@ -1206,6 +1206,7 @@ match_indent = true
 position = 'after'
 pattern = 'function Card:apply_to_run(center)'
 payload = '''local card_to_save = self and copy_card(self) or Card(0, 0, G.CARD_W, G.CARD_H, G.P_CARDS.empty, center)
+card_to_save.VT.x, card_to_save.VT.y = G.vouchers.T.x, G.vouchers.T.y
 G.vouchers:emplace(card_to_save)
 '''
 
