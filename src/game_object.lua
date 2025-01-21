@@ -1043,7 +1043,13 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             self = nil
             return true
         end,
+        create_fake_card = function(self)
+	        return { ability = copy_table(self.config), fake_card = true }
+        end,
         generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
+            if not card then
+                card = self:create_fake_card()
+            end
             local target = {
                 type = 'descriptions',
                 key = self.key,
@@ -1155,6 +1161,11 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             SMODS.remove_pool(G.P_CENTER_POOLS['Consumeables'], self.key)
             SMODS.Consumable.super.delete(self)
         end,
+        create_fake_card = function(self)
+            local ret = SMODS.Center.create_fake_card(self)
+            ret.ability.consumeable = copy_table(self.config)
+            return ret
+	end,
         loc_vars = function(self, info_queue)
             return {}
         end
@@ -1192,6 +1203,21 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             'key',
         }
     }
+
+    SMODS.Voucher:take_ownership('observatory', {
+        calculate = function(self, card, context)
+            if context.joker_main then return { mult = 20 } end
+            if 
+                context.other_consumeable and
+                context.other_consumeable.ability.set == 'Planet' and
+                context.other_consumeable.ability.consumeable.hand_type == context.scoring_name
+            then
+                return {
+                    x_mult = card.ability.extra
+                }
+            end
+        end,
+    })
 
     -------------------------------------------------------------------------------------------------
     ------- API CODE GameObject.Center.Back
@@ -1259,6 +1285,9 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             return { vars = {card.ability.choose, card.ability.extra} }
         end,
         generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
+            if not card then
+                card = self:create_fake_card()
+            end
             local target = {
                 type = 'other',
                 key = self.key,
@@ -2718,6 +2747,9 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             SMODS.insert_pool(G.P_CENTER_POOLS[self.set], self)
         end,
         generate_ui = function(self, info_queue, card, desc_nodes, specific_vars, full_UI_table)
+            if not card then
+                card = { config = copy_table(self.config), fake_tag = true}
+            end
             local target = {
                 type = 'descriptions',
                 key = self.key,
