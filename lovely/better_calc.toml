@@ -801,13 +801,15 @@ end
 position = 'at'
 match_indent = true
 payload = '''
+local i = 0
 for _, area in ipairs(SMODS.get_card_areas('jokers')) do
         for _, _card in ipairs(area.cards) do
         local ret = _card:calculate_dollar_bonus()
 
         -- TARGET: calc_dollar_bonus per card
         if ret then
-            add_round_eval_row({dollars = ret, bonus = true, name='joker'..i, pitch = pitch, card = G.jokers.cards[i]})
+            i = i+1
+            add_round_eval_row({dollars = ret, bonus = true, name='joker'..i, pitch = pitch, card = _card})
             pitch = pitch + 0.06
             dollars = dollars + ret
         end

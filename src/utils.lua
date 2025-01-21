@@ -1460,6 +1460,7 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
         context.destroy_card = card
         context.destroying_card = scoring_hand and card
         for _, area in ipairs(SMODS.get_card_areas('jokers')) do
+            local should_break
             for _, _card in ipairs(area.cards) do
                 local eval, post = eval_card(_card, context)
                 local self_destroy = false
@@ -1471,8 +1472,13 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
                     end
                 end
                 SMODS.trigger_effects({post}, card)
-                if self_destroy then destroyed = true end
+                if self_destroy then 
+                    destroyed = true
+                    should_break = true
+                    break
+                end
             end
+            if should_break then break end
         end
         
         if scoring_hand and SMODS.has_enhancement(card, 'm_glass') and not card.debuff and pseudorandom('glass') < G.GAME.probabilities.normal/(card.ability.name == 'Glass Card' and card.ability.extra or G.P_CENTERS.m_glass.config.extra) then
