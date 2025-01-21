@@ -1004,7 +1004,6 @@ SMODS.get_deckskin_key_from_num = function(num, suit)
     end
 end
 
-
 SMODS.get_palette_loc_options = function(key, suit)
     local deckskin = SMODS.get_deckskin(key , suit)
 
@@ -1059,7 +1058,8 @@ G.FUNCS.update_collab_cards = function(key, suit, silent)
         local card_code = smodSuit.card_key .. '_' .. rank.card_key
         cards_order[#cards_order+1] = card_code
         local card = Card(G.ROOM.T.w+5, G.ROOM.T.h-5, G.CARD_W*1.2, G.CARD_H*1.2, G.P_CARDS[card_code], G.P_CENTERS.c_base)
-        card.no_ui = false
+        -- Instead of no ui it would be nice to pass info queue to this so that artist credits can be done?
+        card.no_ui = true
 
         cards[#cards + 1] = card
     end
@@ -1079,6 +1079,22 @@ G.FUNCS.update_collab_cards = function(key, suit, silent)
         end
     end
     G.cdds_cards.config.card_limit = bufferCardLimitForSmallDS(cards, 4)
+end
+
+G.FUNCS.update_suit_colors = function(suit, skin, palette_num)
+    skin = skin ~= nil and SMODS.get_deckskin(skin, suit) or nil
+    local new_colour_proto = G.C.SO_1[suit]
+    if G.SETTINGS.colourpalettes[suit] == 'lc' or G.SETTINGS.colourpalettes[suit] == 'hc' then
+        new_colour_proto = G.C["SO_"..((G.SETTINGS.colourpalettes[suit] == 'hc' and 2) or (G.SETTINGS.colourpalettes[suit] == 'lc' and 1))][suit]
+    else
+        if skin ~= nil then
+            local palette = (palette_num ~= nil and skin.palettes[palette_num]) or SMODS.get_deckskin_palette(skin.key, G.SETTINGS.colourpalettes[suit], suit)
+            if palette.color then
+                new_colour_proto = palette.color
+            end
+        end
+    end
+    G.C.SUITS[suit] = new_colour_proto
 end
 
 -- This function handles the calculation of each effect returned to evaluate play.

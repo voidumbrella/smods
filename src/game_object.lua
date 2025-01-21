@@ -1736,11 +1736,37 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             self.used_card_keys[self.card_key] = true
             self.max_nominal.value = self.max_nominal.value + 0.01
             self.suit_nominal = self.max_nominal.value
+            local def = 'default_'..self.key
+            if G.COLLABS.options[self.key] == nil then
+                G.COLLABS.options[self.key] = {def}
+            end
             SMODS.Suit.super.register(self)
         end,
         inject = function(self)
             for _, rank in pairs(SMODS.Ranks) do
                 SMODS.inject_p_card(self, rank)
+            end
+            if self.key ~= "Hearts" and self.key ~= "Diamonds" and self.key ~= "Clubs" and self.key ~= "Spades" then
+                SMODS.DeckSkin{
+                    key = 'default_'..self.key,
+                    suit = self.key,
+                    palettes = {
+                        {
+                            key = 'lc',
+                            ranks = {'2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', "King", "Ace",},
+                            display_ranks = {'Jack', 'Queen', "King"},
+                            atlas = 'cards_1',
+                            posStyle = 'deck'
+                        },
+                        {
+                            key = 'hc',
+                            ranks = {'2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', "King", "Ace",},
+                            display_ranks = {'Jack', 'Queen', "King"},
+                            atlas = 'cards_2',
+                            posStyle = 'deck'
+                        },
+                    }
+                }
             end
         end,
         delete = function(self)
@@ -2276,8 +2302,6 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                     G.localization.misc.collab_palettes[self.key]['2'] = localize('b_deckskins_hc')
                 end
             end
-
-            sendDebugMessage(tprint(G.localization.misc.collab_palettes[self.key]))
 
             if not self.loc_txt then
                 G.localization.misc.collabs[self.suit][self.suit_index .. ''] = G.localization.misc.collabs[self.suit][self.suit_index .. ''] or self.key
