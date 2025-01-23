@@ -129,7 +129,7 @@ position = "after"
 match_indent = true
 payload = '''if not G.blind_select_opts then
     G.GAME.round_resets.boss_rerolled = true
-    if not G.from_boss_tag then ease_dollars(-cry_cheapest_boss_reroll()) end
+    if not G.from_boss_tag then ease_dollars(-10) end
     G.from_boss_tag = nil
     G.GAME.round_resets.blind_choices.Boss = get_new_boss()
     for i = 1, #G.GAME.tags do
