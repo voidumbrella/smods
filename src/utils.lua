@@ -834,7 +834,11 @@ end
 function Card:calculate_sticker(context, key)
     local sticker = SMODS.Stickers[key]
     if self.ability[key] and type(sticker.calculate) == 'function' then
-        return sticker:calculate(self, context)
+        local o = sticker:calculate(self, context)
+        if o then
+            if not o.card then o.card = self end
+            return o
+        end
     end
 end
 
@@ -843,7 +847,10 @@ function Card:calculate_enhancement(context)
     local center = self.config.center
     if center.calculate and type(center.calculate) == 'function' then
         local o = center:calculate(self, context)
-        if o then return o end
+        if o then
+            if not o.card then o.card = self end
+            return o
+        end
     end
 end
 
@@ -1201,7 +1208,10 @@ function Card:calculate_edition(context)
         local edition = G.P_CENTERS[self.edition.key]
         if edition.calculate and type(edition.calculate) == 'function' then
             local o = edition:calculate(self, context)
-            if o then return o end
+            if o then
+                if not o.card then o.card = self end    
+                return o
+            end
         end
     end
 end
@@ -1234,8 +1244,11 @@ function SMODS.calculate_context(context, return_table)
                 end
                 context.retrigger_joker = false
             end
-            if return_table then 
-                for _,v in ipairs(effects) do return_table[#return_table+1] = v end
+            if return_table then
+                for _,v in ipairs(effects) do 
+                    if v.jokers and not v.jokers.card then v.jokers.card = _card end
+                    return_table[#return_table+1] = v
+                end
             else
                 SMODS.trigger_effects(effects, _card)
             end
