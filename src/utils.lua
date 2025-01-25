@@ -1081,11 +1081,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
     end
 
     if key == 'extra' then
-        local extra_calc = false
-        for key_ex, amount_ex in pairs(amount) do
-            extra_calc = SMODS.calculate_individual_effect(amount, scored_card, key_ex, amount_ex)
-        end
-        return extra_calc
+        return SMODS.calculate_effect(amount, scored_card)
     end
 
     if key == 'saved' then
@@ -1110,7 +1106,6 @@ end
 
 SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
     local calculated = false
-    local message = false
     for _, key in ipairs(SMODS.calculation_keys) do
         if effect[key] then
             calculated = SMODS.calculate_individual_effect(effect, scored_card, key, effect[key], from_edition, pre_jokers)
@@ -1119,8 +1114,7 @@ SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
     end
     if effect.juice_card then G.E_MANAGER:add_event(Event({trigger = 'immediate', func = function () effect.juice_card:juice_up(0.1); scored_card:juice_up(0.1) return true end})) end
     if effect.effect then calculated = true end
-				if effect.remove then calculated = true end
-    -- if effect.message then calculated = SMODS.calculate_individual_effect(effect, scored_card, 'message', effect.message, from_edition, pre_jokers) end
+    if effect.remove then calculated = true end
     return calculated
 end
 
