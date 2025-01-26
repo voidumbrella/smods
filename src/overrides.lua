@@ -738,14 +738,15 @@ function G.UIDEF.deck_preview(args)
 
 	for k, v in ipairs(suit_map) do
 		if not hidden_suits[v] then
-			local palette = SMODS.get_deckskin_palette(G.SETTINGS.CUSTOM_DECK.Collabs[v], G.SETTINGS.colourpalettes[v], v)
+			local deckskin = SMODS.DeckSkins[G.SETTINGS.CUSTOM_DECK.Collabs[v]]
+			local palette = deckskin.palette_map and deckskin.palette_map[G.SETTINGS.colour_palettes[v] or ''] or (deckskin.palettes or {})[1]
 			local t_s
 			if palette and palette.suitIcon and palette.suitIcon.atlas then
 				local _x = (v == 'Spades' and 3) or (v == 'Hearts' and 0) or (v == 'Clubs' and 2) or (v == 'Diamonds' and 1)
 				t_s = Sprite(0,0,0.3,0.3,G.ASSET_ATLAS[palette.suitIcon.atlas or 'ui_1'], (type(palette.suitIcon.pos) == "number" and {x=_x, y=palette.suitIcon.pos}) or palette.suitIcon.pos or {x=_x, y=0})
-			elseif G.SETTINGS.colourpalettes[v] == 'lc' or G.SETTINGS.colourpalettes[v] == 'hc' then
+			elseif G.SETTINGS.colour_palettes[v] == 'lc' or G.SETTINGS.colour_palettes[v] == 'hc' then
 				t_s = Sprite(0, 0, 0.3, 0.3,
-						G.ASSET_ATLAS[SMODS.Suits[v][G.SETTINGS.colourpalettes[v] == 'hc' and "hc_ui_atlas" or G.SETTINGS.colourpalettes[v] == 'lc' and "lc_ui_atlas"]] or
+						G.ASSET_ATLAS[SMODS.Suits[v][G.SETTINGS.colour_palettes[v] == 'hc' and "hc_ui_atlas" or G.SETTINGS.colour_palettes[v] == 'lc' and "lc_ui_atlas"]] or
 						G.ASSET_ATLAS[("ui_" .. (G.SETTINGS.colourblind_option and "2" or "1"))], SMODS.Suits[v].ui_pos)
 			else
 				t_s = Sprite(0, 0, 0.3, 0.3, G.ASSET_ATLAS[("ui_" .. (G.SETTINGS.colourblind_option and "2" or "1"))], SMODS.Suits[v].ui_pos)
@@ -796,14 +797,15 @@ function tally_sprite(pos, value, tooltip, suit)
 		text_colour = value[1].colour or G.C.WHITE
 		value = value[1].string
 	end
-	local palette = SMODS.get_deckskin_palette(G.SETTINGS.CUSTOM_DECK.Collabs[suit], G.SETTINGS.colourpalettes[suit], suit)
+	local deckskin = SMODS.DeckSkins[G.SETTINGS.CUSTOM_DECK.Collabs[suit]]
+	local palette = deckskin.palette_map and deckskin.palette_map[G.SETTINGS.colour_palettes[suit] or ''] or (deckskin.palettes or {})[1]
 	local t_s
 	if palette and palette.suitIcon and palette.suitIcon.atlas then
 		local _x = (suit == 'Spades' and 3) or (suit == 'Hearts' and 0) or (suit == 'Clubs' and 2) or (suit == 'Diamonds' and 1)
 		t_s = Sprite(0,0,0.3,0.3,G.ASSET_ATLAS[palette.suitIcon.atlas or 'ui_1'], (type(palette.suitIcon.pos) == "number" and {x=_x, y=palette.suitIcon.pos}) or palette.suitIcon.pos or {x=_x, y=0})
-	elseif G.SETTINGS.colourpalettes[suit] == 'lc' or G.SETTINGS.colourpalettes[suit] == 'hc' then
+	elseif G.SETTINGS.colour_palettes[suit] == 'lc' or G.SETTINGS.colour_palettes[suit] == 'hc' then
 		t_s = Sprite(0, 0, 0.3, 0.3,
-				G.ASSET_ATLAS[SMODS.Suits[suit][G.SETTINGS.colourpalettes[suit] == 'hc' and "hc_ui_atlas" or G.SETTINGS.colourpalettes[suit] == 'lc' and "lc_ui_atlas"]] or
+				G.ASSET_ATLAS[SMODS.Suits[suit][G.SETTINGS.colour_palettes[suit] == 'hc' and "hc_ui_atlas" or G.SETTINGS.colour_palettes[suit] == 'lc' and "lc_ui_atlas"]] or
 				G.ASSET_ATLAS[("ui_" .. (G.SETTINGS.colourblind_option and "2" or "1"))], SMODS.Suits[suit].ui_pos)
 	else
 		t_s = Sprite(0,0,0.5,0.5, G.ASSET_ATLAS[suit and SMODS.Suits[suit][G.SETTINGS.colourblind_option and "hc_ui_atlas" or "lc_ui_atlas"]] or G.ASSET_ATLAS[("ui_"..(G.SETTINGS.colourblind_option and "2" or "1"))], {x=pos.x or 0, y=pos.y or 0})
@@ -1709,17 +1711,16 @@ end
 
 G.FUNCS.change_collab = function(args)
 	G.SETTINGS.CUSTOM_DECK.Collabs[args.cycle_config.curr_suit] = G.COLLABS.options[args.cycle_config.curr_suit][args.to_key] or 'default'
-	local deckskin_key = SMODS.get_deckskin_key_from_num(args.to_key, args.cycle_config.curr_suit)
-	local palette_loc_options = SMODS.get_palette_loc_options(args.to_key, args.cycle_config.curr_suit)
+	local deckskin_key = G.COLLABS.options[args.cycle_config.curr_suit][args.to_key]
+	local palette_loc_options = SMODS.DeckSkin.get_palette_loc_options(args.to_key, args.cycle_config.curr_suit)
 	local swap_node = G.OVERLAY_MENU:get_UIE_by_ID('palette_selector')
 	local selected_palette = 1
-	for i, v in ipairs(G.COLLABS.colourpalettes[deckskin_key]) do
-		if G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] == v then
+	for i, v in ipairs(G.COLLABS.colour_palettes[deckskin_key]) do
+		if G.SETTINGS.colour_palettes[args.cycle_config.curr_suit] == v then
 			selected_palette = i
-			G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] = G.COLLABS.colourpalettes[deckskin_key][i]
 		end
 	end
-	G.FUNCS.update_suit_colors(args.cycle_config.curr_suit, deckskin_key, selected_palette)
+	G.FUNCS.update_suit_colours(args.cycle_config.curr_suit, deckskin_key, selected_palette)
 	G.FUNCS.update_collab_cards(args.to_key, args.cycle_config.curr_suit)
 	if swap_node then
 		for i=1, #swap_node.children do
@@ -1740,8 +1741,8 @@ G.FUNCS.change_collab = function(args)
 end
 
 G.FUNCS.change_colour_palette = function(args)
-	G.SETTINGS.colourpalettes[args.cycle_config.curr_suit] = G.COLLABS.colourpalettes[args.cycle_config.curr_skin][args.to_key]
-	G.FUNCS.update_suit_colors(args.cycle_config.curr_suit, args.cycle_config.curr_skin)
+	G.SETTINGS.colour_palettes[args.cycle_config.curr_suit] = G.COLLABS.colour_palettes[args.cycle_config.curr_skin][args.to_key]
+	G.FUNCS.update_suit_colours(args.cycle_config.curr_suit, args.cycle_config.curr_skin)
 	G.FUNCS.update_collab_cards(args.cycle_config.curr_skin, args.cycle_config.curr_suit)
 	for k, v in pairs(G.I.CARD) do
 		if v.config and v.config.card and v.children.front and v.ability.effect ~= 'Stone Card' then

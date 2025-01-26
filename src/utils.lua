@@ -982,54 +982,6 @@ SMODS.find_mod = function(id)
     return ret
 end
 
-SMODS.get_deckskin = function(key, suit)
-    for k, v in pairs(SMODS.DeckSkins) do
-        if v.suit == suit and v.key == key then
-            return v
-        end
-    end
-    return nil
-end
-
-SMODS.get_deckskin_palette = function(key, palette_key, suit)
-    for k, v in pairs(SMODS.DeckSkins) do
-        if v.suit == suit and v.key == key and v.palettes then
-            for i, p in ipairs(v.palettes) do
-                if p.key == palette_key then
-                    return p
-                end
-            end
-            return v.palettes[1]
-        end
-    end
-end
-
-SMODS.get_deckskin_key_from_num = function(num, suit)
-    for k, v in pairs(G.localization.misc.collabs[suit]) do
-        if k == tostring(num) then
-            return G.COLLABS.options[suit][num]
-        end
-    end
-end
-
-SMODS.get_palette_loc_options = function(key, suit)
-    local deckskin = SMODS.get_deckskin(key , suit)
-
-    local current_palette = 1
-    if type(key) == "number" then
-        key = SMODS.get_deckskin_key_from_num(key, suit)
-    else
-        current_palette = key
-    end
-
-    local conv_palette_loc_options = {}
-    for k, v in pairs(G.localization.misc.collab_palettes[key]) do
-        conv_palette_loc_options[tonumber(k)] = v
-    end
-
-    return conv_palette_loc_options
-end
-
 local function bufferCardLimitForSmallDS(cards, scaleFactor)
     local cardCount = #cards
     if type(scaleFactor) ~= "number" or scaleFactor <= 0 then
@@ -1056,51 +1008,49 @@ G.FUNCS.update_collab_cards = function(key, suit, silent)
     if not G.cdds_cards then return end
     local cards = {}
     local cards_order = {}
-    local deckskin = SMODS.get_deckskin(key, suit)
-    local smodSuit = SMODS.Suits[suit]
-    local palette = SMODS.get_deckskin_palette(deckskin.key, G.SETTINGS.colourpalettes[suit], suit)
+    local deckskin = SMODS.DeckSkins[key]
+    local palette = deckskin.palette_map and deckskin.palette_map[G.SETTINGS.colour_palettes[suit] or ''] or (deckskin.palettes or {})[1]
+    local suit_data = SMODS.Suits[suit]
     local d_ranks = (palette and (palette.display_ranks or palette.ranks)) or deckskin.display_ranks or deckskin.ranks
-    for i, r in ipairs(d_ranks) do
-        local r = d_ranks[i]
-        local rank = SMODS.Ranks[r]
-        local card_code = smodSuit.card_key .. '_' .. rank.card_key
-        cards_order[#cards_order+1] = card_code
-        local card = Card(G.ROOM.T.w+5, G.ROOM.T.h-5, G.CARD_W*1.2, G.CARD_H*1.2, G.P_CARDS[card_code], G.P_CENTERS.c_base)
-        -- Instead of no ui it would be nice to pass info queue to this so that artist credits can be done?
-        card.no_ui = true
 
-        cards[#cards + 1] = card
-    end
-    local old_cards_order = {}
-    for i, v in ipairs(G.cdds_cards.cards) do old_cards_order[#old_cards_order+1] = v.config.card_key end
-
-    if cards_order ~= old_cards_order then
-        while #G.cdds_cards.cards > 0 do
-            for i = #G.cdds_cards.cards, 1, -1 do
-                local card = G.cdds_cards.cards[i]
-                card:remove()
-                table.remove(G.cdds_cards.cards, i)
+    local diff_order
+    if #G.cdds_cards.cards ~= #d_ranks then
+        diff_order = true
+    else
+        for i,v in ipairs(G.cdds_cards.cards) do
+            if v.config.card_key ~= suit_data.card_key..'_'..SMODS.Ranks[d_ranks[i]].card_key then
+                diff_order = true
+                break
             end
         end
-        for i = #cards, 1, -1 do
-            G.cdds_cards:emplace(cards[i])
+    end
+
+    if diff_order then
+        for i = #G.cdds_cards.cards, 1, -1 do
+            G.cdds_cards:remove_card(G.cdds_cards.cards[i]):remove()
+        end
+        for i, r in ipairs(d_ranks) do
+            local rank = SMODS.Ranks[r]
+            local card_code = suit_data.card_key .. '_' .. rank.card_key
+            cards_order[#cards_order+1] = card_code
+            local card = Card(G.cdds_cards.T.x+G.cdds_cards.T.w/2, G.cdds_cards.T.y+G.cdds_cards.T.h/2, G.CARD_W*1.2, G.CARD_H*1.2, G.P_CARDS[card_code], G.P_CENTERS.c_base)
+            -- Instead of no ui it would be nice to pass info queue to this so that artist credits can be done?
+            card.no_ui = true
+    
+            G.cdds_cards:emplace(card)
         end
     end
     G.cdds_cards.config.card_limit = bufferCardLimitForSmallDS(cards, 4)
 end
 
-G.FUNCS.update_suit_colors = function(suit, skin, palette_num)
-    skin = skin ~= nil and SMODS.get_deckskin(skin, suit) or nil
+G.FUNCS.update_suit_colours = function(suit, skin, palette_num)
+    skin = skin and SMODS.DeckSkins[skin] or nil
     local new_colour_proto = G.C.SO_1[suit]
-    if G.SETTINGS.colourpalettes[suit] == 'lc' or G.SETTINGS.colourpalettes[suit] == 'hc' then
-        new_colour_proto = G.C["SO_"..((G.SETTINGS.colourpalettes[suit] == 'hc' and 2) or (G.SETTINGS.colourpalettes[suit] == 'lc' and 1))][suit]
-    else
-        if skin ~= nil then
-            local palette = (palette_num ~= nil and skin.palettes[palette_num]) or SMODS.get_deckskin_palette(skin.key, G.SETTINGS.colourpalettes[suit], suit)
-            if palette.color then
-                new_colour_proto = palette.color
-            end
-        end
+    if G.SETTINGS.colour_palettes[suit] == 'lc' or G.SETTINGS.colour_palettes[suit] == 'hc' then
+        new_colour_proto = G.C["SO_"..((G.SETTINGS.colour_palettes[suit] == 'hc' and 2) or (G.SETTINGS.colour_palettes[suit] == 'lc' and 1))][suit]
+    elseif skin then
+        local palette = (palette_num and skin.palettes[palette_num]) or skin.palette_map and skin.palette_map[G.SETTINGS.colour_palettes[suit] or '']
+        new_colour_proto = palette and palette.colour or new_colour_proto
     end
     G.C.SUITS[suit] = new_colour_proto
 end

@@ -23,7 +23,7 @@ if _front and _front.suit and G.SETTINGS.CUSTOM_DECK and G.SETTINGS.CUSTOM_DECK.
                     if deckSkin.ranks[i] == _front.value then hasRank = true break end
                 end
                 if hasRank then
-                    local atlas = G.ASSET_ATLAS[G.SETTINGS.colourpalettes[_front.suit] == 'hc' and deckSkin.hc_atlas or deckSkin.lc_atlas]
+                    local atlas = G.ASSET_ATLAS[G.SETTINGS.colour_palettes[_front.suit] == 'hc' and deckSkin.hc_atlas or deckSkin.lc_atlas]
                     if atlas then
                         if deckSkin.posStyle == 'collab' then
                             return atlas, G.COLLABS.pos[_front.value]
@@ -41,7 +41,7 @@ if _front and _front.suit and G.SETTINGS.CUSTOM_DECK and G.SETTINGS.CUSTOM_DECK.
                     end
                 end
             else
-                local palette = SMODS.get_deckskin_palette(deckSkin.key, G.SETTINGS.colourpalettes[_front.suit], _front.suit)
+                local palette = deckSkin.palette_map and deckSkin.palette_map[G.SETTINGS.colour_palettes[_front.suit] or ''] or (deckSkin.palettes or {})[1]
                 local hasRank = false
                 for i = 1, #palette.ranks do
                     if palette.ranks[i] == _front.value then hasRank = true break end
@@ -102,11 +102,11 @@ position = "at"
 payload = '''
 local deckskin_key = G.COLLABS.options[_suit][current_option]
 
-local palette_loc_options = SMODS.get_palette_loc_options(deckskin_key, _suit)
+local palette_loc_options = SMODS.DeckSkin.get_palette_loc_options(deckskin_key, _suit)
 
 local selected_palette = 1
-for i, v in ipairs(G.COLLABS.colourpalettes[deckskin_key]) do
-    if G.SETTINGS.colourpalettes[_suit] == v then
+for i, v in ipairs(G.COLLABS.colour_palettes[deckskin_key]) do
+    if G.SETTINGS.colour_palettes[_suit] == v then
         selected_palette = i
     end
 end
