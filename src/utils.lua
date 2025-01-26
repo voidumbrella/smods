@@ -982,7 +982,128 @@ SMODS.find_mod = function(id)
     return ret
 end
 
+SMODS.get_deckskin = function(key, suit)
+    for k, v in pairs(SMODS.DeckSkins) do
+        if v.suit == suit and v.key == key then
+            return v
+        end
+    end
+    return nil
+end
 
+SMODS.get_deckskin_palette = function(key, palette_key, suit)
+    for k, v in pairs(SMODS.DeckSkins) do
+        if v.suit == suit and v.key == key and v.palettes then
+            for i, p in ipairs(v.palettes) do
+                if p.key == palette_key then
+                    return p
+                end
+            end
+            return v.palettes[1]
+        end
+    end
+end
+
+SMODS.get_deckskin_key_from_num = function(num, suit)
+    for k, v in pairs(G.localization.misc.collabs[suit]) do
+        if k == tostring(num) then
+            return G.COLLABS.options[suit][num]
+        end
+    end
+end
+
+SMODS.get_palette_loc_options = function(key, suit)
+    local deckskin = SMODS.get_deckskin(key , suit)
+
+    local current_palette = 1
+    if type(key) == "number" then
+        key = SMODS.get_deckskin_key_from_num(key, suit)
+    else
+        current_palette = key
+    end
+
+    local conv_palette_loc_options = {}
+    for k, v in pairs(G.localization.misc.collab_palettes[key]) do
+        conv_palette_loc_options[tonumber(k)] = v
+    end
+
+    return conv_palette_loc_options
+end
+
+local function bufferCardLimitForSmallDS(cards, scaleFactor)
+    local cardCount = #cards
+    if type(scaleFactor) ~= "number" or scaleFactor <= 0 then
+        sendWarnMessage("scaleFactor must be a positive number")
+        return cardCount
+    end
+    -- Ensure card_limit is always at least the number of cards
+    G.cdds_cards.config.card_limit = math.max(G.cdds_cards.config.card_limit, cardCount)
+    -- Calculate the buffer size dynamically based on the scale factor
+    local buffer = 0
+    if cardCount < G.cdds_cards.rankCount then
+        -- Buffer decreases as cardCount approaches G.cdds_cards.rankCount, modulated by scaleFactor
+        buffer = math.ceil(((G.cdds_cards.rankCount - cardCount) / scaleFactor))
+    end
+    G.cdds_cards.config.card_limit = math.max(cardCount, cardCount + buffer)
+
+    return G.cdds_cards.config.card_limit
+end
+
+G.FUNCS.update_collab_cards = function(key, suit, silent)
+    if type(key) == "number" then
+        key = G.COLLABS.options[suit][key]
+    end
+    if not G.cdds_cards then return end
+    local cards = {}
+    local cards_order = {}
+    local deckskin = SMODS.get_deckskin(key, suit)
+    local smodSuit = SMODS.Suits[suit]
+    local palette = SMODS.get_deckskin_palette(deckskin.key, G.SETTINGS.colourpalettes[suit], suit)
+    local d_ranks = (palette and (palette.display_ranks or palette.ranks)) or deckskin.display_ranks or deckskin.ranks
+    for i, r in ipairs(d_ranks) do
+        local r = d_ranks[i]
+        local rank = SMODS.Ranks[r]
+        local card_code = smodSuit.card_key .. '_' .. rank.card_key
+        cards_order[#cards_order+1] = card_code
+        local card = Card(G.ROOM.T.w+5, G.ROOM.T.h-5, G.CARD_W*1.2, G.CARD_H*1.2, G.P_CARDS[card_code], G.P_CENTERS.c_base)
+        -- Instead of no ui it would be nice to pass info queue to this so that artist credits can be done?
+        card.no_ui = true
+
+        cards[#cards + 1] = card
+    end
+    local old_cards_order = {}
+    for i, v in ipairs(G.cdds_cards.cards) do old_cards_order[#old_cards_order+1] = v.config.card_key end
+
+    if cards_order ~= old_cards_order then
+        while #G.cdds_cards.cards > 0 do
+            for i = #G.cdds_cards.cards, 1, -1 do
+                local card = G.cdds_cards.cards[i]
+                card:remove()
+                table.remove(G.cdds_cards.cards, i)
+            end
+        end
+        for i = #cards, 1, -1 do
+            G.cdds_cards:emplace(cards[i])
+        end
+    end
+    G.cdds_cards.config.card_limit = bufferCardLimitForSmallDS(cards, 4)
+end
+
+G.FUNCS.update_suit_colors = function(suit, skin, palette_num)
+    skin = skin ~= nil and SMODS.get_deckskin(skin, suit) or nil
+    local new_colour_proto = G.C.SO_1[suit]
+    if G.SETTINGS.colourpalettes[suit] == 'lc' or G.SETTINGS.colourpalettes[suit] == 'hc' then
+        new_colour_proto = G.C["SO_"..((G.SETTINGS.colourpalettes[suit] == 'hc' and 2) or (G.SETTINGS.colourpalettes[suit] == 'lc' and 1))][suit]
+    else
+        if skin ~= nil then
+            local palette = (palette_num ~= nil and skin.palettes[palette_num]) or SMODS.get_deckskin_palette(skin.key, G.SETTINGS.colourpalettes[suit], suit)
+            if palette.color then
+                new_colour_proto = palette.color
+            end
+        end
+    end
+    G.C.SUITS[suit] = new_colour_proto
+end
 
 -- This function handles the calculation of each effect returned to evaluate play.
 -- Can easily be hooked to add more calculation effects ala Talisman
