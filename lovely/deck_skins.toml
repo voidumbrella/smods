@@ -56,12 +56,12 @@ if _front and _front.suit and G.SETTINGS.CUSTOM_DECK and G.SETTINGS.CUSTOM_DECK.
                             if palette.pos_style[_front.value].pos then
                                 return atlas, palette.pos_style[_front.value].pos
                             end
-                        elseif palette.pos_style.fallbackStyle then
-                            if palette.pos_style.fallbackStyle == 'collab' then
+                        elseif palette.pos_style.fallback_style then
+                            if palette.pos_style.fallback_style == 'collab' then
                                 return atlas, G.COLLABS.pos[_front.value]
-                            elseif palette.pos_style.fallbackStyle == 'suit' then
+                            elseif palette.pos_style.fallback_style == 'suit' then
                                 return atlas, { x = _front.pos.x, y = 0}
-                            elseif palette.pos_style.fallbackStyle == 'deck' then
+                            elseif palette.pos_style.fallback_style == 'deck' then
                                 return atlas, _front.pos
                             end
                         end
