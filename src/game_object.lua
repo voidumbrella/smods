@@ -1795,14 +1795,14 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                             ranks = SMODS.Rank.obj_buffer,
                             display_ranks = {'Jack', 'Queen', "King"},
                             atlas = self.lc_atlas,
-                            posStyle = 'deck'
+                            pos_style = 'deck'
                         },
                         contrast and {
                             key = 'hc',
                             ranks = SMODS.Rank.obj_buffer,
                             display_ranks = {'Jack', 'Queen', "King"},
                             atlas = self.hc_atlas,
-                            posStyle = 'deck'
+                            pos_style = 'deck'
                         } or nil,
                     }
                 }
@@ -2306,7 +2306,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             'key',
             'suit',
         },
-        posStyle = 'deck',
+        pos_style = 'deck',
         set = 'DeckSkin',
         count_by_suit = {},
         process_loc_text = function(self)
@@ -2346,7 +2346,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             if self:check_dependencies() then
                 assert(not self.palettes ~= not (self.ranks and self.lc_atlas), 
                     ('Error loading DeckSkin %s! Please define your palettes or use the old formatting'):format(self.key))
-
+                -- for compat with old format
+                self.pos_style = self.pos_style or self.posStyle
                 if self.palettes and not (self.ranks and self.lc_atlas) then
                     local temp_palettes = self.palettes
                     self.palettes = {}
@@ -2358,10 +2359,10 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                     self.outdated = true
 
                     self.hc_atlas = self.hc_atlas or self.lc_atlas
-                    local valid_posStyles = { ranks = true, collab = true, suit = true, deck = true}
-                    assert(valid_posStyles[self.posStyle],
-                        ('%s is not a valid posStyle on DeckSkin %s. Supported posStyle values are \'ranks\', \'collab\', \'suit\' and \'deck\'')
-                        :format(self.posStyle, self.key), self.set)
+                    local valid_pos_styles = { ranks = true, collab = true, suit = true, deck = true}
+                    assert(valid_pos_styles[self.pos_style],
+                        ('%s is not a valid pos_style on DeckSkin %s. Supported pos_style values are \'ranks\', \'collab\', \'suit\' and \'deck\'')
+                        :format(self.pos_style, self.key), self.set)
                 end
 
                 self.count_by_suit[self.suit] = (self.count_by_suit[self.suit] or 0) + 1
@@ -2397,6 +2398,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         add_palette = function(self, palette)
             if not (self and self.key) then return false, 'Invalid DeckSkin object' end
             local required_values = { 'key', 'ranks', 'atlas' }
+            -- for compat with old format
+            palette.pos_style = palette.pos_style or palette.posStyle
             for _,v in ipairs(required_values) do
                 if not palette[v] then
                     return false, ('Missing required value "%s" in Palette "%s" on DeckSkin "%s"'):format(v, palette.key or '(unknown)', self.key)
@@ -2440,14 +2443,14 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                     ranks = {'2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', "King", "Ace",},
                     display_ranks = {'Jack', 'Queen', "King"},
                     atlas = 'cards_1',
-                    posStyle = 'deck'
+                    pos_style = 'deck'
                 },
                 {
                     key = 'hc',
                     ranks = {'2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', "King", "Ace",},
                     display_ranks = {'Jack', 'Queen', "King"},
                     atlas = 'cards_2',
-                    posStyle = 'deck'
+                    pos_style = 'deck'
                 },
             }
         }
@@ -2462,13 +2465,13 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                         key = 'lc',
                         ranks = {'Jack', 'Queen', "King"},
                         atlas = options[i] .. '_1',
-                        posStyle = 'collab'
+                        pos_style = 'collab'
                     },
                     {
                         key = 'hc',
                         ranks = {'Jack', 'Queen', "King"},
                         atlas = options[i] .. '_2',
-                        posStyle = 'collab'
+                        pos_style = 'collab'
                     },
                 },
             }

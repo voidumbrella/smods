@@ -741,9 +741,9 @@ function G.UIDEF.deck_preview(args)
 			local deckskin = SMODS.DeckSkins[G.SETTINGS.CUSTOM_DECK.Collabs[v]]
 			local palette = deckskin.palette_map and deckskin.palette_map[G.SETTINGS.colour_palettes[v] or ''] or (deckskin.palettes or {})[1]
 			local t_s
-			if palette and palette.suitIcon and palette.suitIcon.atlas then
+			if palette and palette.suit_icon and palette.suit_icon.atlas then
 				local _x = (v == 'Spades' and 3) or (v == 'Hearts' and 0) or (v == 'Clubs' and 2) or (v == 'Diamonds' and 1)
-				t_s = Sprite(0,0,0.3,0.3,G.ASSET_ATLAS[palette.suitIcon.atlas or 'ui_1'], (type(palette.suitIcon.pos) == "number" and {x=_x, y=palette.suitIcon.pos}) or palette.suitIcon.pos or {x=_x, y=0})
+				t_s = Sprite(0,0,0.3,0.3,G.ASSET_ATLAS[palette.suit_icon.atlas or 'ui_1'], (type(palette.suit_icon.pos) == "number" and {x=_x, y=palette.suit_icon.pos}) or palette.suit_icon.pos or {x=_x, y=0})
 			elseif G.SETTINGS.colour_palettes[v] == 'lc' or G.SETTINGS.colour_palettes[v] == 'hc' then
 				t_s = Sprite(0, 0, 0.3, 0.3,
 						G.ASSET_ATLAS[SMODS.Suits[v][G.SETTINGS.colour_palettes[v] == 'hc' and "hc_ui_atlas" or G.SETTINGS.colour_palettes[v] == 'lc' and "lc_ui_atlas"]] or
@@ -800,9 +800,9 @@ function tally_sprite(pos, value, tooltip, suit)
 	local deckskin = SMODS.DeckSkins[G.SETTINGS.CUSTOM_DECK.Collabs[suit]]
 	local palette = deckskin.palette_map and deckskin.palette_map[G.SETTINGS.colour_palettes[suit] or ''] or (deckskin.palettes or {})[1]
 	local t_s
-	if palette and palette.suitIcon and palette.suitIcon.atlas then
+	if palette and palette.suit_icon and palette.suit_icon.atlas then
 		local _x = (suit == 'Spades' and 3) or (suit == 'Hearts' and 0) or (suit == 'Clubs' and 2) or (suit == 'Diamonds' and 1)
-		t_s = Sprite(0,0,0.3,0.3,G.ASSET_ATLAS[palette.suitIcon.atlas or 'ui_1'], (type(palette.suitIcon.pos) == "number" and {x=_x, y=palette.suitIcon.pos}) or palette.suitIcon.pos or {x=_x, y=0})
+		t_s = Sprite(0,0,0.3,0.3,G.ASSET_ATLAS[palette.suit_icon.atlas or 'ui_1'], (type(palette.suit_icon.pos) == "number" and {x=_x, y=palette.suit_icon.pos}) or palette.suit_icon.pos or {x=_x, y=0})
 	elseif G.SETTINGS.colour_palettes[suit] == 'lc' or G.SETTINGS.colour_palettes[suit] == 'hc' then
 		t_s = Sprite(0, 0, 0.3, 0.3,
 				G.ASSET_ATLAS[SMODS.Suits[suit][G.SETTINGS.colour_palettes[suit] == 'hc' and "hc_ui_atlas" or G.SETTINGS.colour_palettes[suit] == 'lc' and "lc_ui_atlas"]] or
