@@ -2372,7 +2372,10 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 self.registered = true
             end
         end,
-        inject = function (self)
+        pre_inject_class = function(self)
+            G.COLLABS.options = {}
+        end,
+        inject = function(self)
             local def = 'default_'..self.suit
             G.COLLABS.options[self.suit] = G.COLLABS.options[self.suit] or {def}
             G.COLLABS.colour_palettes = G.COLLABS.colour_palettes or {}
@@ -2389,7 +2392,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                     table.insert(G.COLLABS.colour_palettes[self.key], 'hc')
                 end
             end
-
+            G.COLLABS.options[self.suit] = G.COLLABS.options[self.suit] or {}
             local options = G.COLLABS.options[self.suit]
             if self.key ~= def then
                 options[#options + 1] = self.key
@@ -2478,8 +2481,6 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end
     end
 
-    --Clear 'Friends of Jimbo' skins so they can be handled via the same pipeline
-    G.COLLABS.options = {}
     if not G.SETTINGS.colour_palettes then
         local val = G.SETTINGS.colourblind_option and 'hc' or 'lc'
         G.SETTINGS.colour_palettes = {
