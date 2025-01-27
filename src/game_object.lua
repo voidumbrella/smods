@@ -1793,14 +1793,14 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                         {
                             key = contrast and 'lc' or 'def',
                             ranks = SMODS.Rank.obj_buffer,
-                            display_ranks = {'Jack', 'Queen', "King"},
+                            display_ranks = {'King', 'Queen', 'Jack'},
                             atlas = self.lc_atlas,
                             pos_style = 'deck'
                         },
                         contrast and {
                             key = 'hc',
                             ranks = SMODS.Rank.obj_buffer,
-                            display_ranks = {'Jack', 'Queen', "King"},
+                            display_ranks = {'King', 'Queen', 'Jack'},
                             atlas = self.hc_atlas,
                             pos_style = 'deck'
                         } or nil,
@@ -2444,14 +2444,14 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 {
                     key = 'lc',
                     ranks = {'2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', "King", "Ace",},
-                    display_ranks = {'Jack', 'Queen', "King"},
+                    display_ranks = {'King', 'Queen', 'Jack'},
                     atlas = 'cards_1',
                     pos_style = 'deck'
                 },
                 {
                     key = 'hc',
                     ranks = {'2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', "King", "Ace",},
-                    display_ranks = {'Jack', 'Queen', "King"},
+                    display_ranks = {'King', 'Queen', 'Jack'},
                     atlas = 'cards_2',
                     pos_style = 'deck'
                 },
@@ -2466,13 +2466,13 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 palettes = {
                     {
                         key = 'lc',
-                        ranks = {'Jack', 'Queen', "King"},
+                        ranks = {'King', 'Queen', 'Jack'},
                         atlas = options[i] .. '_1',
                         pos_style = 'collab'
                     },
                     {
                         key = 'hc',
-                        ranks = {'Jack', 'Queen', "King"},
+                        ranks = {'King', 'Queen', 'Jack'},
                         atlas = options[i] .. '_2',
                         pos_style = 'collab'
                     },

@@ -1040,7 +1040,7 @@ G.FUNCS.update_collab_cards = function(key, suit, silent)
             G.cdds_cards:emplace(card)
         end
     end
-    G.cdds_cards.config.card_limit = bufferCardLimitForSmallDS(cards, 4)
+    G.cdds_cards.config.card_limit = bufferCardLimitForSmallDS(cards, 2.5)
 end
 
 G.FUNCS.update_suit_colours = function(suit, skin, palette_num)
