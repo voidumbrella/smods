@@ -1574,7 +1574,12 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         set = 'Undiscovered Sprite',
         -- this is more consistent and allows for extension
         process_loc_text = function() end,
-        inject = function() end,
+        inject = function(self)
+            if self.overlay_pos then
+                self.overlay_sprite = Sprite(0, 0, G.CARD_W, G.CARD_H, G.ASSET_ATLAS[self.atlas], self.overlay_pos)
+                self.no_overlay = true
+            end
+        end,
         prefix_config = { key = false },
         required_params = {
             'key',
