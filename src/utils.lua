@@ -1048,7 +1048,8 @@ G.FUNCS.update_suit_colours = function(suit, skin, palette_num)
     local new_colour_proto = G.C.SO_1[suit]
     if G.SETTINGS.colour_palettes[suit] == 'lc' or G.SETTINGS.colour_palettes[suit] == 'hc' then
         new_colour_proto = G.C["SO_"..((G.SETTINGS.colour_palettes[suit] == 'hc' and 2) or (G.SETTINGS.colour_palettes[suit] == 'lc' and 1))][suit]
-    elseif skin and not skin.outdated then
+    end
+    if skin and not skin.outdated then
         local palette = (palette_num and skin.palettes[palette_num]) or skin.palette_map and skin.palette_map[G.SETTINGS.colour_palettes[suit] or '']
         new_colour_proto = palette and palette.colour or new_colour_proto
     end
