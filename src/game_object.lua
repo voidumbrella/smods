@@ -2458,7 +2458,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                     ranks = {'2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', "King", "Ace",},
                     display_ranks = {'King', 'Queen', 'Jack'},
                     atlas = 'cards_2',
-                    pos_style = 'deck'
+                    pos_style = 'deck',
+                    hc_default = true,
                 },
             }
         }
@@ -2479,7 +2480,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                         key = 'hc',
                         ranks = {'King', 'Queen', 'Jack'},
                         atlas = options[i] .. '_2',
-                        pos_style = 'collab'
+                        pos_style = 'collab',
+                        hc_default = true,
                     },
                 },
             }
