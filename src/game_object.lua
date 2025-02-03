@@ -2311,7 +2311,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             'key',
             'suit',
         },
-        pos_style = 'deck',
+        pos_style = 'ranks',
         set = 'DeckSkin',
         count_by_suit = {},
         process_loc_text = function(self)
@@ -2407,7 +2407,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             if not (self and self.key) then return false, 'Invalid DeckSkin object' end
             local required_values = { 'key', 'ranks', 'atlas' }
             -- for compat with old format
-            palette.pos_style = palette.pos_style or palette.posStyle
+            palette.pos_style = palette.pos_style or palette.posStyle or 'ranks'
             for _,v in ipairs(required_values) do
                 if not palette[v] then
                     return false, ('Missing required value "%s" in Palette "%s" on DeckSkin "%s"'):format(v, palette.key or '(unknown)', self.key)

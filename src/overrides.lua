@@ -797,18 +797,18 @@ function tally_sprite(pos, value, tooltip, suit)
 		text_colour = value[1].colour or G.C.WHITE
 		value = value[1].string
 	end
-	local deckskin = SMODS.DeckSkins[G.SETTINGS.CUSTOM_DECK.Collabs[suit]]
-	local palette = deckskin.palette_map and deckskin.palette_map[G.SETTINGS.colour_palettes[suit] or ''] or (deckskin.palettes or {})[1]
+	local deckskin = suit and SMODS.DeckSkins[G.SETTINGS.CUSTOM_DECK.Collabs[suit]]
+	local palette = deckskin and (deckskin.palette_map and deckskin.palette_map[G.SETTINGS.colour_palettes[suit] or ''] or (deckskin.palettes or {})[1])
 	local t_s
 	if palette and palette.suit_icon and palette.suit_icon.atlas then
 		local _x = (suit == 'Spades' and 3) or (suit == 'Hearts' and 0) or (suit == 'Clubs' and 2) or (suit == 'Diamonds' and 1)
 		t_s = Sprite(0,0,0.3,0.3,G.ASSET_ATLAS[palette.suit_icon.atlas or 'ui_1'], (type(palette.suit_icon.pos) == "number" and {x=_x, y=palette.suit_icon.pos}) or palette.suit_icon.pos or {x=_x, y=0})
-	elseif G.SETTINGS.colour_palettes[suit] == 'lc' or G.SETTINGS.colour_palettes[suit] == 'hc' then
+	elseif suit and (G.SETTINGS.colour_palettes[suit] == 'lc' or G.SETTINGS.colour_palettes[suit] == 'hc') then
 		t_s = Sprite(0, 0, 0.3, 0.3,
 				G.ASSET_ATLAS[SMODS.Suits[suit][G.SETTINGS.colour_palettes[suit] == 'hc' and "hc_ui_atlas" or G.SETTINGS.colour_palettes[suit] == 'lc' and "lc_ui_atlas"]] or
 				G.ASSET_ATLAS[("ui_" .. (G.SETTINGS.colourblind_option and "2" or "1"))], SMODS.Suits[suit].ui_pos)
 	else
-		t_s = Sprite(0,0,0.5,0.5, G.ASSET_ATLAS[suit and SMODS.Suits[suit][G.SETTINGS.colourblind_option and "hc_ui_atlas" or "lc_ui_atlas"]] or G.ASSET_ATLAS[("ui_"..(G.SETTINGS.colourblind_option and "2" or "1"))], {x=pos.x or 0, y=pos.y or 0})
+		t_s = Sprite(0,0,0.5,0.5, suit and G.ASSET_ATLAS[SMODS.Suits[suit][G.SETTINGS.colourblind_option and "hc_ui_atlas" or "lc_ui_atlas"]] or G.ASSET_ATLAS[("ui_"..(G.SETTINGS.colourblind_option and "2" or "1"))], {x=pos.x or 0, y=pos.y or 0})
 	end
 	t_s.states.drag.can = false
 	t_s.states.hover.can = false
