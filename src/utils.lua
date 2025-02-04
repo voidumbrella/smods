@@ -1012,6 +1012,13 @@ G.FUNCS.update_collab_cards = function(key, suit, silent)
     local palette = deckskin.palette_map and deckskin.palette_map[G.SETTINGS.colour_palettes[suit] or ''] or (deckskin.palettes or {})[1]
     local suit_data = SMODS.Suits[suit]
     local d_ranks = (palette and (palette.display_ranks or palette.ranks)) or deckskin.display_ranks or deckskin.ranks
+    if deckskin.outdated then
+        local reversed = {}
+        for i = #d_ranks, 1, -1 do
+           table.insert(reversed, d_ranks[i])
+        end
+        d_ranks = reversed
+    end
 
     local diff_order
     if #G.cdds_cards.cards ~= #d_ranks then
