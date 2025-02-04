@@ -1209,6 +1209,7 @@ SMODS.calculate_repetitions = function(card, context, reps)
         if value.repetitions then
             for h=1, value.repetitions do
                 value.card = value.card or card
+                value.message = value.message or localize('k_again_ex')
                 reps[#reps+1] = {key = value}
             end
         end
@@ -1226,6 +1227,7 @@ SMODS.calculate_repetitions = function(card, context, reps)
 
                     for h=1, value.repetitions do
                         value.card = value.card or _card
+                        value.message = value.message or localize('k_again_ex')
                         reps[#reps+1] = {key = value}
                         for i=1, rt do
                             local rt_eval, rt_post = eval_card(_card, context)
@@ -1259,6 +1261,7 @@ SMODS.calculate_retriggers = function(card, context, _ret)
                 if value.repetitions then
                     for h=1, value.repetitions do
                         value.retrigger_card = _card
+                        value.message = value.message or localize('k_again_ex')
                         retriggers[#retriggers + 1] = value
                     end
                 end
