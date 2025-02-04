@@ -1797,14 +1797,14 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                     palettes = {
                         {
                             key = contrast and 'lc' or 'def',
-                            ranks = SMODS.Rank.obj_buffer,
+                            ranks = {'Ace', 'King', 'Queen', 'Jack', '10', '9', '8', '7', '6', '5', '4', '3', '2'},
                             display_ranks = {'King', 'Queen', 'Jack'},
                             atlas = self.lc_atlas,
                             pos_style = 'deck'
                         },
                         contrast and {
                             key = 'hc',
-                            ranks = SMODS.Rank.obj_buffer,
+                            ranks = {'Ace', 'King', 'Queen', 'Jack', '10', '9', '8', '7', '6', '5', '4', '3', '2'},
                             display_ranks = {'King', 'Queen', 'Jack'},
                             atlas = self.hc_atlas,
                             pos_style = 'deck'
