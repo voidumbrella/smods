@@ -2436,6 +2436,11 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 if not self.obj_table[val] then
                     G.SETTINGS.CUSTOM_DECK.Collabs[k] = 'default_'..k
                 end
+                local skin = self.obj_table[G.SETTINGS.CUSTOM_DECK.Collabs[k]]
+                local pal = G.SETTINGS.colour_palettes[k]
+                if not skin.outdated and skin.palette_map and not skin.palette_map[pal] then
+                    G.SETTINGS.colour_palettes[k] = skin.palettes[1].key
+                end
             end
                 
         end
