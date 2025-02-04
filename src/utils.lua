@@ -1187,7 +1187,7 @@ SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
     local calculated = false
     for _, key in ipairs(SMODS.calculation_keys) do
         if effect[key] then
-            if effect.juice_card then G.E_MANAGER:add_event(Event({trigger = 'immediate', func = function () effect.juice_card:juice_up(0.1); scored_card:juice_up(0.1); print('juice '..effect.juice_card.config.center_key) return true end})) end
+            if effect.juice_card then G.E_MANAGER:add_event(Event({trigger = 'immediate', func = function () effect.juice_card:juice_up(0.1); scored_card:juice_up(0.1); return true end})) end
             calculated = SMODS.calculate_individual_effect(effect, scored_card, key, effect[key], from_edition, pre_jokers)
             percent = (percent or 0) + (percent_delta or 0.08)
         end
