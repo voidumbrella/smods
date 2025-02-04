@@ -1187,11 +1187,11 @@ SMODS.calculate_effect = function(effect, scored_card, from_edition, pre_jokers)
     local calculated = false
     for _, key in ipairs(SMODS.calculation_keys) do
         if effect[key] then
+            if effect.juice_card then G.E_MANAGER:add_event(Event({trigger = 'immediate', func = function () effect.juice_card:juice_up(0.1); scored_card:juice_up(0.1); print('juice '..effect.juice_card.config.center_key) return true end})) end
             calculated = SMODS.calculate_individual_effect(effect, scored_card, key, effect[key], from_edition, pre_jokers)
             percent = (percent or 0) + (percent_delta or 0.08)
         end
     end
-    if effect.juice_card then G.E_MANAGER:add_event(Event({trigger = 'immediate', func = function () effect.juice_card:juice_up(0.1); scored_card:juice_up(0.1) return true end})) end
     if effect.effect then calculated = true end
     if effect.remove then calculated = true end
     return calculated
@@ -1409,7 +1409,7 @@ function SMODS.score_card(card, context)
                     --calculate the joker individual card effects
                     local eval, post = eval_card(_card, context)
                     if next(eval) then
-                        eval.juice_card = eval.card
+                        if eval.jokers then eval.jokers.juice_card = eval.jokers.juice_card or eval.jokers.card or _card end
                         table.insert(effects, eval)
                         for _, v in ipairs(post) do effects[#effects+1] = v end
                         if eval.retriggers then
