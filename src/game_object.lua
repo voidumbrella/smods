@@ -2346,7 +2346,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 assert(not self.palettes ~= not (self.ranks and self.lc_atlas), 
                     ('Error loading DeckSkin %s! Please define your palettes or use the old formatting'):format(self.key))
                 -- for compat with old format
-                self.pos_style = self.pos_style or self.posStyle
+                self.pos_style = self.posStyle or self.pos_style
                 if self.palettes and not (self.ranks and self.lc_atlas) then
                     local temp_palettes = self.palettes
                     self.palettes = {}
