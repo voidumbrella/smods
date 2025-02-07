@@ -1744,3 +1744,13 @@ SMODS.get_optional_features = function()
         end
     end
 end
+
+G.FUNCS.can_select_from_booster = function(e)
+    if booster_obj and #G[booster_obj.select_card].cards < G[booster_obj.select_card].config.card_limit then 
+        e.config.colour = G.C.GREEN
+        e.config.button = 'use_card'
+    else
+      e.config.colour = G.C.UI.BACKGROUND_INACTIVE
+      e.config.button = nil
+    end
+  end
