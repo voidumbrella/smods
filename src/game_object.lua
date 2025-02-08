@@ -1783,7 +1783,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end,
         create_default_deck_skin = function(self)
             if self.key ~= "Hearts" and self.key ~= "Diamonds" and self.key ~= "Clubs" and self.key ~= "Spades" then
-                local contrast = self.lc_atlas == self.hc_atlas or not rawget(self, 'hc_atlas')
+                local contrast = self.lc_atlas ~= self.hc_atlas or not rawget(self, 'hc_atlas')
                 SMODS.DeckSkin{
                     key = 'default_'..self.key,
                     prefix_config = { key = false },
