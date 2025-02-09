@@ -521,6 +521,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         return play_sound_ref(sound_code, per, vol)
     end
 
+    SMODS.Sound{ key = 'xchips', path = 'xchips.ogg'}
+
     -------------------------------------------------------------------------------------------------
     ----- API CODE GameObject.Stake
     -------------------------------------------------------------------------------------------------

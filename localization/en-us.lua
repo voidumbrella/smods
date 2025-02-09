@@ -125,6 +125,8 @@ return {
 		v_dictionary = {
 			c_types = '#1# Types',
 			cashout_hidden = '...and #1# more',
+            a_xchips = "X#1# Chips",
+            a_xchips_minus = "-X#1# Chips",
 		},
 	}
 }

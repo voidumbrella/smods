@@ -1265,3 +1265,34 @@ payload = '''self.discard_pos = {
     y = 0,
 }
 '''
+
+# xchip support
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+match_indent = true
+position = 'before'
+pattern = '''
+elseif (eval_type == 'x_mult') or (eval_type == 'h_x_mult') then 
+'''
+payload = '''
+elseif eval_type == 'x_chips' then 
+        sound = 'xchips'
+        volume = 0.7
+        amt = amt
+        text = localize{type='variable',key='a_xchips'..(amt<0 and '_minus' or ''),vars={math.abs(amt)}}
+        colour = G.C.BLUE
+        config.type = 'fade'
+        config.scale = 0.7
+'''
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+match_indent = true
+position = 'at'
+pattern = '''
+if extra.chip_mod then
+'''
+payload = '''
+if extra.chip_mod or extra.Xchip_mod then
+'''

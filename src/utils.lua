@@ -1136,7 +1136,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
         update_hand_text({delay = 0}, {chips = hand_chips, mult = mult})
         if not effect.remove_default_message then
             if from_edition then
-                card_eval_status_text(scored_card, 'jokers', nil, percent, nil, {message = localize{type='variable',key= amount > 0 and 'a_xmult' or 'a_xmult_minus',vars={amount}}, x_mult_mod =  amount, colour =  G.C.EDITION, edition = true})
+                card_eval_status_text(scored_card, 'jokers', nil, percent, nil, {message = localize{type='variable',key= amount > 0 and 'a_xmult' or 'a_xmult_minus',vars={amount}}, Xmult_mod =  amount, colour =  G.C.EDITION, edition = true})
             else
                 if key ~= 'Xmult_mod' then
                     if effect.xmult_message then
@@ -1214,6 +1214,7 @@ end
 SMODS.calculation_keys = {
     'chips', 'h_chips', 'chip_mod',
     'mult', 'h_mult', 'mult_mod',
+    'x_chips', 'xchips', 'Xchip_mod',
     'x_mult', 'Xmult', 'xmult', 'x_mult_mod', 'Xmult_mod',
     'p_dollars', 'dollars', 'h_dollars',
     'swap',
