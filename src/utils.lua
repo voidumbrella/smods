@@ -393,7 +393,7 @@ function SMODS.create_mod_badges(obj, badges)
         badges.mod_set[obj.mod.id] = true
         if obj.dependencies then
             for _, v in ipairs(obj.dependencies) do
-                local m = SMODS.Mods[v]
+                local m = assert(SMODS.find_mod(v)[1])
                 if not badges.mod_set[m.id] then
                     table.insert(mods, m)
                     badges.mod_set[m.id] = true
@@ -869,7 +869,7 @@ function Card:calculate_enhancement(context)
 end
 
 function SMODS.get_enhancements(card, extra_only)
-    if not SMODS.optional_features.quantum_enhancements then
+    if not SMODS.optional_features.quantum_enhancements or not G.hand then
         return not extra_only and card.ability.set == 'Enhanced' and { [card.config.center.key] = true } or {}
     end
     if card.extra_enhancements and next(card.extra_enhancements) then
@@ -969,6 +969,11 @@ function SMODS.always_scores(card)
     card.extra_enhancements = nil
     for k, _ in pairs(SMODS.get_enhancements(card)) do
         if k == 'm_stone' or G.P_CENTERS[k].always_scores then return true end
+    end
+    if (G.P_CENTERS[(card.edition or {}).key] or {}).always_scores then return true end
+    if (G.P_SEALS[card.seal or {}] or {}).always_scores then return true end
+    for k, v in pairs(SMODS.Stickers) do
+        if v.always_scores and card.ability[k] then return true end
     end
 end
 
