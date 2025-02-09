@@ -831,6 +831,20 @@ function time(func, ...)
     return 1000*(end_time-start_time)
 end
 
+function Card:add_sticker(self, sticker, bypass_check)
+    local sticker = SMODS.Stickers[sticker]
+    if bypass_check or (sticker and sticker.should_apply and type(sticker.should_apply) == 'function' and sticker:should_apply(self, self.config.center, self.area, true)) then
+        sticker:apply(self, true)
+    end
+end
+
+function Card:remove_sticker(self, sticker)
+    if self.ability[sticker] then
+        SMODS.Stickers[sticker]:apply(self, false)
+    end
+end
+
+
 function Card:calculate_sticker(context, key)
     local sticker = SMODS.Stickers[key]
     if self.ability[key] and type(sticker.calculate) == 'function' then
