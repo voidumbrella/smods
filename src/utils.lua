@@ -1130,6 +1130,25 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
         end
         return true
     end
+
+    if (key == 'x_chips' or key == 'xchips' or key == 'Xchip_mod') and amount ~= 1 then 
+        hand_chips = mod_chips(hand_chips * amount)
+        update_hand_text({delay = 0}, {chips = hand_chips, mult = mult})
+        if not effect.remove_default_message then
+            if from_edition then
+                card_eval_status_text(scored_card, 'jokers', nil, percent, nil, {message = localize{type='variable',key= amount > 0 and 'a_xchips' or 'a_xchips_minus',vars={amount}}, Xchips_mod =  amount, colour =  G.C.EDITION, edition = true})
+            else
+                if key ~= 'Xchip_mod' then
+                    if effect.xchip_message then
+                        card_eval_status_text(scored_card or effect.card or effect.focus, 'extra', nil, percent, nil, effect.xchip_message)
+                    else
+                        card_eval_status_text(scored_card or effect.card or effect.focus, 'x_chips', amount, percent)
+                    end
+                end
+            end
+        end
+        return true
+    end
     
     if (key == 'x_mult' or key == 'xmult' or key == 'Xmult' or key == 'x_mult_mod' or key == 'Xmult_mod') and amount ~= 1 then 
         mult = mod_mult(mult * amount)
@@ -1761,7 +1780,8 @@ SMODS.get_optional_features = function()
 end
 
 G.FUNCS.can_select_from_booster = function(e)
-    if booster_obj and #G[booster_obj.select_card].cards < G[booster_obj.select_card].config.card_limit then 
+    local area = booster_obj and booster_obj.select_card and (type(booster_obj.select_card) == 'table' and (booster_obj.select_card[e.config.ref_table.ability.set] or nil) or booster_obj.select_card) or nil
+    if area and #G[area].cards < G[area].config.card_limit then 
         e.config.colour = G.C.GREEN
         e.config.button = 'use_card'
     else
