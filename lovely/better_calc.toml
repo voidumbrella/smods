@@ -974,7 +974,30 @@ pattern = '''
 position = 'at'
 match_indent = true
 payload = '''
-SMODS.calculate_context({using_consumeable = true, consumeable = card})
+SMODS.calculate_context({using_consumeable = true, consumeable = card, area = card.from_area})
+'''
+# save area of used card
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+match_indent = true
+position = 'before'
+pattern = '''
+c1.area:remove_card(c1)
+'''
+payload = '''
+c1.from_area = c1.area
+'''
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+match_indent = true
+position = 'before'
+pattern = '''
+if card.area and (not nc or card.area == G.pack_cards) then card.area:remove_card(card) end
+'''
+payload = '''
+if not card.from_area then card.from_area = card.area end
 '''
 
 # context.selling_card
@@ -993,6 +1016,7 @@ match_indent = true
 payload = '''
 SMODS.calculate_context({selling_card = true, card = card})
 '''
+
 
 # context.buying_card
 [[patches]]
