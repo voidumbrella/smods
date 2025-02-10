@@ -415,6 +415,7 @@ if card.ability.consumeable then
         nc = obj:keep_on_use(card)
     end
 end
+if not card.from_area then card.from_area = card.area end
 if card.area and (not nc or card.area == G.pack_cards) then card.area:remove_card(card) end'''
 
 [[patches]]
