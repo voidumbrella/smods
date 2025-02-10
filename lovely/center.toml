@@ -325,7 +325,7 @@ position = 'before'
 payload = '''
 local obj = center or self.config.center
 if obj.redeem and type(obj.redeem) == 'function' then
-    obj:redeem(self)
+    obj:redeem(card_to_save)
     return
 end'''
 
