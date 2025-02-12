@@ -1785,7 +1785,7 @@ SMODS.get_optional_features = function()
 end
 
 G.FUNCS.can_select_from_booster = function(e)
-    local area = booster_obj and booster_obj.select_card and (type(booster_obj.select_card) == 'table' and (booster_obj.select_card[e.config.ref_table.ability.set] or nil) or booster_obj.select_card) or nil
+    local area = booster_obj and e.config.ref_table:selectable_from_pack(booster_obj)
     if area and #G[area].cards < G[area].config.card_limit then 
         e.config.colour = G.C.GREEN
         e.config.button = 'use_card'
@@ -1794,3 +1794,17 @@ G.FUNCS.can_select_from_booster = function(e)
       e.config.button = nil
     end
   end
+
+function Card.selectable_from_pack(card, pack)
+    if pack.select_exclusions then
+        for _, key in ipairs(pack.select_exclusions) do
+            if key == card.config.center_key then return false end
+        end
+    end
+    if pack.select_card then
+        if type(pack.select_card) == 'table' then
+            if pack.select_card[card.ability.set] then return pack.select_card[card.ability.set] else return false end
+        end
+        return pack.select_card
+    end
+end

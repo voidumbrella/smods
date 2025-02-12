@@ -409,7 +409,8 @@ match_indent = true
 position = 'at'
 payload = '''
 local nc
-if card.ability.consumeable then
+local select_to = card.area == G.pack_cards and booster_obj.select_card and card:selectable_from_pack(booster_obj)
+if card.ability.consumeable and not select_to then
     local obj = card.config.center
     if obj.keep_on_use and type(obj.keep_on_use) == 'function' then
         nc = obj:keep_on_use(card)
