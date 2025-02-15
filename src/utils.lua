@@ -1394,6 +1394,24 @@ function SMODS.calculate_context(context, return_table)
                 SMODS.trigger_effects(effects, context.scoring_hand[i])
             end
         end
+        if SMODS.optional_features.cardareas.unscored then
+            context.cardarea = 'unscored'
+            local unscored_cards = {}
+            for _, played_card in pairs(G.play.cards) do
+                if not SMODS.in_scoring(played_card, context.scoring_hand) then unscored_cards[#unscored_cards + 1] = played_card end
+            end
+            for i=1, #unscored_cards do
+                --calculate the played card effects
+                if return_table then 
+                    return_table[#return_table+1] = eval_card(unscored_cards[i], context)
+                    SMODS.calculate_quantum_enhancements(unscored_cards[i], return_table, context)
+                else
+                    local effects = {eval_card(unscored_cards[i], context)}
+                    SMODS.calculate_quantum_enhancements(unscored_cards[i], effects, context)
+                    SMODS.trigger_effects(effects, unscored_cards[i])
+                end
+            end
+        end
     end
     context.cardarea = G.hand
     for i=1, #G.hand.cards do
@@ -1434,6 +1452,12 @@ function SMODS.calculate_context(context, return_table)
     end
     local effect = G.GAME.selected_back:trigger_effect(context)
     if effect then SMODS.calculate_effect(effect, G.deck.cards[1] or G.deck) end
+end
+
+function SMODS.in_scoring(card, scoring_hand)
+    for _, _card in pairs(scoring_hand) do
+        if card == _card then return true end
+    end
 end
 
 function SMODS.score_card(card, context)
@@ -1646,6 +1670,7 @@ function SMODS.get_card_areas(_type, _context)
     if _type == 'playing_cards' then
         local t = {}
         if _context ~= 'end_of_round' then t[#t+1] = G.play end
+        if SMODS.optional_features.cardareas.unscored then t[#t+1] = 'unscored' end
         t[#t+1] = G.hand
         if SMODS.optional_features.cardareas.deck then t[#t+1] = G.deck end
         if SMODS.optional_features.cardareas.discard then t[#t+1] = G.discard end

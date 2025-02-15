@@ -16,7 +16,7 @@ line_prepend = '$indent'
 payload = '''$handtext
 delay(0.3)
 for _, v in ipairs(SMODS.get_card_areas('playing_cards')) do
-    SMODS.calculate_main_scoring({cardarea = v, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands}, v == G.play and scoring_hand or nil)
+    SMODS.calculate_main_scoring({cardarea = v, full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands}, v == G.play and scoring_hand or v == 'unscored' and unscored_cards or nil)
     delay(0.3)
 end
 $delimiter'''
@@ -705,7 +705,7 @@ position = "at"
 payload = '''
 local cards_destroyed = {}
 for _,v in ipairs(SMODS.get_card_areas('playing_cards', 'destroying_cards')) do
-    SMODS.calculate_destroying_cards({ full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, cardarea = v }, cards_destroyed, v == G.play and scoring_hand or nil)
+    SMODS.calculate_destroying_cards({ full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, cardarea = v }, cards_destroyed, v == G.play and scoring_hand or v == 'unscored' and unscored_cards or nil)
 end
 
 -- context.remove_playing_cards calculations
@@ -1453,6 +1453,12 @@ for i=1, #G.play.cards do
 end
 -- TARGET: adding to hand effects
 scoring_hand = final_scoring_hand
+local unscored_cards = {}
+if SMODS.optional_features.cardareas.unscored then
+    for _, played_card in pairs(G.play.cards) do
+        if not SMODS.in_scoring(played_card, scoring_hand) then unscored_cards[#unscored_cards + 1] = played_card end
+    end
+end
 '''
 
 # Add ending_booster calculation context
