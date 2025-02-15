@@ -265,9 +265,9 @@ booster_obj = nil
 [patches.pattern]
 target = 'functions/button_callbacks.lua'
 match_indent = true
-position = 'after'
+position = 'before'
 pattern = '''
-G.FUNCS.skip_booster = function(e)
+G.FUNCS.end_consumeable(e)
 '''
 payload = '''
 booster_obj = nil
