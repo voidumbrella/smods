@@ -230,6 +230,9 @@ if card.ability.consumeable then
 payload = '''
 if select_to then
     G[select_to]:emplace(card)
+    if card.config.center.on_select and type(card.config.center.on_select) == 'function' then
+        card.config.center:on_select(card)
+    end
     play_sound('card1', 0.8, 0.6)
     play_sound('generic1')
     dont_dissolve = true
