@@ -976,6 +976,17 @@ function SMODS.always_scores(card)
         if v.always_scores and card.ability[k] then return true end
     end
 end
+function SMODS.never_scores(card)
+    card.extra_enhancements = nil
+    for k, _ in pairs(SMODS.get_enhancements(card)) do
+        if G.P_CENTERS[k].never_scores then return true end
+    end
+    if (G.P_CENTERS[(card.edition or {}).key] or {}).never_scores then return true end
+    if (G.P_SEALS[card.seal or {}] or {}).never_scores then return true end
+    for k, v in pairs(SMODS.Stickers) do
+        if v.never_scores and card.ability[k] then return true end
+    end
+end
 
 SMODS.collection_pool = function(_base_pool)
     local pool = {}

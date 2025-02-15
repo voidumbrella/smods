@@ -128,13 +128,6 @@ end"""
 [[patches]]
 [patches.pattern]
 target = "functions/state_events.lua"
-pattern = "if G.play.cards[i].ability.effect == 'Stone Card' then"
-match_indent = true
-position = "at"
-payload = '''if SMODS.always_scores(G.play.cards[i]) then'''
-[[patches]]
-[patches.pattern]
-target = "functions/state_events.lua"
 pattern = "if scoring_hand[i].ability.effect ~= 'Stone Card' then"
 match_indent = true
 position = "at"
