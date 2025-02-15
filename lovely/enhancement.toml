@@ -159,7 +159,39 @@ target = "card.lua"
 pattern = "if self.children.front and self.ability.effect ~= 'Stone Card' then"
 match_indent = true
 position = "at"
-payload = "if self.children.front and self.ability.effect ~= 'Stone Card' and not self.config.center.replace_base_card then"
+payload = "if self.children.front and (self.ability.delayed or (self.ability.effect ~= 'Stone Card' and not self.config.center.replace_base_card)) then"
+# Add the delayed property to sprites that are delayed
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+match_indent = true
+position = 'at'
+pattern = '''
+if delay_sprites then 
+    G.E_MANAGER:add_event(Event({
+        func = function()
+            if not self.REMOVED then
+                self:set_sprites(center)
+            end
+            return true
+        end
+    })) 
+'''
+payload = '''
+if delay_sprites then 
+    self.ability.delayed = true
+    G.E_MANAGER:add_event(Event({
+        func = function()
+            if not self.REMOVED then
+                self:set_sprites(center)
+                self.ability.delayed = false
+            end
+            return true
+        end
+    })) 
+'''
+
+
 
 # Card:generate_UIBox_ability_table()
 # replaces two consecutive lines
