@@ -161,13 +161,19 @@ payload = 'cfg'
 [patches.pattern]
 target = 'card.lua'
 pattern = "self.config.center = center"
-position = 'before'
+position = 'at'
 match_indent = true
 payload = '''
 if self.added_to_deck and old_center and not self.debuff then
     self:remove_from_deck()
     self.added_to_deck = true
-end'''
+end
+if type(center) == 'string' then 
+    assert(G.P_CENTERS[center])
+    center = G.P_CENTERS[center]
+end
+self.config.center = center
+'''
 
 [[patches]]
 [patches.pattern]
