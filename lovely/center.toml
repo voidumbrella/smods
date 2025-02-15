@@ -418,7 +418,17 @@ if card.ability.consumeable and not select_to then
 end
 if not card.from_area then card.from_area = card.area end
 if card.area and (not nc or card.area == G.pack_cards) then card.area:remove_card(card) end'''
-
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+match_indent = true
+position = 'before'
+pattern = '''
+if area and area.cards[1] then 
+'''
+payload = '''
+if nc and not area then G.consumeables:emplace(card) end
+'''
 [[patches]]
 [patches.pattern]
 target = 'functions/button_callbacks.lua'
