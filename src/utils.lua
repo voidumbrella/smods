@@ -1670,7 +1670,7 @@ function SMODS.get_card_areas(_type, _context)
     if _type == 'playing_cards' then
         local t = {}
         if _context ~= 'end_of_round' then t[#t+1] = G.play end
-        if SMODS.optional_features.cardareas.unscored then t[#t+1] = 'unscored' end
+        if _context ~= 'end_of_round' and SMODS.optional_features.cardareas.unscored then t[#t+1] = 'unscored' end
         t[#t+1] = G.hand
         if SMODS.optional_features.cardareas.deck then t[#t+1] = G.deck end
         if SMODS.optional_features.cardareas.discard then t[#t+1] = G.discard end
