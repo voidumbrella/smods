@@ -257,7 +257,7 @@ match_indent = true
 target = "card.lua"
 pattern = "if card.ability.name == 'Glass Card' then"
 position = "at"
-payload = "if SMODS.has_enhancement(card, 'm_glass') then"
+payload = "if SMODS.shatters(card) then"
 match_indent = true
 
 [[patches]]
@@ -265,7 +265,7 @@ match_indent = true
 target = "functions/state_events.lua"
 pattern = "if G.hand.highlighted[i].ability.name == 'Glass Card' then"
 position = "at"
-payload = "if SMODS.has_enhancement(G.hand.highlighted[i], 'm_glass') then"
+payload = "if SMODS.shatters(G.hand.highlighted[i]) then"
 match_indent = true
 
 [[patches]]
@@ -281,7 +281,7 @@ match_indent = true
 target = "functions/state_events.lua"
 pattern = "if cards_destroyed[i].ability.name == 'Glass Card' then"
 position = "at"
-payload = "if SMODS.has_enhancement(cards_destroyed[i], 'm_glass') then"
+payload = "if cards_destroyed[i].shattered then"
 match_indent = true
 
 # Prevent blue seals from applying on quantum enhancement calc
