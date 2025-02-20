@@ -1204,7 +1204,18 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
     end
 
     if key == 'level_up' then
-        level_up_hand(scored_card, G.GAME.last_hand_played, effect.instant, type(amount) == 'number' and amount or 1)
+        local old_text = {}
+        G.E_MANAGER:add_event(Event({
+            trigger = 'immediate',
+            func = function()
+                old_text = copy_table(G.GAME.current_round.current_hand)
+                update_hand_text({sound = 'button', volume = 0.7, pitch = 1.1, delay = 0}, {mult = old_text.mult, chips = old_text.chips, handname = old_text.handname, level = old_text.handname ~= "" and G.GAME.hands[old_text.handname].level or ''})
+                return true
+            end
+        }))
+        local hand_type = effect.level_up_hand or G.GAME.last_hand_played
+        update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize(hand_type, 'poker_hands'),chips = G.GAME.hands[hand_type].chips, mult = G.GAME.hands[hand_type].mult, level=G.GAME.hands[hand_type].level})
+        level_up_hand(scored_card, hand_type, effect.instant, type(amount) == 'number' and amount or 1)
         return true
     end
 
