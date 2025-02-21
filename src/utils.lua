@@ -1664,6 +1664,12 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
         SMODS.trigger_effects({post}, card)
         if self_destroy then destroyed = true end
         
+        local deck_effect = G.GAME.selected_back:trigger_effect(context)
+        if deck_effect then
+            self_destroy = SMODS.calculate_effect(deck_effect, G.deck.cards[1] or G.deck)
+            if self_destroy then destroyed = true end
+        end
+
         -- TARGET: card destroyed
 
         if destroyed then 
