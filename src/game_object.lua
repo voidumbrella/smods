@@ -2193,7 +2193,6 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 func = function()
                     local cards = {}
                     for i = 1, card.ability.extra do
-                        cards[i] = true
                         -- TODO preserve suit vanilla RNG
                         local _suit, _rank =
                             pseudorandom_element(SMODS.Suits, pseudoseed('grim_create')).card_key, 'A'
@@ -2203,7 +2202,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                                 cen_pool[#cen_pool + 1] = v
                             end
                         end
-                        create_playing_card({
+                        cards[i] = create_playing_card({
                             front = G.P_CARDS[_suit .. '_' .. _rank],
                             center = pseudorandom_element(cen_pool, pseudoseed('spe_card'))
                         }, G.hand, nil, i ~= 1, { G.C.SECONDARY_SET.Spectral })
@@ -2226,7 +2225,6 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 func = function()
                     local cards = {}
                     for i = 1, card.ability.extra do
-                        cards[i] = true
                         -- TODO preserve suit vanilla RNG
                         local faces = {}
                         for _, v in ipairs(SMODS.Rank.obj_buffer) do
@@ -2242,7 +2240,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                                 cen_pool[#cen_pool + 1] = v
                             end
                         end
-                        create_playing_card({
+                        cards[i] = create_playing_card({
                             front = G.P_CARDS[_suit .. '_' .. _rank],
                             center = pseudorandom_element(cen_pool, pseudoseed('spe_card'))
                         }, G.hand, nil, i ~= 1, { G.C.SECONDARY_SET.Spectral })
@@ -2265,7 +2263,6 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 func = function()
                     local cards = {}
                     for i = 1, card.ability.extra do
-                        cards[i] = true
                         -- TODO preserve suit vanilla RNG
                         local numbers = {}
                         for _, v in ipairs(SMODS.Rank.obj_buffer) do
@@ -2281,7 +2278,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                                 cen_pool[#cen_pool + 1] = v
                             end
                         end
-                        create_playing_card({
+                        cards[i] = create_playing_card({
                             front = G.P_CARDS[_suit .. '_' .. _rank],
                             center = pseudorandom_element(cen_pool, pseudoseed('spe_card'))
                         }, G.hand, nil, i ~= 1, { G.C.SECONDARY_SET.Spectral })
