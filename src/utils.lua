@@ -1209,7 +1209,7 @@ SMODS.calculate_individual_effect = function(effect, scored_card, key, amount, f
             trigger = 'immediate',
             func = function()
                 old_text = copy_table(G.GAME.current_round.current_hand)
-                update_hand_text({sound = 'button', volume = 0.7, pitch = 1.1, delay = 0}, {mult = old_text.mult, chips = old_text.chips, handname = old_text.handname, level = old_text.handname ~= "" and G.GAME.hands[old_text.handname].level or ''})
+                update_hand_text({sound = 'button', volume = 0.7, pitch = 1.1, delay = 0}, {mult = old_text.mult, chips = old_text.chips, handname = old_text.handname, level = old_text.handname ~= "" and G.GAME.hands[G.GAME.last_hand_played].level or ''})
                 return true
             end
         }))
