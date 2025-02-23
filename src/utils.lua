@@ -230,15 +230,15 @@ function SMODS.insert_pool(pool, center, replace)
 		for k, v in ipairs(pool) do
             if v.key == center.key then
                 pool[k] = center
+                return
             end
 		end
-    else
-		local prev_order = (pool[#pool] and pool[#pool].order) or 0
-		if prev_order ~= nil then 
-			center.order = prev_order + 1
-		end
-		table.insert(pool, center)
-	end
+    end
+    local prev_order = (pool[#pool] and pool[#pool].order) or 0
+    if prev_order ~= nil then 
+        center.order = prev_order + 1
+    end
+    table.insert(pool, center)
 end
 
 function SMODS.remove_pool(pool, key)

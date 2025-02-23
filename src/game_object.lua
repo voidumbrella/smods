@@ -215,7 +215,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             )
             return
         end
-        local is_loc_modified = obj.loc_txt or obj.loc_vars or obj.generate_ui
+        local is_loc_modified = obj.loc_txt or obj.loc_vars or obj.generate_ui or orig_o.mod
         if is_loc_modified then orig_o.is_loc_modified = true end
         if not orig_o.is_loc_modified then
             -- Setting generate_ui to this sentinel value
@@ -1112,8 +1112,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         inject = function(self)
             -- call the parent function to ensure all pools are set
             SMODS.Center.inject(self)
-            if self.taken_ownership and self.rarity_original == self.rarity then
-                SMODS.remove_pool(G.P_JOKER_RARITY_POOLS[self.rarity_original], self.key)
+            if self.taken_ownership and self.rarity_original and self.rarity_original ~= self.rarity then
+                SMODS.remove_pool(G.P_JOKER_RARITY_POOLS[self.rarity_original] or {}, self.key)
                 SMODS.insert_pool(G.P_JOKER_RARITY_POOLS[self.rarity], self, false)
             else
                 SMODS.insert_pool(G.P_JOKER_RARITY_POOLS[self.rarity], self)
