@@ -183,12 +183,12 @@ function SMODS.process_loc_text(ref_table, ref_value, loc_txt, key)
     ref_table[ref_value] = target
 end
 
-local function parse_loc_file(file_name, force)
+local function parse_loc_file(file_name, force, mod_id)
     local loc_table = nil
     if file_name:lower():match("%.json$") then
         loc_table = assert(JSON.decode(NFS.read(file_name)))
     else
-        loc_table = assert(loadstring(NFS.read(file_name)))()
+        loc_table = assert(loadstring(NFS.read(file_name), ('=[SMODS %s "%s"]'):format(mod_id, string.match(file_name, '[^/]+/[^/]+$'))))()
     end
     local function recurse(target, ref_table)
         if type(target) ~= 'table' then return end --this shouldn't happen unless there's a bad return value
@@ -207,21 +207,21 @@ local function parse_loc_file(file_name, force)
 	recurse(loc_table, G.localization)
 end
 
-local function handle_loc_file(dir, language, force)
+local function handle_loc_file(dir, language, force, mod_id)
     for k, v in ipairs({ dir .. language .. '.lua', dir .. language .. '.json' }) do
         if NFS.getInfo(v) then
-            parse_loc_file(v, force)
+            parse_loc_file(v, force, mod_id)
             break
         end
     end
 end
 
-function SMODS.handle_loc_file(path)
+function SMODS.handle_loc_file(path, mod_id)
     local dir = path .. 'localization/'
-    handle_loc_file(dir, 'en-us', true)
-    handle_loc_file(dir, 'default', true)
-    handle_loc_file(dir, G.SETTINGS.language, true)
-    if G.SETTINGS.real_language then handle_loc_file(dir, G.SETTINGS.real_language, true) end
+    handle_loc_file(dir, 'en-us', true, mod_id)
+    handle_loc_file(dir, 'default', true, mod_id)
+    handle_loc_file(dir, G.SETTINGS.language, true, mod_id)
+    if G.SETTINGS.real_language then handle_loc_file(dir, G.SETTINGS.real_language, true, mod_id) end
 end
 
 function SMODS.insert_pool(pool, center, replace)
