@@ -7,18 +7,6 @@ priority = -10
 
 # Card:set_ability()
 [[patches]]
-[patches.pattern]
-target = 'card.lua'
-pattern = 'function Card:set_ability(center, initial, delay_sprites)'
-position = 'after'
-match_indent = true
-payload = '''
-for k,v in pairs(self.children) do
-    if type(v) == 'table' and v.is and v:is(Sprite) then v:remove(); self.children[k] = nil end
-end
-'''
-
-[[patches]]
 [patches.regex]
 target = "card.lua"
 pattern = "(?<indent>[\t ]*)if not G\\.OVERLAY_MENU then \n"
