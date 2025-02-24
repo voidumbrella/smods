@@ -1412,7 +1412,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         draw_hand = true,
         update_pack = SMODS.Booster.update_pack,
         ease_background_colour = function(self) ease_background_colour_blind(G.STATES.TAROT_PACK) end,
-        create_UIBox = function(self) return create_UIBox_arcana_pack() end,
+        create_UIBox = SMODS.Booster.create_UIBox,
         particles = function(self)
             G.booster_pack_sparkles = Particles(1, 1, 0,0, {
                 timer = 0.015,
@@ -1442,9 +1442,10 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
 
     SMODS.Booster:take_ownership_by_kind('Celestial', {
         group_key = "k_celestial_pack",
+        config = {extra = 10, choose = 1},
         update_pack = SMODS.Booster.update_pack,
         ease_background_colour = function(self) ease_background_colour_blind(G.STATES.PLANET_PACK) end,
-        create_UIBox = function(self) return create_UIBox_celestial_pack() end,
+        create_UIBox = SMODS.Booster.create_UIBox,
         particles = function(self)
             G.booster_pack_stars = Particles(1, 1, 0,0, {
                 timer = 0.07,
@@ -1498,7 +1499,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         draw_hand = true,
         update_pack = SMODS.Booster.update_pack,
         ease_background_colour = function(self) ease_background_colour_blind(G.STATES.SPECTRAL_PACK) end,
-        create_UIBox = function(self) return create_UIBox_spectral_pack() end,
+        create_UIBox = SMODS.Booster.create_UIBox,
         particles = function(self)
             G.booster_pack_sparkles = Particles(1, 1, 0,0, {
                 timer = 0.015,
@@ -1524,7 +1525,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         group_key = "k_standard_pack",
         update_pack = SMODS.Booster.update_pack,
         ease_background_colour = function(self) ease_background_colour_blind(G.STATES.STANDARD_PACK) end,
-        create_UIBox = function(self) return create_UIBox_standard_pack() end,
+        create_UIBox = SMODS.Booster.create_UIBox,
         particles = function(self)
             G.booster_pack_sparkles = Particles(1, 1, 0,0, {
                 timer = 0.015,
@@ -1552,7 +1553,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         group_key = "k_buffoon_pack",
         update_pack = SMODS.Booster.update_pack,
         ease_background_colour = function(self) ease_background_colour_blind(G.STATES.BUFFOON_PACK) end,
-        create_UIBox = function(self) return create_UIBox_buffoon_pack() end,
+        create_UIBox = SMODS.Booster.create_UIBox,
         create_card = function(self, card)
             return {set = "Joker", area = G.pack_cards, skip_materialize = true, soulable = true, key_append = "buf"}
         end,
