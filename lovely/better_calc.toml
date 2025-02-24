@@ -1127,7 +1127,18 @@ match_indent = true
 payload = '''
 SMODS.calculate_context({buying_card = true, card = c1})
 '''
-
+# context.starting_shop
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''
+G.CONTROLLER:snap_to({node = G.shop:get_UIE_by_ID('next_round_button')})
+'''
+position = 'before'
+match_indent = true
+payload = '''
+if not nosave_shop then SMODS.calculate_context({starting_shop = true}) end
+'''
 # context.ending_shop
 [[patches]]
 [patches.pattern]
