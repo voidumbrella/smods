@@ -42,6 +42,16 @@ line_prepend = '$indent'
 payload = '''end
 if self.name == 'The Arm' then'''
 
+# revert the change for Crimson Heart in debuff_card
+[[patches]]
+[patches.regex]
+target = 'blind.lua'
+pattern = '''(?<indent>[\t ]*)elseif self\.name == 'Crimson Heart' and not self\.disabled'''
+position = 'at'
+line_prepend = '$indent'
+payload = '''end
+if self.name == 'Crimson Heart' and not self.disabled'''
+
 ## Set debuffed_by_blind, use it for Matador behavior
 ## Blind:debuff_card()
 [[patches]]
