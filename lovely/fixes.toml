@@ -209,7 +209,7 @@ for k, v in pairs(new_ability) do
     self.ability[k] = v
 end
 -- reset keys do not persist an ability change
-local reset_keys = {'name', 'effect', 'set', 'extra', 'played_this_ante'}
+local reset_keys = {'name', 'effect', 'set', 'extra', 'played_this_ante', 'perma_debuff'}
 for _, mod in ipairs(SMODS.mod_list) do
     if mod.set_ability_reset_keys then
         local keys = mod.set_ability_reset_keys()
