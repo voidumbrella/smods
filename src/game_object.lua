@@ -730,7 +730,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             G.GAME.modifiers.enable_perishables_in_shop = true
         end,
         colour = G.C.ORANGE,
-        loc_txt = {}
+        loc_txt = {},
     }
     SMODS.Stake {
         name = "Gold Stake",
@@ -3272,6 +3272,12 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             SMODS.process_loc_text(G.localization.misc.achievement_descriptions, self.key, self.loc_txt, "description")
         end,
     }
+
+    -------------------------------------------------------------------------------------------------
+    ----- API IMPORT GameObject.DrawStep
+    -------------------------------------------------------------------------------------------------
+
+    assert(load(NFS.read(SMODS.path..'src/card_draw.lua'), ('=[SMODS _ "src/card_draw.lua"]')))()
 
     -------------------------------------------------------------------------------------------------
     ----- INTERNAL API CODE GameObject._Loc_Post
