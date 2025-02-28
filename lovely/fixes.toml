@@ -621,3 +621,18 @@ payload = """local success, _st = pcall(require, 'luasteam')
 if success then st = _st else sendWarnMessage(_st); st = {} end"""
 overwrite = true
 match_indent = true
+
+# copy_card edition config
+[[patches]]
+[patches.pattern]
+target = 'functions/common_events.lua'
+position = 'after'
+match_indent = true
+pattern = 'new_card:set_edition(other.edition or {}, nil, true)'
+payload = '''for k,v in pairs(other.edition) do
+    if type(v) == 'table' then
+        new_card.edition[k] = copy_table(v)
+    else
+        new_card.edition[k] = v
+    end
+end'''
