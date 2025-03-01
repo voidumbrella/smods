@@ -1682,7 +1682,7 @@ function SMODS.blueprint_effect(card, blueprint_card, context)
         if context.blueprint > #G.jokers.cards + 1 then return end
         local other_joker_ret = blueprint_card:calculate_joker(context)
         context.blueprint = nil
-        local eff_card = context.blueprint_card or self
+        local eff_card = context.blueprint_card or card
         context.blueprint_card = nil
         if other_joker_ret then
             other_joker_ret.card = card
