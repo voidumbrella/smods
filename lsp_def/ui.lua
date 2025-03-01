@@ -22,19 +22,48 @@ function create_UIBox_mods(args) end
 
 ---@param mod Mod
 ---@return table
---- Creates the Mod's Description tab UIBox. 
+--- Creates UIBox for Mod's Description tab. 
 function buildModDescTab(mod) end
 
 ---@param mod Mod
 ---@return table
---- Creates the Mod's Additions tab UIBox. 
+--- Creates UIBox for Mod's "Additions" tab. 
 function buildAdditionsTab(mod) end
+
+---@param e table?
+--- Button function for "Other" collections menu
+G.FUNCS.your_collection_other_gameobjects = function(e) end
+
+---@return table|nil UIBox
+--- Creates UIBox for "Other" collections menu
+function create_UIBox_Other_GameObjects() end
+
+---@param e table?
+--- Button function for "Consumables" collections menu UIBox
+G.FUNCS.your_collection_consumables = function(e) end
+
+---@return table UIBox
+--- Creates UIBox for "Consumables" collections menu
+function create_UIBox_your_collection_consumables() end
+
+---@param args table?
+--- Pages button function for "Consumables" collection menu
+G.FUNCS.your_collection_consumables_page = function(args) end
+
+---@param page? number
+---@return table UIBox
+--- Creates UIBox for "Consumables" collection menu pages. 
+G.UIDEF.consumable_collection_page = function(page) end
 
 ---@param mod Mod
 ---@param current_page number?
 ---@return table
---- Creates the Mod's Achievements tab UIBox. 
+--- Creates UIBox for Mod's "Achievements" tab. 
 function buildAchievementsTab(mod, current_page) end
+
+---@param args table?
+--- Pages button function for "Achievements" tab
+G.FUNCS.achievments_tab_page = function(args) end
 
 ---@param pool table[]
 ---@param set string? Only objects with matching set will be tallied. 
@@ -64,7 +93,7 @@ function SMODS.save_mod_config(mod) end
 --- Saves all mod configs. 
 function SMODS.save_all_config() end
 
----@param e table
+---@param e table?
 --- Exits mods tab. 
 function G.FUNCS.exit_mods(e) end
 
@@ -72,11 +101,15 @@ function G.FUNCS.exit_mods(e) end
 --- Creates UIBox for SMODS Menu. 
 function create_UIBox_mods_button() end
 
----@param e table
+---@param e table?
 --- Updates achievements settings. 
 function G.FUNCS.update_achievement_settings(e) end
 
----@param e table
+---@param e table?
+--- Button function for Steamodded Github link. 
+function G.FUNCS.steamodded_github(e) end
+
+---@param e table?
 --- Updates UI to display SMODS menu. 
 function G.FUNCS.mods_button(e) end
 
@@ -132,3 +165,35 @@ function G.FUNCS.SMODS_change_mipmap(args) end
 ---@param rows number[]
 --- Creates a default
 function SMODS.card_collection_UIBox(_pool, rows, args) end
+
+---@return table UIBox
+--- Creates UIBox for "Jokers" collection menu
+function create_UIBox_your_collection_jokers() end
+
+---@return table UIBox
+--- Creates UIBox for "Boosters" collection menu
+function create_UIBox_your_collection_boosters() end
+
+---@return table UIBox
+--- Creates UIBox for "Vouchers" collection menu
+function create_UIBox_your_collection_vouchers() end
+
+---@return table UIBox
+--- Creates UIBox for "Enhancements" collection menu
+function create_UIBox_your_collection_enhancements() end
+
+---@return table UIBox
+--- Creates UIBox for "Editions" collection menu
+function create_UIBox_your_collection_editions() end
+
+---@return table UIBox
+--- Creates UIBox for "Seals" collection menu
+function create_UIBox_your_collection_seals() end
+
+---@param e table?
+--- Button function for "Stickers" collection menu
+G.FUNCS.your_collection_stickers = function(e) end
+
+---@return table UIBox
+--- Creates UIBox for "Stickers" collection menu
+function create_UIBox_your_collection_stickers() end
