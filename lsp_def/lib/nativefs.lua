@@ -12,8 +12,8 @@ local nativefs = {}
 function nativefs.newFile(name) end
 
 ---@param filepath string Path to the file. 
----@return love.FileData data The new FileData.
----@return string error
+---@return string|love.FileData? data The file data.
+---@return string? error
 function nativefs.newFileData(filepath) end
 
 ---@param archive string
@@ -30,7 +30,7 @@ function nativefs.unmount(archive) end
 ---@param nameOrSize? number|string
 ---@param sizeOrNil? number|nil
 ---@return string|love.FileData?
----@return number|string? size # Returns as string if error
+---@return number|string? size Returns as string if error
 function nativefs.read(containerOrName, nameOrSize, sizeOrNil) end
 
 ---@param name string
