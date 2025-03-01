@@ -629,7 +629,7 @@ target = 'functions/common_events.lua'
 position = 'after'
 match_indent = true
 pattern = 'new_card:set_edition(other.edition or {}, nil, true)'
-payload = '''for k,v in pairs(other.edition) do
+payload = '''for k,v in pairs(other.edition or {}) do
     if type(v) == 'table' then
         new_card.edition[k] = copy_table(v)
     else
