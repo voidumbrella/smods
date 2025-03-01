@@ -1384,34 +1384,16 @@ function SMODS.calculate_context(context, return_table)
     end
     context.main_eval = nil
     if context.scoring_hand then
-        context.cardarea = G.play
-        for i=1, #context.scoring_hand do
+        for i=1, #G.play.cards do
+                if SMODS.in_scoring(G.play.cards[i], context.scoring_hand) then context.cardarea = G.play else context.cardarea = 'unscored' end
             --calculate the played card effects
             if return_table then
-                return_table[#return_table+1] = eval_card(context.scoring_hand[i], context)
-                SMODS.calculate_quantum_enhancements(context.scoring_hand[i], return_table, context)
+                return_table[#return_table+1] = eval_card(G.play.cards[i], context)
+                SMODS.calculate_quantum_enhancements(G.play.cards[i], return_table, context)
             else
-                local effects = {eval_card(context.scoring_hand[i], context)}
-                SMODS.calculate_quantum_enhancements(context.scoring_hand[i], effects, context)
-                SMODS.trigger_effects(effects, context.scoring_hand[i])
-            end
-        end
-        if SMODS.optional_features.cardareas.unscored then
-            context.cardarea = 'unscored'
-            local unscored_cards = {}
-            for _, played_card in pairs(G.play.cards) do
-                if not SMODS.in_scoring(played_card, context.scoring_hand) then unscored_cards[#unscored_cards + 1] = played_card end
-            end
-            for i=1, #unscored_cards do
-                --calculate the played card effects
-                if return_table then
-                    return_table[#return_table+1] = eval_card(unscored_cards[i], context)
-                    SMODS.calculate_quantum_enhancements(unscored_cards[i], return_table, context)
-                else
-                    local effects = {eval_card(unscored_cards[i], context)}
-                    SMODS.calculate_quantum_enhancements(unscored_cards[i], effects, context)
-                    SMODS.trigger_effects(effects, unscored_cards[i])
-                end
+                local effects = {eval_card(G.play.cards[i], context)}
+                SMODS.calculate_quantum_enhancements(G.play.cards[i], effects, context)
+                SMODS.trigger_effects(effects, G.play.cards[i])
             end
         end
     end
@@ -1493,7 +1475,7 @@ function SMODS.score_card(card, context)
                         table.insert(effects, eval)
                         for _, v in ipairs(post) do effects[#effects+1] = v end
                         if eval.retriggers then
-                            context.retrigger_joker = true
+                            context.retrigger_joker = eval.retriggers.retrigger_card
                             for rt = 1, #eval.retriggers do
                                 local rt_eval, rt_post = eval_card(_card, context)
                                 if rt_eval.jokers then
@@ -1531,9 +1513,9 @@ function SMODS.score_card(card, context)
 end
 
 function SMODS.calculate_main_scoring(context, scoring_hand)
-    for _, card in ipairs(scoring_hand or context.cardarea.cards) do
+    for _, card in ipairs(context.cardarea.cards) do
         --add cards played to list
-        if scoring_hand and not SMODS.has_no_rank(card) then
+        if scoring_hand and not SMODS.has_no_rank(card) and SMODS.in_scoring(card, context.scoring_hand) then
             G.GAME.cards_played[card.base.value].total = G.GAME.cards_played[card.base.value].total + 1
             if not SMODS.has_no_suit(card) then
                 G.GAME.cards_played[card.base.value].suits[card.base.suit] = true
@@ -1548,6 +1530,9 @@ function SMODS.calculate_main_scoring(context, scoring_hand)
             }))
             card_eval_status_text(card, 'debuff')
         else
+            if scoring_hand then
+                if SMODS.in_scoring(card, context.scoring_hand) then context.cardarea = G.play else context.cardarea = 'unscored' end
+            end
             SMODS.score_card(card, context)
         end
     end
@@ -1628,7 +1613,15 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
 
         -- context.destroying_card calculations
         context.destroy_card = card
-        context.destroying_card = scoring_hand and card
+        if scoring_hand then
+            if SMODS.in_scoring(card, context.scoring_hand) then
+                context.cardarea = G.play
+                context.destroying_card = card
+            else
+                context.cardarea = 'unscored' 
+                context.destroying_card = nil
+            end
+        end
         for _, area in ipairs(SMODS.get_card_areas('jokers')) do
             local should_break
             for _, _card in ipairs(area.cards) do
@@ -1686,7 +1679,6 @@ function SMODS.get_card_areas(_type, _context)
     if _type == 'playing_cards' then
         local t = {}
         if _context ~= 'end_of_round' then t[#t+1] = G.play end
-        if _context ~= 'end_of_round' and SMODS.optional_features.cardareas.unscored then t[#t+1] = 'unscored' end
         t[#t+1] = G.hand
         if SMODS.optional_features.cardareas.deck then t[#t+1] = G.deck end
         if SMODS.optional_features.cardareas.discard then t[#t+1] = G.discard end
