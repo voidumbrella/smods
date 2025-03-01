@@ -1319,6 +1319,7 @@ SMODS.calculate_retriggers = function(card, context, _ret)
                 if value.repetitions then
                     for h=1, value.repetitions do
                         value.retrigger_card = _card
+                        value.message_card = value.message_card or _card
                         value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
                         retriggers[#retriggers + 1] = value
                     end
@@ -1484,13 +1485,21 @@ function SMODS.score_card(card, context)
                     --calculate the joker individual card effects
                     local eval, post = eval_card(_card, context)
                     if next(eval) then
-                        if eval.jokers then eval.jokers.juice_card = eval.jokers.juice_card or eval.jokers.card or _card end
+                        if eval.jokers then
+                            eval.jokers.juice_card = eval.jokers.juice_card or eval.jokers.card or _card
+                            eval.jokers.message_card = eval.jokers.message_card or eval.jokers.card or card
+                        end
+                        
                         table.insert(effects, eval)
                         for _, v in ipairs(post) do effects[#effects+1] = v end
                         if eval.retriggers then
                             context.retrigger_joker = true
                             for rt = 1, #eval.retriggers do
                                 local rt_eval, rt_post = eval_card(_card, context)
+                                if rt_eval.jokers then
+                                    rt_eval.jokers.juice_card = rt_eval.jokers.juice_card or rt_eval.jokers.card or _card
+                                    rt_eval.jokers.message_card = rt_eval.jokers.message_card or rt_eval.jokers.card or card
+                                end
                                 table.insert(effects, { eval.retriggers[rt] })
                                 table.insert(effects, rt_eval)
                                 for _, v in ipairs(rt_post) do effects[#effects+1] = v end
