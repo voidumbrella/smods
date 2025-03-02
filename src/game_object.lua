@@ -3337,7 +3337,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
 
                     self[i] = start_colour[i] + partial_timer*(end_colour[i]-start_colour[i])
                 elseif self.interpolation == 'trig' then
-                    self[i] = start_colour[i] + math.sin(partial_timer*math.pi/2)*(end_colour[i]-start_colour[i])
+                    self[i] = start_colour[i] + 0.5*(1-math.cos(partial_timer*math.pi))*(end_colour[i]-start_colour[i])
                 end
             end
         end,
