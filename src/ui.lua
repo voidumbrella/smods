@@ -1836,12 +1836,12 @@ function G.UIDEF.run_setup_option(_type)
         for _,v in ipairs(text) do
             text_nodes[#text_nodes+1] = {
                 n = G.UIT.R, config = { align = 'cm' }, nodes = {
-                    { n = G.UIT.T, config = { text = v, colour = G.C.L_BLACK, scale = 0.35 } }
+                    { n = G.UIT.T, config = { text = v, colour = G.SETTINGS.reduced_motion and G.C.WHITE or SMODS.Gradients.version_warning_text, scale = 0.35, shadow = true } }
                 }
             }
         end
         table.insert(ret.nodes[1].nodes, 1, {
-            n = G.UIT.R, config = { align = "cm", r = 0.1, minw = 6, minh = 0.6, colour = G.C.RED, padding = 0.1 }, nodes={
+            n = G.UIT.R, config = { align = "cm", r = 0.1, minw = 6, minh = 0.6, colour = G.SETTINGS.reduced_motion and G.C.RED or SMODS.Gradients.version_warning_bg, padding = 0.1 }, nodes={
                 {
                     n = G.UIT.C, config = { align = 'cm' }, nodes = {
                         { n = G.UIT.O, config = { object = Sprite(0, 0, 0.8, 0.8, G.ASSET_ATLAS['mod_tags'], { x = 0, y = 0 }) } },
