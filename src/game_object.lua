@@ -3317,14 +3317,10 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         obj_table = SMODS.Gradients,
         obj_buffer = {},
         required_params = { 'key' },
-        [1] = 0,
-        [2] = 0,
-        [3] = 0,
-        [4] = 1,
         interpolation = 'trig',
         cycle = 10,
         colours = {},
-        inject = function() end,
+        inject = function(self) self[1], self[2], self[3], self[4] = 0,0,0,1 end,
         update = function(self, dt)
             if #self.colours < 2 then return end
             local timer = G.TIMERS.REAL%self.cycle
