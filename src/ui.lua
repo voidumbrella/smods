@@ -1817,4 +1817,46 @@ create_UIBox_your_collection_stickers = function()
             center:apply(card, true)
         end,
     })
+end 
+
+-- warning for updating during run
+local igo = Game.init_game_object
+function Game:init_game_object()
+    local t = igo(self)
+    t.smods_version = SMODS.version
+    return t
+end
+
+local gurso = G.UIDEF.run_setup_option
+function G.UIDEF.run_setup_option(_type)
+    local ret = gurso(_type)
+    if _type == 'Continue' and V(G.SAVED_GAME.GAME.smods_version or '0.0.0') ~= V(SMODS.version) then
+        local text = localize { type = 'variable', key = 'smods_version_mismatch', vars = {G.SAVED_GAME.GAME.smods_version or '(unknown)', SMODS.version}}
+        local text_nodes = {}
+        for _,v in ipairs(text) do
+            text_nodes[#text_nodes+1] = {
+                n = G.UIT.R, config = { align = 'cm' }, nodes = {
+                    { n = G.UIT.T, config = { text = v, colour = G.C.L_BLACK, scale = 0.35 } }
+                }
+            }
+        end
+        table.insert(ret.nodes[1].nodes, 1, {
+            n = G.UIT.R, config = { align = "cm", r = 0.1, minw = 6, minh = 0.6, colour = G.C.RED, padding = 0.1 }, nodes={
+                {
+                    n = G.UIT.C, config = { align = 'cm' }, nodes = {
+                        { n = G.UIT.O, config = { object = Sprite(0, 0, 0.8, 0.8, G.ASSET_ATLAS['mod_tags'], { x = 0, y = 0 }) } },
+                    }
+                }, 
+                { 
+                    n = G.UIT.C, config = { align = 'cm' }, nodes = text_nodes
+                },
+                {
+                    n = G.UIT.C, config = { align = 'cm' }, nodes = {
+                        { n = G.UIT.O, config = { object = Sprite(0, 0, 0.8, 0.8, G.ASSET_ATLAS['mod_tags'], { x = 0, y = 0 }) } },
+                    }
+                }, 
+            }
+        })
+    end
+    return ret
 end
