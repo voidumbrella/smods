@@ -3339,14 +3339,14 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end,
     }
     SMODS.Gradient {
-        key = 'version_warning_bg',
+        key = 'warning_bg',
         colours = { G.C.RED, G.C.GREEN },
-        cycle = 0.75,
+        cycle = 1,
     }
     SMODS.Gradient {
-        key = 'version_warning_text',
+        key = 'warning_text',
         colours = { G.C.WHITE, G.C.RED },
-        cycle = 0.75,
+        cycle = 1,
     }
 
 
