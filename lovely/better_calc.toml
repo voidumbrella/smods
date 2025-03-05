@@ -958,7 +958,7 @@ G.E_MANAGER:add_event(Event({
 '''
 
 # Used to identify first hand of round
-# ew_roud
+# new_round
 [[patches]]
 [patches.pattern]
 target = 'functions/state_events.lua'
