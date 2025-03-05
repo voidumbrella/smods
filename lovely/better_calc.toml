@@ -946,17 +946,28 @@ G.E_MANAGER:add_event(Event({
     delay = 0.4,
     func = function()
         if #SMODS.drawn_cards > 0 then
-            SMODS.calculate_context({first_hand_drawn = G.GAME.facing_blind and G.GAME.current_round.hands_played == 0 and G.GAME.current_round.discards_used == 0,
+            SMODS.calculate_context({first_hand_drawn = not G.GAME.current_round.any_hand_drawn and G.GAME.facing_blind,
                                     hand_drawn = G.GAME.facing_blind and SMODS.drawn_cards,
                                     other_drawn = not G.GAME.facing_blind and SMODS.drawn_cards})
             SMODS.drawn_cards = {}
+            if G.GAME.facing_blind then G.GAME.current_round.any_hand_drawn = true end
         end
         return true
     end
 }))
 '''
 
-
+# Used to identify first hand of round
+# ew_roud
+[[patches]]
+[patches.pattern]
+target = 'functions/state_events.lua'
+match_indent = true
+position = 'after'
+pattern = 'G.GAME.current_round.discards_used = 0'
+payload = '''
+G.GAME.current_round.any_hand_drawn = nil
+'''
 
 
 # context.using_consumeable
