@@ -251,9 +251,15 @@ function SMODS.remove_pool(pool, key) end
 --- Juices up blind. 
 function SMODS.juice_up_blind() end
 
+--- Change a card's suit, rank, or both.
+--- Accepts keys for both objects instead of needing to build a card key yourself.
+--- It is recommended to wrap this function in `assert` to prevent unnoticed errors.
+---@nodiscard
 ---@param card Card|table
 ---@param suit? string Key to the suit. 
 ---@param rank? string Key to the rank. 
+---@return Card|table? cardOrErr If successful the card. If it failed `nil`.
+---@return string? msg If it failed, a message describing what went wrong. 
 function SMODS.change_base(card, suit, rank) end
 
 ---@param key string
