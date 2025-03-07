@@ -199,6 +199,7 @@ function SMODS.never_scores(card) end
 --- Returns `true` if provided card is inside the scoring hand. 
 function SMODS.in_scoring(card, scoring_hand) end
 
+---@nodiscard
 ---@param path string Path to the file (excluding `mod.path`)
 ---@param id string? Key to Mod ID. Default to `SMODS.current_mod` if not provided. 
 ---@return function|nil 
