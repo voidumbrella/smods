@@ -1621,7 +1621,14 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
     for i,card in ipairs(context.cardarea.cards) do
         local destroyed = nil
         --un-highlight all cards
-        if scoring_hand and SMODS.in_scoring(card, context.scoring_hand) then highlight_card(card,(i-0.999)/(#scoring_hand-0.998),'down') end
+        if scoring_hand and SMODS.in_scoring(card, context.scoring_hand) then 
+            -- Use index of card in scoring hand to determine pitch
+            local m = 1
+            for j, _card in pairs(scoring_hand) do
+                if card == _card then m = j break end
+            end
+            highlight_card(card,(m-0.999)/(#scoring_hand-0.998),'down')
+        end
 
         -- context.destroying_card calculations
         context.destroy_card = card
