@@ -1332,6 +1332,13 @@ SMODS.calculate_retriggers = function(card, context, _ret)
             end
         end
     end
+    local deck_effect = G.GAME.selected_back:trigger_effect({retrigger_joker_check = true, other_card = card, other_context = context, other_ret = _ret})
+    if deck_effect and deck_effect.repetitions then
+        deck_effect.retrigger_card = G.GAME.selected_back
+        deck_effect.message_card = deck_effect.message_card or G.deck.cards[1] or G.deck
+        deck_effect.message = deck_effect.message or (not deck_effect.remove_default_message and localize('k_again_ex'))
+        retriggers[#retriggers + 1] = deck_effect
+    end
     return retriggers
 end
 
