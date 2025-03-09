@@ -613,7 +613,7 @@ position = "at"
 payload = '''
 local cards_destroyed = {}
 for _,v in ipairs(SMODS.get_card_areas('playing_cards', 'destroying_cards')) do
-    SMODS.calculate_destroying_cards({ full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, cardarea = v }, cards_destroyed, v == G.play and not SMODS.optional_features.cardareas.unscored and scoring_hand or nil)
+    SMODS.calculate_destroying_cards({ full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, cardarea = v }, cards_destroyed, v == G.play and scoring_hand or nil)
 end
 
 -- context.remove_playing_cards calculations

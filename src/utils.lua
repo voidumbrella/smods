@@ -1611,7 +1611,7 @@ function SMODS.calculate_end_of_round_effects(context)
 end
 
 function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand)
-    for i,card in ipairs(scoring_hand or context.cardarea.cards) do
+    for i,card in ipairs(context.cardarea.cards) do
         local destroyed = nil
         --un-highlight all cards
         if scoring_hand and SMODS.in_scoring(card, context.scoring_hand) then highlight_card(card,(i-0.999)/(#scoring_hand-0.998),'down') end
