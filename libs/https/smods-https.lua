@@ -268,9 +268,10 @@ if not isThread then -- In main thread
 		assert(type(cb) == "function", "Callback is not a function")
 		checkAndHandleInput(url, options, true) -- That way we aren't erroring in the thread as much
 		local thread = love.thread.newThread(getContent())
-		local obj = {thread = thread, cb = cb, id = id}
-		threads[id] = obj
-		thread:start(userAgent, url, options, id)
+		local tID = tostring(id)
+		local obj = {thread = thread, cb = cb, id = tID}
+		threads[tID] = obj
+		thread:start(userAgent, url, options, tID)
 		id = id + 1
 	end
 
