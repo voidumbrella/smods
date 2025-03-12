@@ -231,7 +231,7 @@ if not isThread then -- In main thread
 				sendMessageToConsole(msg.level, msg.logger .. "(" .. tostring(msg.id) .. ")", msg.msg)
 			elseif msgType == "cb" then -- NOTE: cb removes the thread so it must be the last message
 				t.cb(msg.code, msg.body, msg.headers)
-				threads[id] = nil
+				threads[msg.id] = nil
 			end
 		end
 	end
