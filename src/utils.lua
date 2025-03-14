@@ -1277,6 +1277,20 @@ SMODS.calculate_repetitions = function(card, context, reps)
             end
         end
     end
+    -- Quantum enhancement support :cat_owl:
+    local quantum_eval = {}
+    SMODS.calculate_quantum_enhancements(card, quantum_eval, context)
+    for _, eval in ipairs(quantum_eval) do
+        for key, value in pairs(eval) do
+            if value.repetitions then
+                for h=1, value.repetitions do
+                    value.card = value.card or card
+                    value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
+                    reps[#reps+1] = {key = value}
+                end
+            end
+        end
+    end
     context.repetition_only = false
     --From jokers
     for _, area in ipairs(SMODS.get_card_areas('jokers')) do
