@@ -271,9 +271,9 @@ if card.area and area_set[card.area] then
     local jokers, triggered = card:calculate_joker(context)
     if jokers == true then jokers = { remove = true } end
     if type(jokers) ~= 'table' then jokers = nil end
-    if (jokers and not jokers.no_retrigger) or triggered then
+    if jokers or triggered then
         ret.jokers = jokers
-        if not (context.retrigger_joker_check or context.retrigger_joker) then
+        if not (context.retrigger_joker_check or context.retrigger_joker) and not (jokers and jokers.no_retrigger) then
             local retriggers = SMODS.calculate_retriggers(card, context, ret)
             if next(retriggers) then
                 ret.retriggers = retriggers
