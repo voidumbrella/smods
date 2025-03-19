@@ -1568,5 +1568,5 @@ payload = 'do'
 [patches.regex]
 target = 'game.lua'
 position = 'at'
-pattern = 'G.GAME.blind:get_loc_debuff_text()'
+pattern = 'G.GAME.blind:get_loc_debuff_text\(\)'
 payload = 'SMODS.debuff_text or G.GAME.blind:get_loc_debuff_text()'
