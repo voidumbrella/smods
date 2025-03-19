@@ -1702,10 +1702,11 @@ function SMODS.calculate_end_of_round_effects(context)
 end
 
 function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand)
-    for i,card in ipairs(scoring_hand or context.cardarea.cards) do
+    for i,card in ipairs(context.cardarea.cards) do
         local destroyed = nil
         --un-highlight all cards
-        if scoring_hand and SMODS.in_scoring(card, context.scoring_hand) then 
+        local in_scoring = scoring_hand and SMODS.in_scoring(card, context.scoring_hand)
+        if scoring_hand and in_scoring then 
             -- Use index of card in scoring hand to determine pitch
             local m = 1
             for j, _card in pairs(scoring_hand) do
@@ -1750,7 +1751,7 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
             if self_destroy then destroyed = true end
         end
 
-        if scoring_hand and SMODS.has_enhancement(card, 'm_glass') and card:can_calculate() and pseudorandom('glass') < G.GAME.probabilities.normal/(card.ability.name == 'Glass Card' and card.ability.extra or G.P_CENTERS.m_glass.config.extra) then
+        if scoring_hand and in_scoring and SMODS.has_enhancement(card, 'm_glass') and card:can_calculate() and pseudorandom('glass') < G.GAME.probabilities.normal/(card.ability.name == 'Glass Card' and card.ability.extra or G.P_CENTERS.m_glass.config.extra) then
             destroyed = true
         end
 
