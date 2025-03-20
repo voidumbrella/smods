@@ -58,6 +58,17 @@
 ---@field modify_scoring_hand? true Check if `true` for modifying the scoring hand. 
 ---@field ending_booster? true Check if `true` for effects after a Booster Pack ends. 
 ---@field starting_shop? true Check if `true` for effects when the shop is first opened. 
+---@field blind_disabled? true Check if `true` for effects when the blind is disabled. 
+---@field blind_defeated? true Check if `true` for effects when the blind is disabled. 
+---@field press_play? true Check if `true` for effects when the Play button is pressed.
+---@field debuff_card? Card|table The card being checked for if it should be debuffed. 
+---@field ignore_debuff? true Sets if `self.debuff` checks are ignored. 
+---@field debuff_hand? true Check if `true` for calculating if the played hand should be debuffed. 
+---@field check? true `true` when the blind is being checked for if it debuffs the played hand. 
+---@field stay_flipped? true Check if `true` for effects when a card is being drawn. 
+---@field to_area? CardArea|table CardArea the card is being drawn to. 
+---@field from_area? CardArea|table CardArea the card is being drawn from. 
+---@field modify_hand? true Check if `true` for modifying the chips and mult of the played hand. 
 
 --- Util Functions
 
@@ -81,6 +92,7 @@ function SMODS.get_optional_features() end
 
 ---@param context CalcContext|table 
 ---@param return_table? table 
+---@return table
 --- Used to calculate contexts across `G.jokers`, `scoring_hand` (if present), `G.play` and `G.GAME.selected_back`.
 --- Hook this function to add different areas to MOST calculations
 function SMODS.calculate_context(context, return_table) end
