@@ -1386,6 +1386,7 @@ end
 -- immediate = boolean value
 -- silent = boolean value
 function Card:set_edition(edition, immediate, silent)
+	SMODS.enh_cache:write(self, nil)
 	-- Check to see if negative is being removed and reduce card_limit accordingly
 	if (self.added_to_deck or self.joker_added_to_deck_but_debuffed or (self.area == G.hand and not self.debuff)) and self.edition and self.edition.card_limit then
 		if self.ability.consumeable and self.area == G.consumeables then

@@ -838,12 +838,14 @@ function Card:add_sticker(sticker, bypass_check)
     local sticker = SMODS.Stickers[sticker]
     if bypass_check or (sticker and sticker.should_apply and type(sticker.should_apply) == 'function' and sticker:should_apply(self, self.config.center, self.area, true)) then
         sticker:apply(self, true)
+        SMODS.enh_cache:write(self, nil)
     end
 end
 
 function Card:remove_sticker(sticker)
     if self.ability[sticker] then
         SMODS.Stickers[sticker]:apply(self, false)
+        SMODS.enh_cache:write(self, nil)
     end
 end
 
@@ -881,49 +883,54 @@ function SMODS.get_enhancements(card, extra_only)
     if not SMODS.optional_features.quantum_enhancements or not G.hand then
         return not extra_only and card.ability.set == 'Enhanced' and { [card.config.center.key] = true } or {}
     end
-    if card.extra_enhancements and next(card.extra_enhancements) then
-        if extra_only then
-            local extras = copy_table(card.extra_enhancements)
-            extras[card.config.center.key] = nil
-            return extras
+    if not SMODS.enh_cache:read(card, extra_only) then
+
+        local enhancements = {}
+        if card.config.center.key ~= "c_base" then
+            enhancements[card.config.center.key] = true
         end
-        return card.extra_enhancements
-    end
-    local enhancements = {}
-    if card.config.center.key ~= "c_base" and not extra_only then
-        enhancements[card.config.center.key] = true
-    end
-    local calc_return = {}
-    SMODS.calculate_context({other_card = card, check_enhancement = true, no_blueprint = true}, calc_return)
-    for _, eval in pairs(calc_return) do
-        for key, eval2 in pairs(eval) do
-            if type(eval2) == 'table' then
-                for key2, _ in pairs(eval2) do
-                    if G.P_CENTERS[key2] then enhancements[key2] = true end
+        local calc_return = {}
+        SMODS.calculate_context({other_card = card, check_enhancement = true, no_blueprint = true}, calc_return)
+        for _, eval in pairs(calc_return) do
+            for key, eval2 in pairs(eval) do
+                if type(eval2) == 'table' then
+                    for key2, _ in pairs(eval2) do
+                        if G.P_CENTERS[key2] then enhancements[key2] = true end
+                    end
+                else
+                    if G.P_CENTERS[key] then enhancements[key] = true end
                 end
-            else
-                if G.P_CENTERS[key] then enhancements[key] = true end
             end
         end
+        SMODS.enh_cache:write(card, enhancements)
     end
-
-    if extra_only and enhancements[card.config.center.key] then
-        enhancements[card.config.center.key] = nil
-    end
-    if next(enhancements) then card.extra_enhancements = enhancements end
-    return enhancements
+    return SMODS.enh_cache:read(card, extra_only)
 end
+
+SMODS.enh_cache = {
+    write = function(self, key, value)
+        self.data[key] = value
+    end,
+    read = function(self, key, extra_only)
+        if not self.data[key] then return end
+        local ret = copy_table(self.data[key])
+        if extra_only then ret[key.config.center.key] = nil end
+        return ret
+    end,
+    clear = function(self)
+        self.data = setmetatable({}, { __mode = 'k' })
+    end,
+}
+SMODS.enh_cache:clear()
 
 function SMODS.has_enhancement(card, key)
     if card.config.center.key == key then return true end
-    card.extra_enhancements = nil
     local enhancements = SMODS.get_enhancements(card)
     if enhancements[key] then return true end
     return false
 end
 
 function SMODS.shatters(card)
-    card.extra_enhancements = nil
     local enhancements = SMODS.get_enhancements(card)
     for key, _ in pairs(enhancements) do
         if G.P_CENTERS[key].shatters or key == 'm_glass' then return true end
@@ -954,7 +961,6 @@ end
 function SMODS.has_no_suit(card)
     local is_stone = false
     local is_wild = false
-    card.extra_enhancements = nil
     for k, _ in pairs(SMODS.get_enhancements(card)) do
         if k == 'm_stone' or G.P_CENTERS[k].no_suit then is_stone = true end
         if k == 'm_wild' or G.P_CENTERS[k].any_suit then is_wild = true end
@@ -962,19 +968,16 @@ function SMODS.has_no_suit(card)
     return is_stone and not is_wild
 end
 function SMODS.has_any_suit(card)
-    card.extra_enhancements = nil
     for k, _ in pairs(SMODS.get_enhancements(card)) do
         if k == 'm_wild' or G.P_CENTERS[k].any_suit then return true end
     end
 end
 function SMODS.has_no_rank(card)
-    card.extra_enhancements = nil
     for k, _ in pairs(SMODS.get_enhancements(card)) do
         if k == 'm_stone' or G.P_CENTERS[k].no_rank then return true end
     end
 end
 function SMODS.always_scores(card)
-    card.extra_enhancements = nil
     for k, _ in pairs(SMODS.get_enhancements(card)) do
         if k == 'm_stone' or G.P_CENTERS[k].always_scores then return true end
     end
@@ -985,7 +988,6 @@ function SMODS.always_scores(card)
     end
 end
 function SMODS.never_scores(card)
-    card.extra_enhancements = nil
     for k, _ in pairs(SMODS.get_enhancements(card)) do
         if G.P_CENTERS[k].never_scores then return true end
     end
@@ -1624,7 +1626,6 @@ function SMODS.score_card(card, context)
         context.other_card = nil
         card.lucky_trigger = nil
     end
-    card.extra_enhancements = nil
 end
 
 function SMODS.calculate_main_scoring(context, scoring_hand)
