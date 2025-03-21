@@ -1348,11 +1348,9 @@ SMODS.calculate_repetitions = function(card, context, reps)
                 for rt = 1, #eval.retriggers do
                     context.retrigger_joker = eval.retriggers[rt].retrigger_card
                     local rt_eval, rt_post = eval_card(_card, context)
-                    rt_eval.card = rt_eval.card or _card
                     if next(rt_post) then SMODS.trigger_effects({rt_post}, card) end
-                    for key, value in pairs(eval) do
+                    for key, value in pairs(rt_eval) do
                         if value.repetitions and key ~= 'retriggers' then
-        
                             for h=1, value.repetitions do
                                 value.card = value.card or _card
                                 value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
