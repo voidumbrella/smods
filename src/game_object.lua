@@ -3283,6 +3283,16 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         end
     }
 
+    SMODS.Keybind {
+        key_pressed = 'f5',
+        held_keys = { "lalt" },
+        event = 'pressed',
+        action = function(self)
+            SMODS.save_all_config()
+		    SMODS.restart_game()
+        end
+    }
+
     -------------------------------------------------------------------------------------------------
     ------- API CODE GameObject.Achievement
     -------------------------------------------------------------------------------------------------
