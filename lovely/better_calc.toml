@@ -34,7 +34,7 @@ match_indent = true
 payload = '''
 function eval_card(card, context)
     context = context or {}
-    if card.ability.set ~= 'Joker' and not card:can_calculate(context.ignore_debuff) then return {}, {} end
+    if not card:can_calculate(context.ignore_debuff) then return {}, {} end
     local ret = {}
 '''
 
