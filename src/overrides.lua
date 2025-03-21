@@ -1720,6 +1720,7 @@ end
 function Card:align_h_popup()
 	local focused_ui = self.children.focused_ui and true or false
 	local popup_direction = (self.children.buy_button or (self.area and self.area.config.view_deck) or (self.area and self.area.config.type == 'shop')) and 'cl' or
+							(self.T.y > G.CARD_H*0.8 and self.T.y < G.CARD_H*1.8) and ((self.T.x > G.ROOM.T.w*0.4) and "cl" or "cr") or
 							(self.T.y < G.CARD_H*0.8) and 'bm' or
 							'tm'
 	local sign = 1
