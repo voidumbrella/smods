@@ -2077,7 +2077,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                     trigger = 'after',
                     delay = 0.1,
                     func = function()
-                        assert(SMODS.modify_rank(G.hand.highlighted[i]), 1)
+                        assert(SMODS.modify_rank(G.hand.highlighted[i], 1))
                         return true
                     end
                 }))
