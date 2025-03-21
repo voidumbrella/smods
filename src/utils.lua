@@ -292,6 +292,50 @@ function SMODS.change_base(card, suit, rank)
     return card
 end
 
+-- Modify a card's rank by the specified amount.
+-- Increase rank if amount is positive, decrease rank if negative.
+function SMODS.modify_rank(card, amount)
+    local rank_key = card.base.value
+    local rank_data = SMODS.Ranks[card.base.value]
+    if amount > 0 then
+        for _ = 1, amount do
+            local behavior = rank_data.strength_effect or { fixed = 1, ignore = false, random = false }
+            if behavior.ignore or not next(rank_data.next) then
+                break
+            elseif behavior.random then
+                rank_key = pseudorandom_element(
+                    rank_data.next,
+                    pseudoseed('strength'),
+                    { in_pool = function(key) return SMODS.Ranks[key]:in_pool({ suit = card.base.suit}) end }
+                )
+            else
+                local i = (behavior.fixed and rank_data.next[behavior.fixed]) and behavior.fixed or 1
+                rank_key = rank_data.next[i]
+            end
+            rank_data = SMODS.Ranks[rank_key]
+        end
+    else
+        for _ = 1, -amount do
+            local behavior = rank_data.prev_behavior or { fixed = 1, ignore = false, random = false }
+            if not next(rank_data.prev) or behavior.ignore then
+                break
+            elseif behavior.random then
+                rank_key = pseudorandom_element(
+                    rank_data.prev,
+                    pseudoseed('weakness'),
+                    { in_pool = function(key) return SMODS.Ranks[key]:in_pool({ suit = card.base.suit}) end }
+                )
+            else
+                local i = (behavior.fixed and rank_data.prev[behavior.fixed]) and behavior.fixed or 1
+                rank_key = rank_data.prev[i]
+            end
+            rank_data = SMODS.Ranks[rank_key]
+        end
+    end
+    
+    return SMODS.change_base(card, nil, rank_key)
+end
+
 -- Return an array of all (non-debuffed) jokers or consumables with key `key`.
 -- Debuffed jokers count if `count_debuffed` is true.
 -- This function replaces find_joker(); please use SMODS.find_card() instead

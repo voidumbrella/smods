@@ -282,6 +282,16 @@ function SMODS.juice_up_blind() end
 ---@return string? msg If it failed, a message describing what went wrong. 
 function SMODS.change_base(card, suit, rank) end
 
+--- Modify a card's rank by the specified amount.
+--- Increase rank if amount is positive, decrease rank if negative.
+--- It is recommended to wrap this function in `assert` to prevent unnoticed errors.
+---@nodiscard
+---@param card Card|table
+---@param amount number
+---@return Card|table? cardOrErr If successful the card. If it failed `nil`.
+---@return string? msg If it failed, a message describing what went wrong.  
+function SMODS.modify_rank(card, amount) end
+
 ---@param key string
 ---@param count_debuffed true?
 ---@return Card[]|table[]
