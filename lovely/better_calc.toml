@@ -501,7 +501,7 @@ for _, _area in ipairs(SMODS.get_card_areas('individual')) do
     -- TARGET: add context.other_something identifier to your cards
     local _eval,post = SMODS.eval_individual(_area, {full_hand = G.play.cards, scoring_hand = scoring_hand, scoring_name = text, poker_hands = poker_hands, [other_key] = _card, other_main = _card })
     if next(_eval) then
-        _eval.individual.juice_card = _joker
+        _eval.individual.juice_card = _area.scored_card
         table.insert(effects, _eval)
         for _, v in ipairs(post) do effects[#effects+1] = v end
         if _eval.retriggers then

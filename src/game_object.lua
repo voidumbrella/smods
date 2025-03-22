@@ -1219,7 +1219,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 context.other_consumeable.ability.consumeable.hand_type == context.scoring_name
             then
                 return {
-                    x_mult = card.ability.extra
+                    x_mult = card.ability.extra,
+                    message_card = context.other_consumeable,
                 }
             end
         end,

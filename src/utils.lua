@@ -1416,7 +1416,7 @@ SMODS.calculate_repetitions = function(card, context, reps)
             if value.repetitions and key ~= 'retriggers' then
 
                 for h=1, value.repetitions do
-                    value.card = value.card or _card
+                    value.card = value.card or area.scored_card
                     value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
                     reps[#reps+1] = {key = value}
                 end
@@ -1427,13 +1427,12 @@ SMODS.calculate_repetitions = function(card, context, reps)
             for rt = 1, #eval.retriggers do
                 context.retrigger_joker = eval.retriggers[rt].retrigger_card
                 local rt_eval, rt_post = SMODS.eval_individual(area, context)
-                rt_eval.card = rt_eval.card or _card
                 if next(rt_post) then SMODS.trigger_effects({rt_post}, card) end
-                for key, value in pairs(eval) do
+                for key, value in pairs(rt_eval) do
                     if value.repetitions and key ~= 'retriggers' then
     
                         for h=1, value.repetitions do
-                            value.card = value.card or _card
+                            value.card = value.card or area.scored_card
                             value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
                             reps[#reps+1] = {key = value}
                         end
@@ -1601,7 +1600,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
             if return_table then
                 return_table[#return_table+1] = effects[1]
             else
-                local f = SMODS.trigger_effects(effects, _card)
+                local f = SMODS.trigger_effects(effects, area.scored_card)
                 for k,v in pairs(f) do flags[k] = v end
             end
         end
@@ -1877,7 +1876,7 @@ function SMODS.eval_individual(individual, context)
     if type(eff) ~= 'table' then eff = nil end
 
     if (eff and not eff.no_retrigger) or triggered then
-        if type(eff) == 'table' then eff.juice_card = eff.juice_card or individual.scored_card end
+        --if type(eff) == 'table' then eff.juice_card = eff.juice_card or individual.scored_card end
         ret.individual = eff
 
         if not (context.retrigger_joker_check or context.retrigger_joker) then
