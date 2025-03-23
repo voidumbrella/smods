@@ -1385,7 +1385,7 @@ end
 -- OR another card's self.edition table
 -- immediate = boolean value
 -- silent = boolean value
-function Card:set_edition(edition, immediate, silent)
+function Card:set_edition(edition, immediate, silent, delay)
 	SMODS.enh_cache:write(self, nil)
 	-- Check to see if negative is being removed and reduce card_limit accordingly
 	if (self.added_to_deck or self.joker_added_to_deck_but_debuffed or (self.area == G.hand and not self.debuff)) and self.edition and self.edition.card_limit then
@@ -1531,6 +1531,17 @@ function Card:set_edition(edition, immediate, silent)
 			delay = 0.1,
 			func = function()
 				G.CONTROLLER.locks.edition = false
+				return true
+			end
+		}))
+	end
+
+	if delay then
+		self.delay_edition = true
+		G.E_MANAGER:add_event(Event({
+			trigger = 'immediate',
+			func = function()
+				self.delay_edition = nil
 				return true
 			end
 		}))
