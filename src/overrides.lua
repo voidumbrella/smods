@@ -1489,7 +1489,7 @@ function Card:set_edition(edition, immediate, silent, delay)
 							G.hand.config.real_card_limit = G.hand.config.real_card_limit + v
 						end
 						G.hand.config.card_limit = G.hand.config.card_limit + v
-						if not is_in_pack then
+						if not is_in_pack and G.GAME.blind.in_blind then
 							G.FUNCS.draw_from_deck_to_hand(v)
 						end
 						return true
