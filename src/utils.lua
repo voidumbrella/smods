@@ -1759,48 +1759,17 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
 
         -- context.destroying_card calculations
         context.destroy_card = card
+        context.destroying_card = nil
         if scoring_hand then
-            if SMODS.in_scoring(card, context.scoring_hand) then
+            if in_scoring then
                 context.cardarea = G.play
                 context.destroying_card = card
             else
                 context.cardarea = 'unscored'
-                context.destroying_card = nil
             end
         end
-        for _, area in ipairs(SMODS.get_card_areas('jokers')) do
-            local should_break
-            for _, _card in ipairs(area.cards) do
-                local eval, post = eval_card(_card, context)
-                local self_destroy = false
-                local flags = SMODS.trigger_effects({eval, post}, card)
-                if flags.remove then self_destroy = true end
-                if self_destroy then
-                    destroyed = true
-                    should_break = true
-                    break
-                end
-            end
-            if should_break then break end
-        end
-
-        for _, area in ipairs(SMODS.get_card_areas('individual')) do
-            if destroyed then break end
-            local eval, post = SMODS.eval_individual(area, context)
-            local self_destroy = false
-            local flags = SMODS.trigger_effects({eval, post}, card)
-            if flags.remove then self_destroy = true end
-            if self_destroy then destroyed = true end
-        end
-
-        if scoring_hand and in_scoring and SMODS.has_enhancement(card, 'm_glass') and card:can_calculate() and pseudorandom('glass') < G.GAME.probabilities.normal/(card.ability.name == 'Glass Card' and card.ability.extra or G.P_CENTERS.m_glass.config.extra) then
-            destroyed = true
-        end
-
-        local effects = {eval_card(card, context)}
-        local flags = SMODS.trigger_effects(effects, card)
-        local self_destroy = flags.remove
-        if self_destroy then destroyed = true end
+        local flags = SMODS.calculate_context(context)
+        if flags.remove then destroyed = true end
 
         -- TARGET: card destroyed
 
