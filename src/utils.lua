@@ -610,7 +610,7 @@ V_MT = {
         local minorWildcard = string.match(minor, '%*')
         local patchWildcard = string.match(patch, '%*')
         if (minorFull ~= "" and minor == "") or (patchFull ~= "" and patch == "") then
-            sendWarnMessage('Trailing dot found in version "' .. str .. '".')
+            sendWarnMessage('Trailing dot found in version "' .. str .. '".', "Utils")
             major, minor, patch = -1, 0, 0
         end
         local t = {
@@ -1069,7 +1069,7 @@ end
 local function bufferCardLimitForSmallDS(cards, scaleFactor)
     local cardCount = #cards
     if type(scaleFactor) ~= "number" or scaleFactor <= 0 then
-        sendWarnMessage("scaleFactor must be a positive number")
+        sendWarnMessage("scaleFactor must be a positive number", "Utils")
         return cardCount
     end
     -- Ensure card_limit is always at least the number of cards
