@@ -1555,12 +1555,14 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
             if area == G.play and not context.scoring_hand then goto continue end
             if not args or not args.has_area then context.cardarea = area end
             for _, card in ipairs(area.cards) do
-                if area == G.play then
-                    context.cardarea = SMODS.in_scoring(card, context.scoring_hand) and G.play or 'unscored'
-                elseif scoring_map[card] then
-                    context.cardarea = G.play
-                else
-                    context.cardarea = area
+                if not args or not args.has_area then
+                    if area == G.play then
+                        context.cardarea = SMODS.in_scoring(card, context.scoring_hand) and G.play or 'unscored'
+                    elseif scoring_map[card] then
+                        context.cardarea = G.play
+                    else
+                        context.cardarea = area
+                    end
                 end
             --calculate the played card effects
                 if return_table then
