@@ -1611,7 +1611,7 @@ function poll_edition(_key, _mod, _no_neg, _guaranteed, _options)
 	local weight_i = 0
 	for _, v in ipairs(available_editions) do
 		weight_i = weight_i + v.weight * _modifier
-		-- sendDebugMessage(v.name.." weight is "..v.weight*_modifier)
+		-- sendDebugMessage(v.name.." weight is "..v.weight*_modifier, "EditionAPI")
 		-- sendDebugMessage("Checking for "..v.name.." at "..(1 - (weight_i)/total_weight), "EditionAPI")
 		if edition_poll > 1 - (weight_i) / total_weight then
 			if not (v.name == 'e_negative' and _no_neg) then -- skip return if negative is selected and _no_neg is true
