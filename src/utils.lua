@@ -1787,20 +1787,20 @@ function SMODS.calculate_destroying_cards(context, cards_destroyed, scoring_hand
     end
 end
 
-function SMODS.blueprint_effect(card, blueprint_card, context)
-    if card == blueprint_card then return end
-        context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
-        context.blueprint_card = context.blueprint_card or card
-        if context.blueprint > #G.jokers.cards + 1 then return end
-        local other_joker_ret = blueprint_card:calculate_joker(context)
-        context.blueprint = nil
-        local eff_card = context.blueprint_card or card
-        context.blueprint_card = nil
-        if other_joker_ret then
-            other_joker_ret.card = card
-            other_joker_ret.colour = G.C.BLUE
-            return other_joker_ret
-        end
+function SMODS.blueprint_effect(copier, copied_card, context)
+    if copied_card == copier then return end
+    context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
+    context.blueprint_card = context.blueprint_card or copier
+    if context.blueprint > #G.jokers.cards + 1 then return end
+    local other_joker_ret = copied_card:calculate_joker(context)
+    context.blueprint = nil
+    local eff_card = context.blueprint_card or copier
+    context.blueprint_card = nil
+    if other_joker_ret then
+        other_joker_ret.card = copier
+        other_joker_ret.colour = G.C.BLUE
+        return other_joker_ret
+    end
 end
 
 function SMODS.get_card_areas(_type, _context)
