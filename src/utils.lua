@@ -1500,7 +1500,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
     local flags = {}
     if _type == 'jokers' then
         for _, area in ipairs(SMODS.get_card_areas('jokers')) do
-            if args and args.joker_area then context.cardarea = area end
+            if args and args.joker_area and not args.has_area then context.cardarea = area end
             for _, _card in ipairs(area.cards) do
                 --calculate the joker effects
                 local eval, post = eval_card(_card, context)
@@ -1553,7 +1553,7 @@ function SMODS.calculate_card_areas(_type, context, return_table, args)
         end
         for _, area in ipairs(SMODS.get_card_areas('playing_cards')) do
             if area == G.play and not context.scoring_hand then goto continue end
-            context.cardarea = area
+            if not args or not args.has_area then context.cardarea = area end
             for _, card in ipairs(area.cards) do
                 if area == G.play then
                     context.cardarea = SMODS.in_scoring(card, context.scoring_hand) and G.play or 'unscored'
@@ -1611,12 +1611,13 @@ end
 -- Used to calculate contexts across G.jokers, scoring_hand (if present), G.play and G.GAME.selected_back
 -- Hook this function to add different areas to MOST calculations
 function SMODS.calculate_context(context, return_table)
+    local has_area = context.cardarea and true or nil
     local flags = {}
     context.main_eval = true
-    flags[#flags+1] = SMODS.calculate_card_areas('jokers', context, return_table, { joker_area = true })
+    flags[#flags+1] = SMODS.calculate_card_areas('jokers', context, return_table, { joker_area = true, has_area = has_area })
     context.main_eval = nil
     
-    flags[#flags+1] = SMODS.calculate_card_areas('playing_cards', context, return_table)
+    flags[#flags+1] = SMODS.calculate_card_areas('playing_cards', context, return_table, { has_area = has_area })
     flags[#flags+1] = SMODS.calculate_card_areas('individual', context, return_table)
     if not return_table then
         local ret = {}
