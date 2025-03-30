@@ -1345,31 +1345,46 @@ SMODS.calculation_keys = {
     'level_up', 'func', 'extra',
 }
 
+SMODS.insert_repetitions = function(ret, eval, effect_card, _type)
+    repeat
+        eval.repetitions = eval.repetitions or 0
+        if eval.repetitions <= 0 then
+            sendWarnMessage('Found effect table with no assigned repetitions during repetition check')
+        end
+        local effect = {}
+        for k,v in pairs(eval) do
+            if k ~= 'extra' then effect[k] = v end
+        end
+        if _type == 'joker_retrigger' then
+            effect.retrigger_card = effect_card
+            effect.message_card = effect.message_card or effect_card
+        elseif _type == 'individual_retrigger' then
+            effect.retrigger_card = effect_card.object
+            effect.message_card = effect.message_card or effect_card.scored_card
+        elseif not _type then
+            effect.card = effect.card or effect_card
+        end
+        effect.message = effect.message or (not effect.remove_default_message and localize('k_again_ex'))
+        for h=1, effect.repetitions do
+            table.insert(ret, { key = effect})
+        end
+        eval = eval.extra
+    until not eval
+end
+
 SMODS.calculate_repetitions = function(card, context, reps)
     -- From the card
     context.repetition_only = true
     local eval = eval_card(card, context)
-    for key, value in pairs(eval) do
-        if value.repetitions then
-            for h=1, value.repetitions do
-                value.card = value.card or card
-                value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
-                reps[#reps+1] = {key = value}
-            end
-        end
+    for _, value in pairs(eval) do
+        SMODS.insert_repetitions(reps, value, card)
     end
     -- Quantum enhancement support :cat_owl:
     local quantum_eval = {}
     SMODS.calculate_quantum_enhancements(card, quantum_eval, context)
     for _, eval in ipairs(quantum_eval) do
-        for key, value in pairs(eval) do
-            if value.repetitions then
-                for h=1, value.repetitions do
-                    value.card = value.card or card
-                    value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
-                    reps[#reps+1] = {key = value}
-                end
-            end
+        for _, value in pairs(eval) do
+            SMODS.insert_repetitions(reps, value, card)
         end
     end
     context.repetition_only = nil
@@ -1380,13 +1395,8 @@ SMODS.calculate_repetitions = function(card, context, reps)
             local eval, post = eval_card(_card, context)
             if next(post) then SMODS.trigger_effects({post}, card) end
             for key, value in pairs(eval) do
-                if value.repetitions and key ~= 'retriggers' then
-
-                    for h=1, value.repetitions do
-                        value.card = value.card or _card
-                        value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
-                        reps[#reps+1] = {key = value}
-                    end
+                if key ~= 'retriggers' then
+                    SMODS.insert_repetitions(reps, value, _card)
                 end
             end
             if eval.retriggers then
@@ -1396,12 +1406,8 @@ SMODS.calculate_repetitions = function(card, context, reps)
                     local rt_eval, rt_post = eval_card(_card, context)
                     if next(rt_post) then SMODS.trigger_effects({rt_post}, card) end
                     for key, value in pairs(rt_eval) do
-                        if value.repetitions and key ~= 'retriggers' then
-                            for h=1, value.repetitions do
-                                value.card = value.card or _card
-                                value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
-                                reps[#reps+1] = {key = value}
-                            end
+                        if key ~= 'retriggers' then
+                            SMODS.insert_repetitions(reps, value, _card)
                         end
                     end
                 end
@@ -1413,13 +1419,8 @@ SMODS.calculate_repetitions = function(card, context, reps)
         local eval, post = SMODS.eval_individual(area, context)
         if next(post) then SMODS.trigger_effects({post}, card) end
         for key, value in pairs(eval) do
-            if value.repetitions and key ~= 'retriggers' then
-
-                for h=1, value.repetitions do
-                    value.card = value.card or area.scored_card
-                    value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
-                    reps[#reps+1] = {key = value}
-                end
+            if key ~= 'retriggers' then
+                SMODS.insert_repetitions(reps, value, area.scored_card)
             end
         end
         if eval.retriggers then
@@ -1429,13 +1430,8 @@ SMODS.calculate_repetitions = function(card, context, reps)
                 local rt_eval, rt_post = SMODS.eval_individual(area, context)
                 if next(rt_post) then SMODS.trigger_effects({rt_post}, card) end
                 for key, value in pairs(rt_eval) do
-                    if value.repetitions and key ~= 'retriggers' then
-    
-                        for h=1, value.repetitions do
-                            value.card = value.card or area.scored_card
-                            value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
-                            reps[#reps+1] = {key = value}
-                        end
+                    if key ~= 'retriggers' then
+                        SMODS.insert_repetitions(reps, value, area.scored_card)
                     end
                 end
             end
@@ -1453,14 +1449,7 @@ SMODS.calculate_retriggers = function(card, context, _ret)
             local eval, post = eval_card(_card, {retrigger_joker_check = true, other_card = card, other_context = context, other_ret = _ret})
             if next(post) then SMODS.trigger_effects({post}, _card) end
             for key, value in pairs(eval) do
-                if value.repetitions then
-                    for h=1, value.repetitions do
-                        value.retrigger_card = _card
-                        value.message_card = value.message_card or _card
-                        value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
-                        retriggers[#retriggers + 1] = value
-                    end
-                end
+                SMODS.insert_repetitions(retriggers, value, _card, 'joker_retrigger')
             end
         end
     end
@@ -1470,12 +1459,7 @@ SMODS.calculate_retriggers = function(card, context, _ret)
         if next(post) then SMODS.trigger_effects({post}, _card) end
         for key, value in pairs(eval) do
             if value.repetitions then
-                for h=1, value.repetitions do
-                    value.retrigger_card = G.GAME.selected_back
-                    value.message_card = value.message_card or value.scored_card
-                    value.message = value.message or (not value.remove_default_message and localize('k_again_ex'))
-                    retriggers[#retriggers + 1] = value
-                end
+                SMODS.insert_repetitions(retriggers, value, area, 'individual_retrigger')
             end
         end
     end
