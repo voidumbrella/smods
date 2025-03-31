@@ -1385,7 +1385,8 @@ end
 -- OR another card's self.edition table
 -- immediate = boolean value
 -- silent = boolean value
-function Card:set_edition(edition, immediate, silent)
+function Card:set_edition(edition, immediate, silent, delay)
+	SMODS.enh_cache:write(self, nil)
 	-- Check to see if negative is being removed and reduce card_limit accordingly
 	if (self.added_to_deck or self.joker_added_to_deck_but_debuffed or (self.area == G.hand and not self.debuff)) and self.edition and self.edition.card_limit then
 		if self.ability.consumeable and self.area == G.consumeables then
@@ -1488,7 +1489,7 @@ function Card:set_edition(edition, immediate, silent)
 							G.hand.config.real_card_limit = G.hand.config.real_card_limit + v
 						end
 						G.hand.config.card_limit = G.hand.config.card_limit + v
-						if not is_in_pack then
+						if not is_in_pack and G.GAME.blind.in_blind then
 							G.FUNCS.draw_from_deck_to_hand(v)
 						end
 						return true
@@ -1530,6 +1531,17 @@ function Card:set_edition(edition, immediate, silent)
 			delay = 0.1,
 			func = function()
 				G.CONTROLLER.locks.edition = false
+				return true
+			end
+		}))
+	end
+
+	if delay then
+		self.delay_edition = true
+		G.E_MANAGER:add_event(Event({
+			trigger = 'immediate',
+			func = function()
+				self.delay_edition = nil
 				return true
 			end
 		}))
@@ -1599,7 +1611,7 @@ function poll_edition(_key, _mod, _no_neg, _guaranteed, _options)
 	local weight_i = 0
 	for _, v in ipairs(available_editions) do
 		weight_i = weight_i + v.weight * _modifier
-		-- sendDebugMessage(v.name.." weight is "..v.weight*_modifier)
+		-- sendDebugMessage(v.name.." weight is "..v.weight*_modifier, "EditionAPI")
 		-- sendDebugMessage("Checking for "..v.name.." at "..(1 - (weight_i)/total_weight), "EditionAPI")
 		if edition_poll > 1 - (weight_i) / total_weight then
 			if not (v.name == 'e_negative' and _no_neg) then -- skip return if negative is selected and _no_neg is true
@@ -1719,6 +1731,7 @@ end
 function Card:align_h_popup()
 	local focused_ui = self.children.focused_ui and true or false
 	local popup_direction = (self.children.buy_button or (self.area and self.area.config.view_deck) or (self.area and self.area.config.type == 'shop')) and 'cl' or
+							(self.T.y > G.CARD_H*0.8 and self.T.y < G.CARD_H*1.8) and ((self.T.x > G.ROOM.T.w*0.4) and "cl" or "cr") or
 							(self.T.y < G.CARD_H*0.8) and 'bm' or
 							'tm'
 	local sign = 1

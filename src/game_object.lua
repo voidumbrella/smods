@@ -765,7 +765,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
             G.C.RARITY[self.key] = self.badge_colour
             -- Called every frame, moving deprecated prints here
             if self.gradient and type(self.gradient) == "function" then
-                sendWarnMessage(('Found `gradient` function on SMODS.Rarity object "%s". This field is deprecated; please use `SMODS.Gradient` API instead.'):format(obj.key), 'Rarity')
+                sendWarnMessage(('Found `gradient` function on SMODS.Rarity object "%s". This field is deprecated; please use `SMODS.Gradient` API instead.'):format(self.key), 'Rarity')
             end
         end,
         process_loc_text = function(self)
@@ -1219,7 +1219,8 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 context.other_consumeable.ability.consumeable.hand_type == context.scoring_name
             then
                 return {
-                    x_mult = card.ability.extra
+                    x_mult = card.ability.extra,
+                    message_card = context.other_consumeable,
                 }
             end
         end,
@@ -1940,19 +1941,19 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                 else
                     table.insert(self.obj_buffer, self.key)
                 end
-                for _,v in ipairs(self.next) do
-                    local other = self.obj_table[v]
-                    if other then
-                        other.prev = other.prev or {}
-                        table.insert(other.prev, self.key)
-                    end
-                end
+                
             end
         end,
         process_loc_text = function(self)
             SMODS.process_loc_text(G.localization.misc.ranks, self.key, self.loc_txt, 'name')
         end,
         inject = function(self)
+            for _,v in ipairs(self.next) do
+                local other = self.obj_table[v]
+                if other then
+                    table.insert(other.prev, self.key)
+                end
+            end
             for _, suit in pairs(SMODS.Suits) do
                 SMODS.inject_p_card(suit, self)
             end
@@ -2077,20 +2078,7 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
                     trigger = 'after',
                     delay = 0.1,
                     func = function()
-                        local _card = G.hand.highlighted[i]
-                        local rank_data = SMODS.Ranks[_card.base.value]
-                        local behavior = rank_data.strength_effect or { fixed = 1, ignore = false, random = false }
-                        local new_rank
-                        if behavior.ignore or not next(rank_data.next) then
-                            return true
-                        elseif behavior.random then
-                            -- TODO doesn't respect in_pool
-                            new_rank = pseudorandom_element(rank_data.next, pseudoseed('strength'))
-                        else
-                            local ii = (behavior.fixed and rank_data.next[behavior.fixed]) and behavior.fixed or 1
-                            new_rank = rank_data.next[ii]
-                        end
-                        assert(SMODS.change_base(_card, nil, new_rank))
+                        assert(SMODS.modify_rank(G.hand.highlighted[i], 1))
                         return true
                     end
                 }))
@@ -3038,6 +3026,14 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
     --     end
     -- })
 
+    SMODS.Enhancement:take_ownership('glass', {
+        calculate = function(self, card, context)
+            if context.destroy_card and context.cardarea == G.play and context.destroy_card == card and pseudorandom('glass') < G.GAME.probabilities.normal/card.ability.extra then
+                return { remove = true }
+            end
+        end,
+    })
+
     -------------------------------------------------------------------------------------------------
     ----- API CODE GameObject.Shader
     -------------------------------------------------------------------------------------------------
@@ -3277,6 +3273,16 @@ Set `prefix_config.key = false` on your object instead.]]):format(obj.key), obj.
         key_pressed = 'm',
         event = 'held',
         held_duration = 1.1,
+        action = function(self)
+            SMODS.save_all_config()
+		    SMODS.restart_game()
+        end
+    }
+
+        SMODS.Keybind {
+        key_pressed = 'f5',
+        held_keys = { "lalt" },
+        event = 'pressed',
         action = function(self)
             SMODS.save_all_config()
 		    SMODS.restart_game()

@@ -82,10 +82,14 @@ function SMODS.merge_lists(...) end
 ---@field quantum_enhancements? boolean Enables "Quantum Enhancement" contexts. Cards can count as having multiple enhancements at once. 
 ---@field retrigger_joker? boolean Enables "Joker Retrigger" contexts. Jokers can be retriggered by other jokers or effects. 
 ---@field post_trigger? boolean Enables "Post Trigger" contexts. Allows calculating effects after a Joker has been calculated. 
----@field cardarea? table<string, boolean> Enables additional CardArea calculation. Currently supports: `deck`, `discards`, `unscored`. 
+---@field cardareas? SMODS.optional_features.cardareas Enables additional CardArea calculation. 
+
+---@class SMODS.optional_features.cardareas: table
+---@field deck? boolean Enables "Deck Calculation". Decks are included in calculation.
+---@field discard? boolean Enables "Discard Calculation". Discarded cards are included in calculation.
 
 ---@type SMODS.optional_features
-SMODS.optional_features = { cardarea = {} }
+SMODS.optional_features = { cardareas = {} }
 
 --- Inserts all SMODS features enabled by loaded mods into `SMODS.optional_features`. 
 function SMODS.get_optional_features() end
@@ -152,12 +156,12 @@ function SMODS.calculate_retriggers(card, context, _ret) end
 ---@return table[] reps
 function SMODS.calculate_repetitions(card, context, reps) end
 
----@param card Card|table
----@param blueprint_card Card|table 
+---@param copier Card|table
+---@param copied_card Card|table
 ---@param context CalcContext|table
 ---@return table?
---- Calculates blueprint-like effects.
-function SMODS.blueprint_effect(card, blueprint_card, context) end
+--- Helper function to copy the ability of another joker. Useful for implementing Blueprint-like jokers.
+function SMODS.blueprint_effect(copier, copied_card, context) end
 
 ---@param _type string
 ---@param _context string
@@ -281,6 +285,16 @@ function SMODS.juice_up_blind() end
 ---@return Card|table? cardOrErr If successful the card. If it failed `nil`.
 ---@return string? msg If it failed, a message describing what went wrong. 
 function SMODS.change_base(card, suit, rank) end
+
+--- Modify a card's rank by the specified amount.
+--- Increase rank if amount is positive, decrease rank if negative.
+--- It is recommended to wrap this function in `assert` to prevent unnoticed errors.
+---@nodiscard
+---@param card Card|table
+---@param amount number
+---@return Card|table? cardOrErr If successful the card. If it failed `nil`.
+---@return string? msg If it failed, a message describing what went wrong.  
+function SMODS.modify_rank(card, amount) end
 
 ---@param key string
 ---@param count_debuffed true?
